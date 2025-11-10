@@ -187,11 +187,11 @@ export default function Dashboard() {
         </motion.h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8">
           {featuredAlbums.map((album, i) => (
-            <Link key={album.id || i} href={`/albums/${encodeURIComponent(album.name)}`}>
+            <Link key={album.id || i} href={`/albums/details/${encodeURIComponent(album.id)}`}>
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 transition={{ duration: 0.3 }}
-                className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-md hover:shadow-lg"
+                className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-md hover:shadow-lg cursor-pointer"
               >
                 <img
                   src={album.image?.[2]?.url || album.image?.[1]?.url}
@@ -217,7 +217,7 @@ export default function Dashboard() {
 
       {/* 🌙 Footer */}
       <footer className="text-center text-gray-600 text-sm py-10 border-t border-gray-200">
-        Made with 💙 by Abhishek Kumar — Serenity
+        Serenity 💙 
       </footer>
     </div>
   );
