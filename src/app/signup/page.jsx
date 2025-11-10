@@ -40,30 +40,16 @@ export default function Signup() {
   };
 
   return (
-    <div className="relative flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-gray-950 to-black overflow-hidden text-white">
-      {/* 🌈 Glowing background accents */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 0.6 }}
-        transition={{ duration: 1.5 }}
-        className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(0,255,255,0.15),transparent_60%)]"
-      />
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 0.6 }}
-        transition={{ duration: 2 }}
-        className="absolute inset-0 bg-[radial-gradient(circle_at_80%_80%,rgba(0,150,255,0.15),transparent_60%)]"
-      />
-
+    <div className="relative flex items-center justify-center min-h-screen bg-white overflow-hidden text-black">
       {/* ✨ Signup Card */}
       <motion.form
         onSubmit={handleSubmit}
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="relative z-10 bg-white/10 backdrop-blur-2xl border border-white/10 shadow-[0_0_40px_rgba(0,255,255,0.1)] rounded-2xl p-8 w-[90%] max-w-md"
+        className="relative z-10 bg-white border border-gray-300 shadow-lg rounded-2xl p-8 w-[90%] max-w-md"
       >
-        <h2 className="text-3xl font-bold mb-6 text-center bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+        <h2 className="text-3xl font-bold mb-6 text-center text-[#0097b2]">
           Create Your Account ✨
         </h2>
 
@@ -71,7 +57,7 @@ export default function Signup() {
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="text-red-400 text-sm text-center mb-4"
+            className="text-red-600 text-sm text-center mb-4"
           >
             {error}
           </motion.p>
@@ -84,7 +70,7 @@ export default function Signup() {
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
             required
-            className="w-full px-4 py-2 rounded-full bg-white/5 border border-white/10 placeholder-gray-400 text-white focus:ring-2 focus:ring-cyan-400 focus:outline-none"
+            className="w-full px-4 py-2 rounded-full bg-white border border-gray-300 placeholder-gray-500 text-black focus:ring-2 focus:ring-[#0097b2] focus:outline-none"
           />
 
           <input
@@ -93,7 +79,7 @@ export default function Signup() {
             value={form.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
             required
-            className="w-full px-4 py-2 rounded-full bg-white/5 border border-white/10 placeholder-gray-400 text-white focus:ring-2 focus:ring-cyan-400 focus:outline-none"
+            className="w-full px-4 py-2 rounded-full bg-white border border-gray-300 placeholder-gray-500 text-black focus:ring-2 focus:ring-[#0097b2] focus:outline-none"
           />
 
           <input
@@ -102,23 +88,23 @@ export default function Signup() {
             value={form.password}
             onChange={(e) => setForm({ ...form, password: e.target.value })}
             required
-            className="w-full px-4 py-2 rounded-full bg-white/5 border border-white/10 placeholder-gray-400 text-white focus:ring-2 focus:ring-cyan-400 focus:outline-none"
+            className="w-full px-4 py-2 rounded-full bg-white border border-gray-300 placeholder-gray-500 text-black focus:ring-2 focus:ring-[#0097b2] focus:outline-none"
           />
 
           <motion.button
             whileTap={{ scale: 0.95 }}
             disabled={loading}
-            className="w-full py-2 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-blue-500 hover:to-cyan-500 transition-all text-white font-semibold mt-2 shadow-[0_0_20px_rgba(0,255,255,0.2)] hover:shadow-[0_0_25px_rgba(0,255,255,0.4)]"
+            className="w-full py-2 rounded-full bg-[#0097b2] hover:bg-[#007a93] transition-all text-white font-semibold mt-2"
           >
             {loading ? "Signing up..." : "Sign Up"}
           </motion.button>
         </div>
 
-        <p className="text-sm text-gray-400 text-center mt-6">
+        <p className="text-sm text-gray-600 text-center mt-6">
           Already have an account?{" "}
           <a
             href="/login"
-            className="text-cyan-400 hover:underline hover:text-cyan-300"
+            className="text-[#0097b2] hover:underline"
           >
             Log in
           </a>

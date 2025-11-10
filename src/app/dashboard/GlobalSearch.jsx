@@ -103,21 +103,13 @@ export default function GlobalSearch() {
 
   return (
     <section className="mt-20 relative">
-      {/* 🌌 Ambient Glow Background */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 0.4 }}
-        transition={{ duration: 1.5, ease: "easeInOut" }}
-        className="absolute inset-0 bg-gradient-to-br from-blue-900 via-indigo-800 to-cyan-700 blur-3xl opacity-25 pointer-events-none"
-      />
-
       {/* 🔍 Search Header */}
       <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 text-center sm:text-left">
         <motion.h2
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-4xl font-extrabold bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-400 bg-clip-text text-transparent"
+          className="text-4xl font-extrabold text-[#0097b2]"
         >
           Explore Music 🌐
         </motion.h2>
@@ -129,11 +121,11 @@ export default function GlobalSearch() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && searchAll()}
-            className="border border-white/10 bg-white/5 backdrop-blur-md text-white px-5 py-2 rounded-full focus:outline-none focus:ring-2 focus:ring-cyan-400 w-80 placeholder-gray-400"
+            className="border border-gray-300 bg-white text-black px-5 py-2 rounded-full focus:outline-none focus:ring-2 focus:ring-[#0097b2] w-80 placeholder-gray-500"
           />
           <button
             onClick={searchAll}
-            className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-blue-500 hover:to-cyan-500 text-white font-semibold px-6 py-2 rounded-full transition-all shadow-[0_0_20px_rgba(0,255,255,0.2)] hover:shadow-[0_0_30px_rgba(0,255,255,0.4)]"
+            className="bg-[#0097b2] hover:bg-[#007a93] text-white font-semibold px-6 py-2 rounded-full transition-all"
           >
             {loading ? "Searching..." : "Search"}
           </button>
@@ -149,7 +141,7 @@ export default function GlobalSearch() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8 }}
           >
-            <h3 className="text-3xl font-semibold mb-6 bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+            <h3 className="text-3xl font-semibold mb-6 text-[#0097b2]">
               🎧 Songs
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8">
@@ -158,16 +150,16 @@ export default function GlobalSearch() {
                   key={song.id || i}
                   whileHover={{ scale: 1.05 }}
                   transition={{ type: "spring", stiffness: 200, damping: 15 }}
-                  className="group relative bg-white/10 backdrop-blur-lg border border-white/10 rounded-2xl overflow-hidden shadow-lg hover:shadow-[0_0_40px_rgba(0,255,255,0.25)] transition-all"
+                  className="group relative bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all"
                 >
                   {/* ❤️ Favorite */}
                   <button
                     onClick={() => toggleFavorite(song)}
                     disabled={favLoading}
-                    className={`absolute z-100 top-3 right-3 p-2 rounded-full backdrop-blur-md ${
+                    className={`absolute z-100 top-3 right-3 p-2 rounded-full ${
                       isFavorite(song.id)
                         ? "bg-red-500 text-white"
-                        : "bg-white/10 text-gray-300 hover:bg-red-500 hover:text-white"
+                        : "bg-gray-100 text-gray-600 hover:bg-red-500 hover:text-white"
                     }`}
                   >
                     {isFavorite(song.id) ? "❤️" : "🤍"}
@@ -180,13 +172,13 @@ export default function GlobalSearch() {
                   />
 
                   <div className="p-4 text-center">
-                    <h4 className="font-semibold truncate">{song.name}</h4>
-                    <p className="text-gray-400 text-sm truncate">
+                    <h4 className="font-semibold truncate text-black">{song.name}</h4>
+                    <p className="text-gray-600 text-sm truncate">
                       {song.primaryArtists || "Unknown Artist"}
                     </p>
                     <button
                       onClick={() => playSong(song)}
-                      className="mt-3 w-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-4 py-2 rounded-full text-sm font-semibold hover:from-blue-500 hover:to-cyan-500 transition-all"
+                      className="mt-3 w-full bg-[#0097b2] hover:bg-[#007a93] text-white px-4 py-2 rounded-full text-sm font-semibold transition-all"
                     >
                       ▶ Play
                     </button>
@@ -204,7 +196,7 @@ export default function GlobalSearch() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8 }}
           >
-            <h3 className="text-3xl font-semibold mb-6 bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">
+            <h3 className="text-3xl font-semibold mb-6 text-[#0097b2]">
               💿 Albums
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8">
@@ -212,7 +204,7 @@ export default function GlobalSearch() {
                 <motion.div
                   key={album.id || i}
                   whileHover={{ scale: 1.05 }}
-                  className="bg-white/10 backdrop-blur-lg border border-white/10 rounded-2xl overflow-hidden shadow-lg hover:shadow-[0_0_40px_rgba(0,255,255,0.25)] transition-all"
+                  className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all"
                 >
                   <img
                     src={album.image?.[1]?.url || album.image?.[0]?.url || "/default-album.jpg"}
@@ -220,8 +212,8 @@ export default function GlobalSearch() {
                     className="w-full h-48 object-cover hover:scale-105 transition-transform duration-500"
                   />
                   <div className="p-4 text-center">
-                    <h4 className="font-semibold truncate">{album.name}</h4>
-                    <p className="text-gray-400 text-sm truncate">
+                    <h4 className="font-semibold truncate text-black">{album.name}</h4>
+                    <p className="text-gray-600 text-sm truncate">
                       {album.primaryArtists || "Unknown Artist"}
                     </p>
                   </div>
@@ -238,7 +230,7 @@ export default function GlobalSearch() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8 }}
           >
-            <h3 className="text-3xl font-semibold mb-6 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+            <h3 className="text-3xl font-semibold mb-6 text-[#0097b2]">
               🎶 Playlists
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8">
@@ -246,7 +238,7 @@ export default function GlobalSearch() {
                 <motion.div
                   key={pl.id || i}
                   whileHover={{ scale: 1.05 }}
-                  className="bg-white/10 backdrop-blur-lg border border-white/10 rounded-2xl overflow-hidden shadow-lg hover:shadow-[0_0_40px_rgba(255,200,255,0.25)] transition-all"
+                  className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all"
                 >
                   <img
                     src={pl.image?.[1]?.url || pl.image?.[0]?.url || "/default-playlist.jpg"}
@@ -254,8 +246,8 @@ export default function GlobalSearch() {
                     className="w-full h-48 object-cover hover:scale-105 transition-transform duration-500"
                   />
                   <div className="p-4 text-center">
-                    <h4 className="font-semibold truncate">{pl.name}</h4>
-                    <p className="text-gray-400 text-sm truncate">
+                    <h4 className="font-semibold truncate text-black">{pl.name}</h4>
+                    <p className="text-gray-600 text-sm truncate">
                       {pl.language || "Mixed Languages"}
                     </p>
                   </div>
@@ -270,7 +262,7 @@ export default function GlobalSearch() {
           !results.songs.length &&
           !results.albums.length &&
           !results.playlists.length && (
-            <p className="text-gray-400 text-center text-lg mt-20">
+            <p className="text-gray-600 text-center text-lg mt-20">
               Start typing to explore your favorite music 🎶
             </p>
           )}

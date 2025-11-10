@@ -73,22 +73,22 @@ export default function OnboardingPage() {
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white flex flex-col items-center justify-center p-6">
+    <div className="min-h-screen bg-white text-black flex flex-col items-center justify-center p-6">
       <motion.h1
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-4xl font-bold mb-6 text-center bg-gradient-to-r from-green-400 via-emerald-400 to-teal-500 bg-clip-text text-transparent"
+        className="text-4xl font-bold mb-6 text-center text-[#0097b2]"
       >
         🎵 Personalize Your Music Taste
       </motion.h1>
 
-      <p className="text-gray-400 mb-10 text-center max-w-md">
+      <p className="text-gray-600 mb-10 text-center max-w-md">
         Select your favorite genres and artists to help us tailor your dashboard experience.
       </p>
 
       {/* Genre Selection */}
       <div className="max-w-xl mb-10">
-        <h2 className="text-xl mb-3 font-semibold">Pick your favorite genres</h2>
+        <h2 className="text-xl mb-3 font-semibold text-black">Pick your favorite genres</h2>
         <div className="flex flex-wrap gap-3">
           {GENRES.map((g) => (
             <button
@@ -96,8 +96,8 @@ export default function OnboardingPage() {
               onClick={() => toggleSelection("genre", g)}
               className={`px-4 py-2 rounded-full text-sm border transition-all ${
                 genres.includes(g)
-                  ? "bg-emerald-500 border-emerald-400 text-white"
-                  : "border-gray-600 text-gray-300 hover:bg-gray-800"
+                  ? "bg-[#0097b2] border-[#0097b2] text-white"
+                  : "border-gray-300 text-black hover:bg-gray-100"
               }`}
             >
               {g}
@@ -108,7 +108,7 @@ export default function OnboardingPage() {
 
       {/* Artist Selection */}
       <div className="max-w-xl mb-10">
-        <h2 className="text-xl mb-3 font-semibold">Select your favorite artists</h2>
+        <h2 className="text-xl mb-3 font-semibold text-black">Select your favorite artists</h2>
         <div className="flex flex-wrap gap-3">
           {ARTISTS.map((a) => (
             <button
@@ -116,8 +116,8 @@ export default function OnboardingPage() {
               onClick={() => toggleSelection("artist", a)}
               className={`px-4 py-2 rounded-full text-sm border transition-all ${
                 artists.includes(a)
-                  ? "bg-green-500 border-green-400 text-white"
-                  : "border-gray-600 text-gray-300 hover:bg-gray-800"
+                  ? "bg-[#0097b2] border-[#0097b2] text-white"
+                  : "border-gray-300 text-black hover:bg-gray-100"
               }`}
             >
               {a}
@@ -131,7 +131,7 @@ export default function OnboardingPage() {
         whileHover={{ scale: 1.05 }}
         onClick={handleSubmit}
         disabled={loading}
-        className="bg-gradient-to-r from-green-500 to-emerald-600 px-8 py-3 rounded-full font-semibold hover:from-green-400 hover:to-emerald-500 transition-all disabled:opacity-50"
+        className="bg-[#0097b2] hover:bg-[#007a93] px-8 py-3 rounded-full font-semibold text-white transition-all disabled:opacity-50"
       >
         {loading ? "Saving..." : "Continue →"}
       </motion.button>

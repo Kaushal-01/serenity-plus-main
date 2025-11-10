@@ -22,13 +22,13 @@ export default function AudioRecognitionButton() {
         onClick={handleClick}
         onHoverStart={() => setIsHovered(true)}
         onHoverEnd={() => setIsHovered(false)}
-        className="relative w-16 h-16 rounded-full bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 shadow-lg shadow-purple-500/50 hover:shadow-purple-500/80 transition-all duration-300 flex items-center justify-center overflow-hidden"
+        className="relative w-16 h-16 rounded-full bg-[#0097b2] shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center overflow-hidden hover:bg-[#007a93]"
         whileHover={{ scale: 1.1, rotate: 5 }}
         whileTap={{ scale: 0.95 }}
       >
         {/* Animated background pulse */}
         <motion.div
-          className="absolute inset-0 bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-600"
+          className="absolute inset-0 bg-[#00b8d4]"
           animate={{
             scale: [1, 1.2, 1],
             opacity: [0.3, 0.6, 0.3],
@@ -71,7 +71,7 @@ export default function AudioRecognitionButton() {
       <motion.div
         initial={{ opacity: 0, x: 10 }}
         animate={{ opacity: isHovered ? 1 : 0, x: isHovered ? 0 : 10 }}
-        className="absolute right-20 top-1/2 -translate-y-1/2 bg-black/90 text-white px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap pointer-events-none shadow-xl backdrop-blur-sm border border-white/10"
+        className="absolute right-20 top-1/2 -translate-y-1/2 bg-[#0097b2] text-white px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap pointer-events-none shadow-lg border border-gray-200"
       >
         Recognize Song 🎵
       </motion.div>

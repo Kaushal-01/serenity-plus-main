@@ -93,22 +93,22 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#05091a] via-[#0b1030] to-[#000000] text-white overflow-x-hidden mt-20">
+    <div className="min-h-screen bg-white text-black overflow-x-hidden mt-20">
       {/* 🎵 Header */}
-      <header className="px-10 md:px-16 py-10 flex flex-col md:flex-row justify-between items-center gap-4 backdrop-blur-md bg-white/5 rounded-b-3xl border-b border-white/10">
+      <header className="px-10 md:px-16 py-10 flex flex-col md:flex-row justify-between items-center gap-4 bg-gray-50 rounded-b-3xl border-b border-gray-200">
         <motion.h1
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent"
+          className="text-4xl font-extrabold tracking-tight text-black"
         >
-           Welcome back, <span className="font-semibold text-white">{userName}👋</span> 
+           Welcome back, <span className="font-semibold text-[#0097b2]">{userName}👋</span> 
         </motion.h1>
       </header>
 
       {/* 🌈 Mood Selector */}
       <section className="px-10 md:px-16 py-16 text-center">
-        <h2 className="text-3xl md:text-4xl font-bold mb-8 bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+        <h2 className="text-3xl md:text-4xl font-bold mb-8 text-[#0097b2]">
           Tap Your Mood 🎧
         </h2>
         <div className="flex flex-wrap justify-center gap-6">
@@ -118,10 +118,10 @@ export default function Dashboard() {
               onClick={() => router.push(`/dashboard/${name.toLowerCase()}`)}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className={`group relative w-40 h-40 rounded-3xl overflow-hidden transition-all duration-300 bg-gradient-to-br ${gradient} shadow-[0_0_25px_rgba(0,255,200,0.2)] hover:shadow-[0_0_40px_rgba(0,255,200,0.35)]`}
+              className={`group relative w-40 h-40 rounded-3xl overflow-hidden transition-all duration-300 bg-gradient-to-br ${gradient} shadow-md hover:shadow-lg border border-gray-200`}
             >
-              <div className="absolute inset-0 bg-black/40 backdrop-blur-sm group-hover:backdrop-blur-2xl transition-all"></div>
-              <div className="relative z-10 flex flex-col items-center justify-center h-full">
+              <div className="absolute inset-0 bg-white/30 group-hover:bg-white/20 transition-all"></div>
+              <div className="relative z-10 flex flex-col items-center justify-center h-full text-black">
                 <span className="text-4xl mb-2">{emoji}</span>
                 <span className="text-lg font-semibold">{name}</span>
               </div>
@@ -135,13 +135,13 @@ export default function Dashboard() {
         <motion.h2
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-3xl font-bold mb-8 bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent"
+          className="text-3xl font-bold mb-8 text-[#0097b2]"
         >
           Recommended for You
         </motion.h2>
 
         {loadingRecs ? (
-          <p className="text-gray-400 text-center animate-pulse">Loading music magic...</p>
+          <p className="text-gray-600 text-center animate-pulse">Loading music magic...</p>
         ) : recommendedSongs.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8">
             {recommendedSongs.map((song, i) => (
@@ -149,7 +149,7 @@ export default function Dashboard() {
                 key={song.id || i}
                 whileHover={{ scale: 1.05 }}
                 transition={{ duration: 0.3 }}
-                className="bg-white/10 backdrop-blur-md border border-white/10 rounded-2xl overflow-hidden shadow-lg hover:shadow-cyan-500/30 transition-all"
+                className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all"
               >
                 <img
                   src={song.image?.[1]?.url || song.image?.[0]?.url}
@@ -157,13 +157,13 @@ export default function Dashboard() {
                   className="w-full h-48 object-cover"
                 />
                 <div className="p-4">
-                  <h3 className="font-semibold truncate">{song.name}</h3>
-                  <p className="text-gray-400 text-sm truncate">
+                  <h3 className="font-semibold truncate text-black">{song.name}</h3>
+                  <p className="text-gray-600 text-sm truncate">
                     {song.primaryArtists || "Unknown Artist"}
                   </p>
                   <button
                     onClick={() => playSong(song)}
-                    className="mt-3 w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-blue-500 hover:to-cyan-500 text-white px-4 py-2 rounded-full text-sm transition-all"
+                    className="mt-3 w-full bg-[#0097b2] hover:bg-[#007a93] text-white px-4 py-2 rounded-full text-sm transition-all"
                   >
                     🎧 Play
                   </button>
@@ -172,7 +172,7 @@ export default function Dashboard() {
             ))}
           </div>
         ) : (
-          <p className="text-gray-500 text-center">No personalized songs yet 🎶</p>
+          <p className="text-gray-600 text-center">No personalized songs yet 🎶</p>
         )}
       </section>
 
@@ -181,7 +181,7 @@ export default function Dashboard() {
         <motion.h2
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-3xl font-bold mb-8 bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent"
+          className="text-3xl font-bold mb-8 text-[#0097b2]"
         >
           Trending Albums 🔥
         </motion.h2>
@@ -191,7 +191,7 @@ export default function Dashboard() {
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 transition={{ duration: 0.3 }}
-                className="bg-white/10 border border-white/10 backdrop-blur-md rounded-2xl overflow-hidden hover:shadow-cyan-500/30"
+                className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-md hover:shadow-lg"
               >
                 <img
                   src={album.image?.[2]?.url || album.image?.[1]?.url}
@@ -199,8 +199,8 @@ export default function Dashboard() {
                   className="w-full h-48 object-cover"
                 />
                 <div className="p-4">
-                  <h3 className="font-semibold truncate">{album.name}</h3>
-                  <p className="text-gray-400 text-sm truncate">
+                  <h3 className="font-semibold truncate text-black">{album.name}</h3>
+                  <p className="text-gray-600 text-sm truncate">
                     {album.artists?.primary?.[0]?.name || "Unknown"}
                   </p>
                 </div>
@@ -216,7 +216,7 @@ export default function Dashboard() {
       </div>
 
       {/* 🌙 Footer */}
-      <footer className="text-center text-gray-400 text-sm py-10 border-t border-white/10">
+      <footer className="text-center text-gray-600 text-sm py-10 border-t border-gray-200">
         Made with 💙 by Abhishek Kumar — Serenity
       </footer>
     </div>

@@ -47,9 +47,9 @@ export default function MiniPlayer() {
           exit={{ y: 100, opacity: 0 }}
           transition={{ type: "spring", stiffness: 120, damping: 18 }}
           className="fixed bottom-4 left-1/2 -translate-x-1/2 w-[95%] md:w-[70%] lg:w-[60%]
-          rounded-2xl bg-white/10 backdrop-blur-2xl border border-white/10
-          shadow-[0_0_40px_rgba(0,255,200,0.1)] flex items-center justify-between gap-4
-          p-3 md:p-4 text-white z-[999] hover:shadow-[0_0_60px_rgba(0,255,200,0.25)]
+          rounded-2xl bg-white border border-gray-200
+          shadow-lg flex items-center justify-between gap-4
+          p-3 md:p-4 text-black z-[999] hover:shadow-xl
           transition-all"
         >
           {/* 🎵 Song Info */}
@@ -57,15 +57,15 @@ export default function MiniPlayer() {
             <motion.img
               src={currentSong?.image?.[1]?.url || "/default-song.jpg"}
               alt={currentSong?.name}
-              className="w-12 h-12 md:w-14 md:h-14 rounded-xl object-cover border border-white/20 shadow-lg"
+              className="w-12 h-12 md:w-14 md:h-14 rounded-xl object-cover border border-gray-200 shadow-md"
               whileHover={{ scale: 1.05 }}
               transition={{ duration: 0.2 }}
             />
             <div className="flex flex-col truncate">
-              <h4 className="font-semibold text-sm md:text-base truncate w-40 md:w-64">
+              <h4 className="font-semibold text-sm md:text-base truncate w-40 md:w-64 text-black">
                 {currentSong?.name || "Unknown Track"}
               </h4>
-              <p className="text-gray-400 text-xs truncate w-40 md:w-64">
+              <p className="text-gray-600 text-xs truncate w-40 md:w-64">
                 {currentSong?.artists?.primary
                   ?.map((a) => a.name)
                   .join(", ") || "Unknown Artist"}
@@ -82,9 +82,9 @@ export default function MiniPlayer() {
               className={`w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-full 
               ${
                 isFavorite
-                  ? "bg-gradient-to-r from-pink-500 to-rose-500 text-white"
-                  : "bg-gray-800 hover:bg-pink-500/80 text-gray-300 hover:text-white"
-              } border border-white/10 transition-all`}
+                  ? "bg-red-500 text-white"
+                  : "bg-gray-100 hover:bg-red-100 text-gray-600"
+              } border border-gray-200 transition-all`}
             >
               {isFavorite ? "❤️" : "🤍"}
             </motion.button>
@@ -94,8 +94,8 @@ export default function MiniPlayer() {
               onClick={() => setShowPlaylistModal(true)}
               whileTap={{ scale: 0.9 }}
               className="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-full 
-              bg-gray-800 hover:bg-emerald-500/80 text-gray-300 hover:text-white
-              border border-white/10 transition-all"
+              bg-gray-100 hover:bg-[#0097b2] text-gray-600 hover:text-white
+              border border-gray-200 transition-all"
             >
               ➕
             </motion.button>
@@ -105,11 +105,11 @@ export default function MiniPlayer() {
               onClick={togglePlay}
               whileTap={{ scale: 0.9 }}
               className={`flex items-center justify-center w-10 h-10 md:w-12 md:h-12 
-              rounded-full shadow-[0_0_20px_rgba(0,255,200,0.3)]
+              rounded-full shadow-md
               ${
                 isPlaying
-                  ? "bg-gradient-to-r from-emerald-500 to-cyan-500"
-                  : "bg-gradient-to-r from-gray-700 to-gray-800 hover:from-emerald-600 hover:to-cyan-600"
+                  ? "bg-[#0097b2] text-white"
+                  : "bg-gray-200 hover:bg-[#0097b2] text-black hover:text-white"
               } transition-all`}
             >
               {isPlaying ? "⏸" : "▶"}
@@ -120,7 +120,7 @@ export default function MiniPlayer() {
               onClick={stopSong}
               whileTap={{ scale: 0.9 }}
               className="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-full 
-              bg-gray-800 hover:bg-red-600 text-white border border-white/10 transition-all"
+              bg-gray-100 hover:bg-red-600 text-gray-600 hover:text-white border border-gray-200 transition-all"
             >
               ⏹
             </motion.button>
@@ -132,7 +132,7 @@ export default function MiniPlayer() {
               {[...Array(4)].map((_, i) => (
                 <motion.span
                   key={i}
-                  className="w-1 bg-emerald-400 rounded-full"
+                  className="w-1 bg-[#0097b2] rounded-full"
                   animate={{
                     height: ["20%", "90%", "40%", "70%", "30%"],
                     opacity: [0.5, 1, 0.7, 1, 0.6],
@@ -165,18 +165,18 @@ export default function MiniPlayer() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="bg-gray-900/90 p-6 rounded-2xl border border-white/10 shadow-[0_0_40px_rgba(0,255,200,0.2)] w-[90%] max-w-md text-center"
+              className="bg-white p-6 rounded-2xl border border-gray-200 shadow-lg w-[90%] max-w-md text-center"
               onClick={(e) => e.stopPropagation()}
             >
-              <h3 className="text-lg font-semibold text-emerald-400 mb-4">
+              <h3 className="text-lg font-semibold text-[#0097b2] mb-4">
                 Add to Playlist
               </h3>
-              <p className="text-gray-400 text-sm mb-6">
+              <p className="text-gray-600 text-sm mb-6">
                 (This is a placeholder — connect to your playlist API or show available playlists here.)
               </p>
               <button
                 onClick={() => setShowPlaylistModal(false)}
-                className="bg-emerald-600 hover:bg-emerald-500 px-5 py-2 rounded-full text-white font-medium"
+                className="bg-[#0097b2] hover:bg-[#007a93] px-5 py-2 rounded-full text-white font-medium"
               >
                 Close
               </button>

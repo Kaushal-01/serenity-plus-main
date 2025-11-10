@@ -52,17 +52,17 @@ export default function Login() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-900 text-white">
+    <div className="flex items-center justify-center min-h-screen bg-white text-black">
       <form
         onSubmit={handleSubmit}
-        className="bg-white/10 backdrop-blur-xl border border-white/10 shadow-[0_0_30px_rgba(0,255,255,0.1)] p-8 rounded-2xl w-96"
+        className="bg-white border border-gray-300 shadow-lg p-8 rounded-2xl w-96"
       >
-        <h2 className="text-3xl font-bold mb-6 text-center bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+        <h2 className="text-3xl font-bold mb-6 text-center text-[#0097b2]">
           Welcome Back 👋
         </h2>
 
         {error && (
-          <p className="text-red-400 text-sm mb-3 text-center">{error}</p>
+          <p className="text-red-600 text-sm mb-3 text-center">{error}</p>
         )}
 
         <input
@@ -71,7 +71,7 @@ export default function Login() {
           value={form.email}
           onChange={(e) => setForm({ ...form, email: e.target.value })}
           required
-          className="border border-gray-700 bg-gray-800 text-white p-3 w-full mb-4 rounded-full focus:outline-none focus:ring-2 focus:ring-cyan-400"
+          className="border border-gray-300 bg-white text-black p-3 w-full mb-4 rounded-full focus:outline-none focus:ring-2 focus:ring-[#0097b2]"
         />
         <input
           type="password"
@@ -79,21 +79,21 @@ export default function Login() {
           value={form.password}
           onChange={(e) => setForm({ ...form, password: e.target.value })}
           required
-          className="border border-gray-700 bg-gray-800 text-white p-3 w-full mb-4 rounded-full focus:outline-none focus:ring-2 focus:ring-cyan-400"
+          className="border border-gray-300 bg-white text-black p-3 w-full mb-4 rounded-full focus:outline-none focus:ring-2 focus:ring-[#0097b2]"
         />
 
         <button
           disabled={loading}
-          className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-blue-500 hover:to-cyan-500 text-white px-4 py-2 rounded-full w-full transition-all shadow-[0_0_20px_rgba(0,255,255,0.2)] hover:shadow-[0_0_30px_rgba(0,255,255,0.4)]"
+          className="bg-[#0097b2] hover:bg-[#007a93] text-white px-4 py-2 rounded-full w-full transition-all"
         >
           {loading ? "Logging in..." : "Login"}
         </button>
 
-        <p className="text-sm text-gray-400 text-center mt-6">
-          Don’t have an account?{" "}
+        <p className="text-sm text-gray-600 text-center mt-6">
+          Don't have an account?{" "}
           <a
             href="/signup"
-            className="text-cyan-400 hover:underline hover:text-cyan-300"
+            className="text-[#0097b2] hover:underline"
           >
             Sign up
           </a>

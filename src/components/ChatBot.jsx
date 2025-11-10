@@ -287,11 +287,11 @@ export default function ChatBot() {
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 z-50 bg-black text-white rounded-full p-4 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 group"
+          className="fixed bottom-6 right-6 z-50 bg-[#0097b2] text-white rounded-full w-16 h-16 flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 group"
           aria-label="Open chat"
         >
           <svg 
-            className="w-6 h-6" 
+            className="w-8 h-8" 
             fill="none" 
             stroke="currentColor" 
             viewBox="0 0 24 24"
@@ -303,9 +303,6 @@ export default function ChatBot() {
               d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" 
             />
           </svg>
-          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center group-hover:animate-pulse">
-            🎵
-          </span>
         </button>
       )}
 
@@ -313,19 +310,19 @@ export default function ChatBot() {
       {isOpen && (
         <div className="fixed bottom-6 right-6 z-50 w-96 h-[600px] bg-white rounded-2xl shadow-2xl flex flex-col border border-gray-200 animate-slideUp">
           {/* Header */}
-          <div className="bg-black text-white px-6 py-4 rounded-t-2xl flex items-center justify-between">
+          <div className="bg-[#0097b2] text-white px-6 py-4 rounded-t-2xl flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-xl">
                 🎵
               </div>
               <div>
                 <h3 className="font-semibold text-lg">SerenityAI</h3>
-                <p className="text-xs text-gray-300">Your musical companion</p>
+                <p className="text-xs text-white/80">Your musical companion</p>
               </div>
             </div>
             <button
               onClick={() => setIsOpen(false)}
-              className="hover:bg-gray-800 rounded-full p-2 transition-colors"
+              className="hover:bg-[#007a93] rounded-full p-2 transition-colors"
               aria-label="Close chat"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -344,7 +341,7 @@ export default function ChatBot() {
                 <div
                   className={`max-w-[80%] px-4 py-3 rounded-2xl ${
                     msg.role === 'user'
-                      ? 'bg-black text-white rounded-br-sm'
+                      ? 'bg-[#0097b2] text-white rounded-br-sm'
                       : 'bg-gray-100 text-black rounded-bl-sm'
                   }`}
                 >
@@ -406,13 +403,13 @@ export default function ChatBot() {
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 placeholder="Share how you're feeling..."
-                className="flex-1 px-4 py-3 border border-gray-300 rounded-full focus:outline-none focus:border-black transition-colors text-black placeholder-gray-400"
+                className="flex-1 px-4 py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-[#0097b2] focus:border-transparent transition-colors text-black placeholder-gray-400"
                 disabled={isLoading}
               />
               <button
                 type="submit"
                 disabled={isLoading || !inputMessage.trim()}
-                className="bg-black text-white rounded-full px-5 hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-[#0097b2] text-white rounded-full px-5 hover:bg-[#007a93] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 aria-label="Send message"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

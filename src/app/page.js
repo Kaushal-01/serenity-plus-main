@@ -17,10 +17,10 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen flex flex-col bg-gradient-to-b from-[#121212] via-[#181818] to-black text-white">
+    <main className="min-h-screen flex flex-col bg-white text-black">
       {/* ================= NAVBAR ================= */}
-      <nav className="w-full fixed top-0 z-20 flex justify-between items-center px-6 sm:px-10 py-4 bg-black/40 backdrop-blur-md border-b border-white/10">
-        <h1 className="text-2xl sm:text-3xl font-bold text-green-400 tracking-tight">
+      <nav className="w-full fixed top-0 z-20 flex justify-between items-center px-6 sm:px-10 py-4 bg-white border-b border-gray-200 shadow-sm">
+        <h1 className="text-2xl sm:text-3xl font-bold text-[#0097b2] tracking-tight">
           Serenity
         </h1>
 
@@ -28,31 +28,31 @@ export default function Home() {
           <div className="flex items-center gap-3 sm:gap-5">
             <Link
               href="/login"
-              className="text-sm sm:text-base px-4 py-2 rounded-full bg-green-500 hover:bg-green-600 transition font-medium"
+              className="text-sm sm:text-base px-4 py-2 rounded-full bg-[#0097b2] hover:bg-[#007a93] transition font-medium text-white"
             >
               Log In
             </Link>
             <Link
               href="/signup"
-              className="text-sm sm:text-base px-4 py-2 rounded-full bg-white text-black hover:bg-gray-200 transition font-medium"
+              className="text-sm sm:text-base px-4 py-2 rounded-full bg-gray-100 text-black hover:bg-gray-200 transition font-medium border border-gray-300"
             >
               Sign Up
             </Link>
           </div>
         ) : (
           <div className="flex items-center gap-4 sm:gap-5">
-            <p className="text-gray-300 text-sm sm:text-base">
+            <p className="text-gray-600 text-sm sm:text-base">
               Hi, {user.name || "Listener"} 👋
             </p>
             <Link
               href="/explore"
-              className="text-sm sm:text-base px-4 py-2 rounded-full bg-green-500 hover:bg-green-600 transition font-medium"
+              className="text-sm sm:text-base px-4 py-2 rounded-full bg-[#0097b2] hover:bg-[#007a93] transition font-medium text-white"
             >
               Dashboard
             </Link>
             <button
               onClick={handleLogout}
-              className="text-sm sm:text-base px-4 py-2 rounded-full bg-gray-700 hover:bg-gray-600 transition"
+              className="text-sm sm:text-base px-4 py-2 rounded-full bg-gray-200 hover:bg-gray-300 transition text-black"
             >
               Logout
             </button>
@@ -62,10 +62,10 @@ export default function Home() {
 
       {/* ================= HERO SECTION ================= */}
       <section className="flex flex-col items-center justify-center text-center flex-grow px-6 pt-28 sm:pt-36">
-        <h2 className="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-blue-400 leading-tight">
+        <h2 className="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-6 text-[#0097b2] leading-tight">
           Feel the Music with Serenity
         </h2>
-        <p className="text-gray-400 text-base sm:text-lg max-w-xl mb-8">
+        <p className="text-gray-600 text-base sm:text-lg max-w-xl mb-8">
           Discover songs, albums, and artists like never before — all in one elegant,
           immersive experience.
         </p>
@@ -74,13 +74,13 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
             <Link
               href="/signup"
-              className="px-6 py-3 rounded-full bg-green-500 hover:bg-green-600 transition text-base sm:text-lg font-semibold"
+              className="px-6 py-3 rounded-full bg-[#0097b2] hover:bg-[#007a93] transition text-base sm:text-lg font-semibold text-white"
             >
               Get Started
             </Link>
             <Link
               href="/login"
-              className="px-6 py-3 rounded-full border border-white hover:bg-white hover:text-black transition text-base sm:text-lg font-semibold"
+              className="px-6 py-3 rounded-full border-2 border-[#0097b2] hover:bg-[#0097b2] hover:text-white transition text-base sm:text-lg font-semibold text-[#0097b2]"
             >
               Log In
             </Link>
@@ -88,7 +88,7 @@ export default function Home() {
         ) : (
           <Link
             href="/dashboard"
-            className="px-8 py-3 rounded-full bg-green-500 hover:bg-green-600 transition text-lg font-semibold"
+            className="px-8 py-3 rounded-full bg-[#0097b2] hover:bg-[#007a93] transition text-lg font-semibold text-white"
           >
             Go to Dashboard →
           </Link>
@@ -107,16 +107,16 @@ export default function Home() {
         ].map((feature, i) => (
           <div
             key={i}
-            className="bg-white/5 hover:bg-white/10 transition p-6 rounded-2xl border border-white/10 backdrop-blur-sm"
+            className="bg-white hover:bg-gray-50 transition p-6 rounded-2xl border border-gray-200 shadow-sm"
           >
-            <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-            <p className="text-gray-400 text-sm">{feature.desc}</p>
+            <h3 className="text-xl font-semibold mb-2 text-black">{feature.title}</h3>
+            <p className="text-gray-600 text-sm">{feature.desc}</p>
           </div>
         ))}
       </section>
 
       {/* ================= FOOTER ================= */}
-      <footer className="py-6 text-center text-gray-500 text-sm border-t border-white/10">
+      <footer className="py-6 text-center text-gray-500 text-sm border-t border-gray-200">
         
       </footer>
     </main>
