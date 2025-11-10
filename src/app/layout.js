@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import { PlayerProvider } from "./../context/PlayerContext";
 import MiniPlayer from "../context/MiniPlayer";
 import ChatBot from "@/components/ChatBot";
+import AudioRecognitionButton from "@/components/AudioRecognitionButton";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,6 +31,7 @@ export default function RootLayout({ children }) {
         <Navbar />
         {children}
         <ChatBot />
+        <AudioRecognitionButton />
         </PlayerProvider>
       </body>
     </html>

@@ -1,0 +1,30 @@
+
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: Inter, system-ui, sans-serif;
+  }
+
+  body {
+    @apply min-h-screen bg-gradient-to-br from-slate-900 via-indigo-900 to-slate-800;
+  }
+}
+
+/* Custom animation for microphone button pulse */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: .85;
+    transform: scale(1.05);
+  }
+}
+
+
+
