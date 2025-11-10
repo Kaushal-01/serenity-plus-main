@@ -163,6 +163,9 @@ export default function RecognizePage() {
         setAudioBlob(wavBlob);
         stream.getTracks().forEach((track) => track.stop());
         streamRef.current = null;
+
+        // Automatically recognize the song after processing
+        await recognizeSongWithBlob(wavBlob);
       };
 
       mediaRecorderRef.current.start();
@@ -189,8 +192,8 @@ export default function RecognizePage() {
     }
   };
 
-  const recognizeSong = async () => {
-    if (!audioBlob) {
+  const recognizeSongWithBlob = async (blob) => {
+    if (!blob) {
       setError("No audio recorded. Please record audio first.");
       return;
     }
@@ -205,7 +208,7 @@ export default function RecognizePage() {
 
     try {
       const formData = new FormData();
-      formData.append("audio", audioBlob, "recording.wav");
+      formData.append("audio", blob, "recording.wav");
       formData.append("user_id", userId.toString());
       formData.append("emotion", "neutral");
 
@@ -233,6 +236,10 @@ export default function RecognizePage() {
     } finally {
       setIsProcessing(false);
     }
+  };
+
+  const recognizeSong = async () => {
+    await recognizeSongWithBlob(audioBlob);
   };
 
   const handlePlaySong = async (songName) => {
@@ -339,15 +346,25 @@ export default function RecognizePage() {
               className={`relative w-40 h-40 rounded-full flex items-center justify-center ${
                 isRecording
                   ? "bg-gradient-to-r from-red-500 to-pink-500"
+                  : isProcessing
+                  ? "bg-gradient-to-r from-cyan-500 to-blue-500"
                   : "bg-gradient-to-r from-purple-500 to-indigo-500"
               }`}
               animate={{
-                scale: isRecording ? [1, 1.05, 1] : 1,
+                scale: isRecording || isProcessing ? [1, 1.05, 1] : 1,
+                rotate: isProcessing ? [0, 360] : 0,
               }}
               transition={{
-                duration: 1.5,
-                repeat: isRecording ? Infinity : 0,
-                ease: "easeInOut",
+                scale: {
+                  duration: 1.5,
+                  repeat: isRecording || isProcessing ? Infinity : 0,
+                  ease: "easeInOut",
+                },
+                rotate: {
+                  duration: 2,
+                  repeat: isProcessing ? Infinity : 0,
+                  ease: "linear",
+                },
               }}
             >
               {/* Pulse rings */}
@@ -360,6 +377,22 @@ export default function RecognizePage() {
                   />
                   <motion.div
                     className="absolute inset-0 rounded-full border-4 border-pink-300"
+                    animate={{ scale: [1, 1.5, 2], opacity: [0.8, 0.3, 0] }}
+                    transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
+                  />
+                </>
+              )}
+
+              {/* Processing rings */}
+              {isProcessing && (
+                <>
+                  <motion.div
+                    className="absolute inset-0 rounded-full border-4 border-cyan-300"
+                    animate={{ scale: [1, 1.5, 2], opacity: [0.8, 0.3, 0] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  />
+                  <motion.div
+                    className="absolute inset-0 rounded-full border-4 border-blue-300"
                     animate={{ scale: [1, 1.5, 2], opacity: [0.8, 0.3, 0] }}
                     transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
                   />
@@ -397,8 +430,10 @@ export default function RecognizePage() {
             <p className="mt-4 text-lg text-gray-300">
               {isRecording
                 ? "Recording... Press to stop"
+                : isProcessing
+                ? "Recognizing song..."
                 : audioBlob
-                ? "Recording saved. Recognize now!"
+                ? "Ready to recognize again!"
                 : "Press to start recording"}
             </p>
           </div>
@@ -422,46 +457,6 @@ export default function RecognizePage() {
                 className="w-full py-4 rounded-full bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white font-bold text-lg shadow-lg shadow-red-500/50 transition-all"
               >
                 ⏹️ Stop Recording
-              </motion.button>
-            )}
-
-            {/* Recognize Button */}
-            {audioBlob && !isRecording && (
-              <motion.button
-                onClick={recognizeSong}
-                disabled={isProcessing}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="w-full py-4 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-bold text-lg shadow-lg shadow-cyan-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isProcessing ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <svg
-                      className="animate-spin h-5 w-5"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      />
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      />
-                    </svg>
-                    Recognizing...
-                  </span>
-                ) : (
-                  "🔍 Recognize Song"
-                )}
               </motion.button>
             )}
           </div>
