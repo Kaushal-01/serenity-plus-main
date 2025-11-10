@@ -117,7 +117,7 @@ export default function Home() {
 
       {/* ================= FOOTER ================= */}
       <footer className="py-6 text-center text-gray-500 text-sm border-t border-white/10">
-        © {new Date().getFullYear()} Serenity • Built by Abhishek Kumar 🎧
+        
       </footer>
     </main>
   );

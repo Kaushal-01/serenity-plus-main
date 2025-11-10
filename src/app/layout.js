@@ -3,6 +3,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import { PlayerProvider } from "./../context/PlayerContext";
 import MiniPlayer from "../context/MiniPlayer";
+import ChatBot from "@/components/ChatBot";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,6 +29,7 @@ export default function RootLayout({ children }) {
         <PlayerProvider>
         <Navbar />
         {children}
+        <ChatBot />
         </PlayerProvider>
       </body>
     </html>

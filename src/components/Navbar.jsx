@@ -122,8 +122,31 @@ export default function Navbar() {
               </Link>
             </>
           ) : (
-            <div className="relative">
+            <>
+              {/* Harmony Chat Icon */}
               <button
+                onClick={() => window.dispatchEvent(new CustomEvent('toggle-harmony-chat'))}
+                className="flex items-center gap-2 text-gray-300 hover:text-white transition-all hover:scale-110 group"
+                title="Chat with SerenityAI"
+              >
+                <svg 
+                  className="w-6 h-6" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    strokeWidth={2} 
+                    d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" 
+                  />
+                </svg>
+                <span className="text-xs hidden lg:inline group-hover:text-cyan-400">Serenity AI</span>
+              </button>
+              
+              <div className="relative">
+                <button
                 onClick={() => setMenuOpen(!menuOpen)}
                 className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full hover:bg-white/20 backdrop-blur-sm transition-all"
               >
@@ -181,7 +204,8 @@ export default function Navbar() {
                   </motion.div>
                 )}
               </AnimatePresence>
-            </div>
+              </div>
+            </>
           )}
         </div>
       </div>
