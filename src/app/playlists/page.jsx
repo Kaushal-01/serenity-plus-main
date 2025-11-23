@@ -251,7 +251,14 @@ export default function PlaylistsPage() {
           </motion.div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {playlists.map((playlist, idx) => (
+            {playlists.map((playlist, idx) => {
+              // Get the last added song's image (most recent song)
+              const lastSong = playlist.songs && playlist.songs.length > 0 
+                ? playlist.songs[playlist.songs.length - 1] 
+                : null;
+              const playlistImage = lastSong?.image?.[2]?.url || lastSong?.image?.[1]?.url || lastSong?.image?.[0]?.url;
+              
+              return (
               <motion.div
                 key={playlist._id}
                 initial={{ opacity: 0, y: 20 }}
@@ -261,11 +268,22 @@ export default function PlaylistsPage() {
               >
                 <div 
                   onClick={() => viewPlaylistDetails(playlist._id)}
-                  className="relative h-48 bg-gradient-to-br from-[#0097b2] to-[#007a93] flex items-center justify-center"
+                  className="relative h-48 bg-gradient-to-br from-[#0097b2] to-[#007a93] flex items-center justify-center overflow-hidden"
                 >
-                  <svg className="w-20 h-20 text-white opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
-                  </svg>
+                  {playlistImage ? (
+                    <>
+                      <img 
+                        src={playlistImage} 
+                        alt={playlist.name}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-all" />
+                    </>
+                  ) : (
+                    <svg className="w-20 h-20 text-white opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                    </svg>
+                  )}
                   <div className="absolute top-3 right-3 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1 text-white text-xs font-medium">
                     {playlist.songs?.length || 0} songs
                   </div>
@@ -312,7 +330,8 @@ export default function PlaylistsPage() {
                   </div>
                 </div>
               </motion.div>
-            ))}
+            )}
+            )}
           </div>
         )}
       </div>

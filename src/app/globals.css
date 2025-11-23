@@ -79,21 +79,28 @@ input[type="range"]::-moz-range-thumb:hover {
   box-shadow: 0 4px 8px rgba(0, 151, 178, 0.4);
 }
 
-/* Scrollbar for queue (if needed) */
-.custom-scrollbar::-webkit-scrollbar {
+/* Scrollbar for queue */
+*::-webkit-scrollbar {
   width: 6px;
+  height: 6px;
 }
 
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: #f1f1f1;
+*::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
   border-radius: 10px;
 }
 
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #0097b2;
+*::-webkit-scrollbar-thumb {
+  background: rgba(0, 151, 178, 0.5);
   border-radius: 10px;
 }
 
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #007a93;
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 151, 178, 0.7);
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 151, 178, 0.5) rgba(255, 255, 255, 0.05);
 }

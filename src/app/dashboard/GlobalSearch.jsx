@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { usePlayer } from "@/context/PlayerContext";
 import MiniPlayer from "@/context/MiniPlayer";
 import SongCard from "@/components/SongCard";
+import Link from "next/link";
 
 export default function GlobalSearch() {
   const [query, setQuery] = useState("");
@@ -48,11 +49,16 @@ export default function GlobalSearch() {
     }
   };
 
-  const searchAll = async () => {
-    if (!query.trim()) return;
+  const searchAll = async (searchQuery) => {
+    const queryToSearch = searchQuery || query;
+    if (!queryToSearch.trim()) {
+      // Load default trending if query is empty
+      loadDefault();
+      return;
+    }
     setLoading(true);
     try {
-      const res = await axios.get(`/api/serenity/search?query=${encodeURIComponent(query)}`);
+      const res = await axios.get(`/api/serenity/search?query=${encodeURIComponent(queryToSearch)}`);
       const data = res.data.data;
       if (Array.isArray(data.results)) {
         setResults({ songs: data.results || [], albums: [], playlists: [] });
@@ -70,26 +76,41 @@ export default function GlobalSearch() {
     }
   };
 
-  useEffect(() => {
-    const loadDefault = async () => {
-      try {
-        const res = await axios.get(`/api/serenity/search?query=trending`);
-        const data = res.data.data;
-        if (Array.isArray(data.results)) {
-          setResults({ songs: data.results || [], albums: [], playlists: [] });
-        } else {
-          setResults({
-            songs: data.songs?.results || data.songs || [],
-            albums: data.albums?.results || data.albums || [],
-            playlists: data.playlists?.results || data.playlists || [],
-          });
-        }
-      } catch (err) {
-        console.error("Default search load error:", err);
+  const loadDefault = async () => {
+    try {
+      const res = await axios.get(`/api/serenity/search?query=trending`);
+      const data = res.data.data;
+      if (Array.isArray(data.results)) {
+        setResults({ songs: data.results || [], albums: [], playlists: [] });
+      } else {
+        setResults({
+          songs: data.songs?.results || data.songs || [],
+          albums: data.albums?.results || data.albums || [],
+          playlists: data.playlists?.results || data.playlists || [],
+        });
       }
-    };
+    } catch (err) {
+      console.error("Default search load error:", err);
+    }
+  };
+
+  // Load default trending on mount
+  useEffect(() => {
     loadDefault();
   }, []);
+
+  // Real-time search with debouncing
+  useEffect(() => {
+    const debounceTimer = setTimeout(() => {
+      if (query.trim()) {
+        searchAll(query);
+      } else {
+        loadDefault();
+      }
+    }, 500); // 500ms delay
+
+    return () => clearTimeout(debounceTimer);
+  }, [query]);
 
   const toggleFavorite = async (song) => {
     const token = localStorage.getItem("token");
@@ -149,82 +170,159 @@ export default function GlobalSearch() {
   return (
     <section className="mt-20 relative">
       {/* 🔍 Search Header */}
-      <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 text-center sm:text-left">
-        <motion.h2
-          initial={{ opacity: 0, y: 10 }}
+      <div className="relative z-10 mb-12">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-4xl font-extrabold text-[#0097b2]"
+          className="text-center mb-8"
         >
-          Explore Music 🌐
-        </motion.h2>
+          <h2 className="text-5xl font-extrabold bg-gradient-to-r from-[#0097b2] via-[#00b8d4] to-[#0097b2] bg-clip-text text-transparent mb-3">
+            Explore Music 🎵
+          </h2>
+          <p className="text-gray-600 text-lg">Discover your next favorite song, album, or playlist</p>
+        </motion.div>
 
-        <div className="flex items-center justify-center gap-3 mt-5 sm:mt-0">
-          <input
-            type="text"
-            placeholder="Search songs, albums or playlists..."
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && searchAll()}
-            className="border border-gray-300 bg-white text-black px-5 py-2 rounded-full focus:outline-none focus:ring-2 focus:ring-[#0097b2] w-80 placeholder-gray-500"
-          />
-          <button
-            onClick={searchAll}
-            className="bg-[#0097b2] hover:bg-[#007a93] text-white font-semibold px-6 py-2 rounded-full transition-all"
-          >
-            {loading ? "Searching..." : "Search"}
-          </button>
-        </div>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+          className="max-w-3xl mx-auto"
+        >
+          <div className="relative">
+            <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none">
+              <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            <input
+              type="text"
+              placeholder="Search songs, albums, playlists, or artists..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && searchAll()}
+              className="w-full pl-14 pr-6 py-4 text-lg border-2 border-gray-200 bg-white text-black rounded-2xl 
+              focus:outline-none focus:border-[#0097b2] focus:ring-4 focus:ring-[#0097b2]/20 
+              placeholder-gray-400 transition-all shadow-sm hover:shadow-md"
+            />
+            {loading && (
+              <div className="absolute inset-y-0 right-5 flex items-center">
+                <div className="w-6 h-6 border-3 border-[#0097b2] border-t-transparent rounded-full animate-spin"></div>
+              </div>
+            )}
+            {query && !loading && (
+              <button
+                onClick={() => setQuery("")}
+                className="absolute inset-y-0 right-5 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            )}
+          </div>
+          <div className="flex items-center justify-center gap-2 mt-4 text-sm text-gray-500">
+            <span>💡 Tip: Results appear as you type</span>
+          </div>
+        </motion.div>
       </div>
 
       {/* 🌀 Results Section */}
-      <div className="relative z-10 space-y-20">
-        {/* 🎧 Songs */}
-        {results.songs.length > 0 && (
+      <AnimatePresence mode="wait">
+        {loading ? (
           <motion.div
+            key="loading"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.8 }}
+            exit={{ opacity: 0 }}
+            className="flex flex-col items-center justify-center py-20"
           >
-            <h3 className="text-3xl font-semibold mb-6 text-[#0097b2]">
-              🎧 Songs
-            </h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-              {results.songs.slice(0, 12).map((song, i) => (
-                <SongCard
-                  key={song.id || i}
-                  song={song}
-                  allSongs={results.songs}
-                  onPlay={(s) => playSong(s, results.songs)}
-                  isFavorite={isFavorite(song.id)}
-                  onToggleFavorite={() => toggleFavorite(song)}
-                  onAddToPlaylist={() => openPlaylistModal(song)}
-                  showFavoriteButton={true}
-                  showAddToPlaylistButton={true}
-                />
-              ))}
+            <div className="relative">
+              <div className="w-16 h-16 border-4 border-gray-200 border-t-[#0097b2] rounded-full animate-spin"></div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <svg className="w-8 h-8 text-[#0097b2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                </svg>
+              </div>
             </div>
+            <p className="mt-6 text-gray-600 text-lg font-medium">Searching for amazing music...</p>
           </motion.div>
-        )}
+        ) : (
+          <div className="relative z-10 space-y-16">
+            {/* 🎧 Songs */}
+            {results.songs.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+              >
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-12 h-12 bg-gradient-to-br from-[#0097b2] to-[#00b8d4] rounded-xl flex items-center justify-center">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-3xl font-bold text-gray-900">Songs</h3>
+                    <p className="text-sm text-gray-500">{results.songs.length} results found</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                  {results.songs.slice(0, 12).map((song, i) => (
+                    <motion.div
+                      key={song.id || i}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: i * 0.05, duration: 0.3 }}
+                    >
+                      <SongCard
+                        song={song}
+                        allSongs={results.songs}
+                        onPlay={(s) => playSong(s, results.songs)}
+                        isFavorite={isFavorite(song.id)}
+                        onToggleFavorite={() => toggleFavorite(song)}
+                        onAddToPlaylist={() => openPlaylistModal(song)}
+                        showFavoriteButton={true}
+                        showAddToPlaylistButton={true}
+                      />
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
 
-        {/* 💿 Albums */}
-        {results.albums.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8 }}
-          >
-            <h3 className="text-3xl font-semibold mb-6 text-[#0097b2]">
-              💿 Albums
-            </h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-              {results.albums.slice(0, 12).map((album, i) => (
-                <a key={album.id || i} href={`/albums/details/${encodeURIComponent(album.id)}`}>
-                  <motion.div
-                    whileHover={{ y: -5 }}
-                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                    className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all group"
-                  >
+            {/* 💿 Albums */}
+            {results.albums.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+              >
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-3xl font-bold text-gray-900">Albums</h3>
+                    <p className="text-sm text-gray-500">{results.albums.length} albums found</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                  {results.albums.slice(0, 12).map((album, i) => (
+                    <motion.div
+                      key={album.id || i}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: i * 0.05, duration: 0.3 }}
+                    >
+                      <a href={`/albums/details/${encodeURIComponent(album.id)}`}>
+                        <motion.div
+                          whileHover={{ y: -5 }}
+                          transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                          className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all group"
+                        >
                     <div className="relative aspect-square overflow-hidden bg-gray-100">
                       <img
                         src={album.image?.[2]?.url || album.image?.[1]?.url || "/default-album.jpg"}
@@ -247,81 +345,103 @@ export default function GlobalSearch() {
                         </motion.div>
                       </div>
                     </div>
-                    <div className="p-4">
-                      <h4 className="font-semibold text-sm truncate text-black" title={album.name}>{album.name}</h4>
-                      <p className="text-gray-600 text-xs truncate">
-                        {album.primaryArtists || "Unknown Artist"}
-                      </p>
-                    </div>
-                  </motion.div>
-                </a>
-              ))}
-            </div>
-          </motion.div>
-        )}
+                          <div className="p-4">
+                            <h4 className="font-semibold text-sm truncate text-black" title={album.name}>{album.name}</h4>
+                            <p className="text-gray-600 text-xs truncate">
+                              {album.primaryArtists || "Unknown Artist"}
+                            </p>
+                          </div>
+                        </motion.div>
+                      </a>
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
 
-        {/* 🎶 Playlists */}
-        {results.playlists.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8 }}
-          >
-            <h3 className="text-3xl font-semibold mb-6 text-[#0097b2]">
-              🎶 Playlists
-            </h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-              {results.playlists.slice(0, 12).map((pl, i) => (
-                <motion.div
-                  key={pl.id || i}
-                  whileHover={{ y: -5 }}
-                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                  className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all group"
-                >
-                  <div className="relative aspect-square overflow-hidden bg-gray-100">
-                    <img
-                      src={pl.image?.[2]?.url || pl.image?.[1]?.url || "/default-playlist.jpg"}
-                      alt={pl.name}
-                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                    />
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center">
+            {/* 🎶 Playlists */}
+            {results.playlists.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+              >
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-3xl font-bold text-gray-900">Playlists</h3>
+                    <p className="text-sm text-gray-500">{results.playlists.length} playlists found</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                  {results.playlists.slice(0, 12).map((pl, i) => (
+                    <Link key={pl.id || i} href={`/playlists/details/${encodeURIComponent(pl.id)}`}>
                       <motion.div
-                        whileHover={{ scale: 1.1 }}
-                        className="bg-[#0097b2] hover:bg-[#007a93] rounded-full w-12 h-12 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: i * 0.05, duration: 0.3 }}
+                        whileHover={{ y: -5 }}
+                        className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all group cursor-pointer"
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="white"
-                          viewBox="0 0 24 24"
-                          className="w-6 h-6 ml-1"
-                        >
-                          <path d="M5 3l14 9-14 9V3z" />
-                        </svg>
+                        <div className="relative aspect-square overflow-hidden bg-gray-100">
+                          <img
+                            src={pl.image?.[2]?.url || pl.image?.[1]?.url || "/default-playlist.jpg"}
+                            alt={pl.name}
+                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                          />
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center">
+                            <div className="bg-[#0097b2] hover:bg-[#007a93] rounded-full w-12 h-12 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all shadow-lg">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="white"
+                                viewBox="0 0 24 24"
+                                className="w-6 h-6 ml-1"
+                              >
+                                <path d="M5 3l14 9-14 9V3z" />
+                              </svg>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="p-4">
+                          <h4 className="font-semibold text-sm truncate text-black" title={pl.name}>{pl.name}</h4>
+                          <p className="text-gray-600 text-xs truncate">
+                            {pl.language || "Mixed Languages"}
+                          </p>
+                        </div>
                       </motion.div>
-                    </div>
-                  </div>
-                  <div className="p-4">
-                    <h4 className="font-semibold text-sm truncate text-black" title={pl.name}>{pl.name}</h4>
-                    <p className="text-gray-600 text-xs truncate">
-                      {pl.language || "Mixed Languages"}
-                    </p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        )}
+                    </Link>
+                  ))}
+                </div>
+              </motion.div>
+            )}
 
-        {/* Empty */}
-        {!loading &&
-          !results.songs.length &&
-          !results.albums.length &&
-          !results.playlists.length && (
-            <p className="text-gray-600 text-center text-lg mt-20">
-              Start typing to explore your favorite music 🎶
-            </p>
-          )}
-      </div>
+            {/* Empty State */}
+            {!results.songs.length &&
+              !results.albums.length &&
+              !results.playlists.length && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex flex-col items-center justify-center py-20"
+                >
+                  <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-6">
+                    <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                    </svg>
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">No results found</h3>
+                  <p className="text-gray-600 text-lg text-center max-w-md">
+                    {query ? `We couldn't find anything matching "${query}". Try a different search term.` : "Start typing to discover amazing music 🎶"}
+                  </p>
+                </motion.div>
+              )}
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Add to Playlist Modal */}
       <AnimatePresence>

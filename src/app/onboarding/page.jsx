@@ -16,6 +16,7 @@ export default function OnboardingPage() {
   const [genres, setGenres] = useState([]);
   const [artists, setArtists] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
   const router = useRouter();
 
   const toggleSelection = (type, value) => {
@@ -36,40 +37,46 @@ export default function OnboardingPage() {
 
     setLoading(true);
     try {
-      await axios.post(
+      // Use PUT if updating existing preferences, POST for initial setup
+      const method = isUpdating ? 'put' : 'post';
+      await axios[method](
         "/api/user/preferences",
         { genres, artists },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      router.push("/dashboard");
+      router.push(isUpdating ? "/profile" : "/dashboard");
     } catch (err) {
       console.error("Preferences save error:", err);
     } finally {
       setLoading(false);
     }
   };
+  
   useEffect(() => {
-  const token = localStorage.getItem("token");
-  if (!token) {
-    router.push("/login");
-    return;
-  }
-
-  const checkSetup = async () => {
-    try {
-      const res = await axios.get("/api/user/preferences", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.data?.preferences?.isSetupComplete) {
-        router.push("/dashboard");
-      }
-    } catch (err) {
-      console.error("checkSetup error", err);
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/login");
+      return;
     }
-  };
 
-  checkSetup();
-}, [router]);
+    const fetchPreferences = async () => {
+      try {
+        const res = await axios.get("/api/user/preferences", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (res.data?.preferences?.isSetupComplete) {
+          // Load existing preferences for updating
+          setIsUpdating(true);
+          setGenres(res.data.preferences.genres || []);
+          setArtists(res.data.preferences.artists || []);
+        }
+      } catch (err) {
+        console.error("fetchPreferences error", err);
+      }
+    };
+
+    fetchPreferences();
+  }, [router]);
 
 
   return (
@@ -79,11 +86,11 @@ export default function OnboardingPage() {
         animate={{ opacity: 1, y: 0 }}
         className="text-4xl font-bold mb-6 text-center text-[#0097b2]"
       >
-        🎵 Personalize Your Music Taste
+        🎵 {isUpdating ? 'Update Your Music Preferences' : 'Personalize Your Music Taste'}
       </motion.h1>
 
       <p className="text-gray-600 mb-10 text-center max-w-md">
-        Select your favorite genres and artists to help us tailor your dashboard experience.
+        {isUpdating ? 'Update your favorite genres and artists to refine your music recommendations.' : 'Select your favorite genres and artists to help us tailor your dashboard experience.'}
       </p>
 
       {/* Genre Selection */}
@@ -133,7 +140,7 @@ export default function OnboardingPage() {
         disabled={loading}
         className="bg-[#0097b2] hover:bg-[#007a93] px-8 py-3 rounded-full font-semibold text-white transition-all disabled:opacity-50"
       >
-        {loading ? "Saving..." : "Continue →"}
+        {loading ? "Saving..." : isUpdating ? "Save Changes" : "Continue →"}
       </motion.button>
     </div>
   );

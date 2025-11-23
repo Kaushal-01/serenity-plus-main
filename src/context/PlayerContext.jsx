@@ -79,6 +79,18 @@ export function PlayerProvider({ children }) {
     setCurrentTime(0);
   };
 
+  const closePlayer = () => {
+    setCurrentSong(null);
+    setQueue([]);
+    setCurrentIndex(0);
+    setIsPlaying(false);
+    setCurrentTime(0);
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+  };
+
   const playNext = () => {
     if (queue.length === 0) return;
     
@@ -184,6 +196,7 @@ export function PlayerProvider({ children }) {
         playSong,
         togglePlay,
         stopSong,
+        closePlayer,
         playNext,
         playPrevious,
         seekTo,

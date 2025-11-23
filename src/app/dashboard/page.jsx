@@ -51,10 +51,38 @@ export default function Dashboard() {
 
   const fetchAlbums = async () => {
     try {
-      const res = await axios.get(`/api/serenity/albums?query=Top%20Hits`);
-      setFeaturedAlbums(res.data.data.results.slice(0, 6));
+      // Fetch multiple trending sources and combine them
+      const queries = [
+        "trending global",
+        "bollywood hits 2024",
+        "top charts india",
+        "latest albums"
+      ];
+      
+      const requests = queries.map(q => 
+        axios.get(`/api/serenity/albums?query=${encodeURIComponent(q)}`)
+      );
+      
+      const responses = await Promise.all(requests);
+      
+      // Combine and deduplicate albums
+      const allAlbums = responses.flatMap(res => res.data.data.results || []);
+      const uniqueAlbums = Array.from(
+        new Map(allAlbums.map(album => [album.id, album])).values()
+      );
+      
+      // Shuffle and take top 12 for variety
+      const shuffled = uniqueAlbums.sort(() => Math.random() - 0.5);
+      setFeaturedAlbums(shuffled.slice(0, 12));
     } catch (err) {
       console.error("Error fetching albums:", err);
+      // Fallback to simple query
+      try {
+        const res = await axios.get(`/api/serenity/albums?query=trending`);
+        setFeaturedAlbums(res.data.data.results.slice(0, 12));
+      } catch (fallbackErr) {
+        console.error("Fallback error:", fallbackErr);
+      }
     }
   };
 
@@ -84,10 +112,15 @@ export default function Dashboard() {
 
       const responses = await Promise.all(songRequests);
       const allSongs = responses.flatMap(
-        (res) => res.data.data?.songs?.results?.slice(0, 2) || []
+        (res) => res.data.data?.songs?.results || []
       );
 
-      setRecommendedSongs(allSongs);
+      // Deduplicate songs by ID and ensure exactly 6 songs
+      const uniqueSongs = Array.from(
+        new Map(allSongs.map(song => [song.id, song])).values()
+      );
+      
+      setRecommendedSongs(uniqueSongs.slice(0, 6));
     } catch (err) {
       console.error("Error fetching recommendations:", err);
     } finally {
