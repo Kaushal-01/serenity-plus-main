@@ -4,6 +4,8 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import Navbar from "../../components/Navbar";
 import { usePlayer } from "@/context/PlayerContext";
+import SongCard from "@/components/SongCard";
+import { motion } from "framer-motion";
 
 export default function FavoritesPage() {
   const [favorites, setFavorites] = useState([]);
@@ -51,41 +53,65 @@ export default function FavoritesPage() {
 
   return (
     <>
-      <div className="mt-10 min-h-screen bg-white text-black p-8">
-        <h1 className="text-3xl font-bold mb-6 text-[#0097b2]">My Favorites</h1>
+      <div className="mt-10 min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white text-black p-8">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-8"
+          >
+            <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-[#0097b2] to-[#007a93] bg-clip-text text-transparent">
+              ❤️ My Favorites
+            </h1>
+            <p className="text-gray-600">
+              {favorites.length} {favorites.length === 1 ? "song" : "songs"} in your collection
+            </p>
+          </motion.div>
 
-        {loading ? <p className="text-gray-600">Loading...</p> : null}
+          {loading ? (
+            <div className="flex justify-center items-center py-20">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#0097b2]"></div>
+            </div>
+          ) : null}
 
-        {favorites.length === 0 && !loading ? (
-          <p className="text-gray-600">No favorites yet. Add songs from the dashboard.</p>
-        ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-            {favorites.map((f) => (
-              <div key={f.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all group">
-                <img src={f.image?.[1]?.url || f.image?.[0]?.url} alt={f.name} className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300" />
-                <div className="p-3">
-                  <h3 className="font-semibold text-black text-sm truncate">{f.name}</h3>
-                  <p className="text-xs text-gray-600 truncate">{(f.artists && f.artists[0]?.name) || ""}</p>
-
-                  <div className="flex flex-col gap-2 mt-3">
-                    <button 
-                      onClick={() => playSong(f)} 
-                      className="w-full bg-[#0097b2] hover:bg-[#007a93] text-white px-2 py-1.5 rounded-lg text-xs transition-all font-medium"
-                    >
-                      ▶ Play
-                    </button>
-                    <button 
-                      onClick={() => removeFavorite(f.id)} 
-                      className="w-full bg-red-600 hover:bg-red-700 text-white px-2 py-1.5 rounded-lg text-xs transition-all"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                </div>
+          {favorites.length === 0 && !loading ? (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center py-20"
+            >
+              <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                </svg>
               </div>
-            ))}
-          </div>
-        )}
+              <h3 className="text-xl font-bold text-gray-700 mb-2">No Favorites Yet</h3>
+              <p className="text-gray-600 mb-6">Start adding songs from the dashboard</p>
+              <button
+                onClick={() => router.push("/dashboard")}
+                className="bg-[#0097b2] hover:bg-[#007a93] text-white px-6 py-3 rounded-full font-medium transition-all"
+              >
+                Browse Music
+              </button>
+            </motion.div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+              {favorites.map((song, idx) => (
+                <motion.div
+                  key={song.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.05 }}
+                >
+                  <SongCard
+                    song={song}
+                    onPlay={(s) => playSong(s, favorites)}
+                  />
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </>
   );

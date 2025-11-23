@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { usePlayer } from "@/context/PlayerContext";
 import GlobalSearch from "./GlobalSearch";
 import Link from "next/link";
+import SongCard from "@/components/SongCard";
 
 export default function Dashboard() {
   const router = useRouter();
@@ -15,6 +16,7 @@ export default function Dashboard() {
   const [recommendedSongs, setRecommendedSongs] = useState([]);
   const [loadingRecs, setLoadingRecs] = useState(false);
   const [selectedMood, setSelectedMood] = useState(null);
+  const [favorites, setFavorites] = useState([]);
 
   const moodList = [
     { id: 1, name: "Happy", emoji: "☀️", gradient: "from-yellow-400 via-orange-400 to-pink-500" },
@@ -33,6 +35,7 @@ export default function Dashboard() {
     fetchUser(token);
     fetchAlbums();
     fetchRecommendations(token);
+    fetchFavorites(token);
   }, [router]);
 
   const fetchUser = async (token) => {
@@ -92,6 +95,42 @@ export default function Dashboard() {
     }
   };
 
+  const fetchFavorites = async (token) => {
+    try {
+      const res = await axios.get("/api/user/favorites", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setFavorites(res.data.favorites || []);
+    } catch (err) {
+      console.error("Error fetching favorites:", err);
+    }
+  };
+
+  const toggleFavorite = async (song) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Please log in to add favorites.");
+      return;
+    }
+
+    const isFav = favorites.some((f) => f.id === song.id);
+    try {
+      if (isFav) {
+        await axios.delete(`/api/user/favorites?id=${encodeURIComponent(song.id)}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setFavorites((prev) => prev.filter((f) => f.id !== song.id));
+      } else {
+        await axios.post("/api/user/favorites", { song }, { headers: { Authorization: `Bearer ${token}` } });
+        setFavorites((prev) => [...prev, song]);
+      }
+    } catch (err) {
+      console.error("Toggle favorite error:", err);
+    }
+  };
+
+  const isFavorite = (songId) => favorites.some((f) => f.id === songId);
+
   return (
     <div className="min-h-screen bg-white text-black overflow-x-hidden mt-20">
       {/* 🎵 Header */}
@@ -143,32 +182,16 @@ export default function Dashboard() {
         {loadingRecs ? (
           <p className="text-gray-600 text-center animate-pulse">Loading music magic...</p>
         ) : recommendedSongs.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
             {recommendedSongs.map((song, i) => (
-              <motion.div
+              <SongCard
                 key={song.id || i}
-                whileHover={{ scale: 1.05 }}
-                transition={{ duration: 0.3 }}
-                className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all"
-              >
-                <img
-                  src={song.image?.[1]?.url || song.image?.[0]?.url}
-                  alt={song.name}
-                  className="w-full h-48 object-cover"
-                />
-                <div className="p-4">
-                  <h3 className="font-semibold truncate text-black">{song.name}</h3>
-                  <p className="text-gray-600 text-sm truncate">
-                    {song.primaryArtists || "Unknown Artist"}
-                  </p>
-                  <button
-                    onClick={() => playSong(song)}
-                    className="mt-3 w-full bg-[#0097b2] hover:bg-[#007a93] text-white px-4 py-2 rounded-full text-sm transition-all"
-                  >
-                    🎧 Play
-                  </button>
-                </div>
-              </motion.div>
+                song={song}
+                onPlay={(s) => playSong(s, recommendedSongs)}
+                isFavorite={isFavorite(song.id)}
+                onToggleFavorite={() => toggleFavorite(song)}
+                showFavoriteButton={true}
+              />
             ))}
           </div>
         ) : (
@@ -185,22 +208,39 @@ export default function Dashboard() {
         >
           Trending Albums 🔥
         </motion.h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
           {featuredAlbums.map((album, i) => (
             <Link key={album.id || i} href={`/albums/details/${encodeURIComponent(album.id)}`}>
               <motion.div
-                whileHover={{ scale: 1.05 }}
-                transition={{ duration: 0.3 }}
-                className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-md hover:shadow-lg cursor-pointer"
+                whileHover={{ y: -5 }}
+                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all group"
               >
-                <img
-                  src={album.image?.[2]?.url || album.image?.[1]?.url}
-                  alt={album.name}
-                  className="w-full h-48 object-cover"
-                />
+                <div className="relative aspect-square overflow-hidden bg-gray-100">
+                  <img
+                    src={album.image?.[2]?.url || album.image?.[1]?.url}
+                    alt={album.name}
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center">
+                    <motion.div
+                      whileHover={{ scale: 1.1 }}
+                      className="bg-[#0097b2] hover:bg-[#007a93] rounded-full w-12 h-12 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="white"
+                        viewBox="0 0 24 24"
+                        className="w-6 h-6 ml-1"
+                      >
+                        <path d="M5 3l14 9-14 9V3z" />
+                      </svg>
+                    </motion.div>
+                  </div>
+                </div>
                 <div className="p-4">
-                  <h3 className="font-semibold truncate text-black">{album.name}</h3>
-                  <p className="text-gray-600 text-sm truncate">
+                  <h3 className="font-semibold text-sm truncate text-black" title={album.name}>{album.name}</h3>
+                  <p className="text-gray-600 text-xs truncate">
                     {album.artists?.primary?.[0]?.name || "Unknown"}
                   </p>
                 </div>

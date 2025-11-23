@@ -4,6 +4,7 @@ import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePlayer } from "@/context/PlayerContext";
 import MiniPlayer from "@/context/MiniPlayer";
+import SongCard from "@/components/SongCard";
 
 export default function GlobalSearch() {
   const [query, setQuery] = useState("");
@@ -188,57 +189,19 @@ export default function GlobalSearch() {
             <h3 className="text-3xl font-semibold mb-6 text-[#0097b2]">
               🎧 Songs
             </h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8">
-              {results.songs.slice(0, 10).map((song, i) => (
-                <motion.div
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+              {results.songs.slice(0, 12).map((song, i) => (
+                <SongCard
                   key={song.id || i}
-                  whileHover={{ scale: 1.05 }}
-                  transition={{ type: "spring", stiffness: 200, damping: 15 }}
-                  className="group relative bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all"
-                >
-                  {/* ❤️ Favorite */}
-                  <button
-                    onClick={() => toggleFavorite(song)}
-                    disabled={favLoading}
-                    className={`absolute z-100 top-3 right-3 p-2 rounded-full ${
-                      isFavorite(song.id)
-                        ? "bg-red-500 text-white"
-                        : "bg-gray-100 text-gray-600 hover:bg-red-500 hover:text-white"
-                    }`}
-                  >
-                    {isFavorite(song.id) ? "❤️" : "🤍"}
-                  </button>
-
-                  <img
-                    src={song.image?.[1]?.url || song.image?.[0]?.url || "/default-song.jpg"}
-                    alt={song.name}
-                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-
-                  <div className="p-4 text-center">
-                    <h4 className="font-semibold truncate text-black">{song.name}</h4>
-                    <p className="text-gray-600 text-sm truncate">
-                      {song.primaryArtists || "Unknown Artist"}
-                    </p>
-                    <div className="flex gap-2 mt-3">
-                      <button
-                        onClick={() => playSong(song)}
-                        className="flex-1 bg-[#0097b2] hover:bg-[#007a93] text-white px-3 py-2 rounded-full text-xs font-semibold transition-all"
-                      >
-                        ▶ Play
-                      </button>
-                      <button
-                        onClick={() => openPlaylistModal(song)}
-                        className="p-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full transition-all"
-                        title="Add to playlist"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
+                  song={song}
+                  allSongs={results.songs}
+                  onPlay={(s) => playSong(s, results.songs)}
+                  isFavorite={isFavorite(song.id)}
+                  onToggleFavorite={() => toggleFavorite(song)}
+                  onAddToPlaylist={() => openPlaylistModal(song)}
+                  showFavoriteButton={true}
+                  showAddToPlaylistButton={true}
+                />
               ))}
             </div>
           </motion.div>
@@ -254,21 +217,39 @@ export default function GlobalSearch() {
             <h3 className="text-3xl font-semibold mb-6 text-[#0097b2]">
               💿 Albums
             </h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8">
-              {results.albums.slice(0, 10).map((album, i) => (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+              {results.albums.slice(0, 12).map((album, i) => (
                 <a key={album.id || i} href={`/albums/details/${encodeURIComponent(album.id)}`}>
                   <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all cursor-pointer"
+                    whileHover={{ y: -5 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                    className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all group"
                   >
-                    <img
-                      src={album.image?.[1]?.url || album.image?.[0]?.url || "/default-album.jpg"}
-                      alt={album.name}
-                      className="w-full h-48 object-cover hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="p-4 text-center">
-                      <h4 className="font-semibold truncate text-black">{album.name}</h4>
-                      <p className="text-gray-600 text-sm truncate">
+                    <div className="relative aspect-square overflow-hidden bg-gray-100">
+                      <img
+                        src={album.image?.[2]?.url || album.image?.[1]?.url || "/default-album.jpg"}
+                        alt={album.name}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center">
+                        <motion.div
+                          whileHover={{ scale: 1.1 }}
+                          className="bg-[#0097b2] hover:bg-[#007a93] rounded-full w-12 h-12 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="white"
+                            viewBox="0 0 24 24"
+                            className="w-6 h-6 ml-1"
+                          >
+                            <path d="M5 3l14 9-14 9V3z" />
+                          </svg>
+                        </motion.div>
+                      </div>
+                    </div>
+                    <div className="p-4">
+                      <h4 className="font-semibold text-sm truncate text-black" title={album.name}>{album.name}</h4>
+                      <p className="text-gray-600 text-xs truncate">
                         {album.primaryArtists || "Unknown Artist"}
                       </p>
                     </div>
@@ -289,21 +270,39 @@ export default function GlobalSearch() {
             <h3 className="text-3xl font-semibold mb-6 text-[#0097b2]">
               🎶 Playlists
             </h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8">
-              {results.playlists.slice(0, 10).map((pl, i) => (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+              {results.playlists.slice(0, 12).map((pl, i) => (
                 <motion.div
                   key={pl.id || i}
-                  whileHover={{ scale: 1.05 }}
-                  className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all"
+                  whileHover={{ y: -5 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all group"
                 >
-                  <img
-                    src={pl.image?.[1]?.url || pl.image?.[0]?.url || "/default-playlist.jpg"}
-                    alt={pl.name}
-                    className="w-full h-48 object-cover hover:scale-105 transition-transform duration-500"
-                  />
-                  <div className="p-4 text-center">
-                    <h4 className="font-semibold truncate text-black">{pl.name}</h4>
-                    <p className="text-gray-600 text-sm truncate">
+                  <div className="relative aspect-square overflow-hidden bg-gray-100">
+                    <img
+                      src={pl.image?.[2]?.url || pl.image?.[1]?.url || "/default-playlist.jpg"}
+                      alt={pl.name}
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center">
+                      <motion.div
+                        whileHover={{ scale: 1.1 }}
+                        className="bg-[#0097b2] hover:bg-[#007a93] rounded-full w-12 h-12 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="white"
+                          viewBox="0 0 24 24"
+                          className="w-6 h-6 ml-1"
+                        >
+                          <path d="M5 3l14 9-14 9V3z" />
+                        </svg>
+                      </motion.div>
+                    </div>
+                  </div>
+                  <div className="p-4">
+                    <h4 className="font-semibold text-sm truncate text-black" title={pl.name}>{pl.name}</h4>
+                    <p className="text-gray-600 text-xs truncate">
                       {pl.language || "Mixed Languages"}
                     </p>
                   </div>

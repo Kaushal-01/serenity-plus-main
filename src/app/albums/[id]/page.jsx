@@ -54,24 +54,47 @@ export default function AlbumsByQuery() {
         <span className="text-[#0097b2]">"{decodeURIComponent(query)}"</span>
       </h1>
 
-      {/* Albums Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8">
+      {/* Albums Grid - 6 per row */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
         {albums.map((album, i) => (
           <Link
+            key={album.id || i}
             href={`/albums/details/${album.url
               ?.split("/")
               .pop()
               ?.replace("_", "")}`}
           >
-            <motion.div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all">
-              <img
-                src={album.image?.[2]?.url || album.image?.[1]?.url}
-                alt={album.name}
-                className="w-full h-48 object-cover"
-              />
+            <motion.div 
+              whileHover={{ y: -5 }}
+              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+              className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all group"
+            >
+              <div className="relative aspect-square overflow-hidden bg-gray-100">
+                <img
+                  src={album.image?.[2]?.url || album.image?.[1]?.url}
+                  alt={album.name}
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                />
+                
+                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-300 flex items-center justify-center">
+                  <motion.div
+                    whileHover={{ scale: 1.1 }}
+                    className="bg-[#0097b2] hover:bg-[#007a93] rounded-full w-12 h-12 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="white"
+                      viewBox="0 0 24 24"
+                      className="w-6 h-6 ml-1"
+                    >
+                      <path d="M5 3l14 9-14 9V3z" />
+                    </svg>
+                  </motion.div>
+                </div>
+              </div>
               <div className="p-4">
-                <h3 className="text-lg font-semibold truncate text-black">{album.name}</h3>
-                <p className="text-gray-600 text-sm truncate">
+                <h3 className="text-sm font-semibold truncate text-black" title={album.name}>{album.name}</h3>
+                <p className="text-gray-600 text-xs truncate">
                   {album.artists?.primary?.map((a) => a.name).join(", ") ||
                     "Various"}
                 </p>

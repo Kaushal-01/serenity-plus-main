@@ -215,28 +215,47 @@ export default function PlaylistDetailsPage() {
                   <div className="flex-1 min-w-0">
                     <h3 className="font-semibold text-gray-900 truncate">{song.name}</h3>
                     <p className="text-sm text-gray-600 truncate">
-                      {song.primaryArtists || song.artists?.[0]?.name || "Unknown Artist"}
+                      {song.artists?.primary?.map((artist, i) => (
+                        <span key={artist.id || i}>
+                          <button
+                            onClick={() => router.push(`/artists/${artist.id}`)}
+                            className="hover:text-[#0097b2] hover:underline transition-colors"
+                          >
+                            {artist.name}
+                          </button>
+                          {i < song.artists.primary.length - 1 && ", "}
+                        </span>
+                      )) || song.primaryArtists || song.artists?.[0]?.name || "Unknown Artist"}
                     </p>
                   </div>
+                  {song.duration && (
+                    <span className="text-sm text-gray-500 w-12 text-right">
+                      {Math.floor(song.duration / 60)}:{String(Math.floor(song.duration % 60)).padStart(2, '0')}
+                    </span>
+                  )}
                   <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => playSong(song)}
-                      className="p-2 bg-[#0097b2] hover:bg-[#007a93] text-white rounded-full transition-all opacity-0 group-hover:opacity-100"
+                    <motion.button
+                      onClick={() => playSong(song, playlist.songs)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="p-2 bg-[#0097b2] hover:bg-[#007a93] text-white rounded-full transition-all opacity-0 group-hover:opacity-100 shadow-md"
                       title="Play song"
                     >
                       <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
                       </svg>
-                    </button>
-                    <button
+                    </motion.button>
+                    <motion.button
                       onClick={() => removeSong(song.id)}
-                      className="p-2 bg-red-100 hover:bg-red-200 text-red-600 rounded-full transition-all"
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="p-2 bg-red-100 hover:bg-red-200 text-red-600 rounded-full transition-all shadow-md"
                       title="Remove from playlist"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                       </svg>
-                    </button>
+                    </motion.button>
                   </div>
                 </motion.div>
               ))}

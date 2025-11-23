@@ -185,7 +185,7 @@ export default function MiniPlayer() {
           >
             {/* Progress Bar */}
             <div
-              className="absolute top-0 left-0 right-0 h-1 bg-gray-200 rounded-t-2xl cursor-pointer group"
+              className="absolute top-0 left-0 right-0 h-1 bg-gray-200 rounded-t-2xl cursor-pointer group overflow-hidden"
               onClick={handleProgressChange}
               onMouseDown={() => setIsDragging(true)}
               onMouseUp={() => setIsDragging(false)}
@@ -193,7 +193,7 @@ export default function MiniPlayer() {
               onMouseLeave={() => setIsDragging(false)}
             >
               <motion.div
-                className="h-full bg-gradient-to-r from-[#0097b2] to-[#00b8d4] rounded-full relative"
+                className="h-full bg-gradient-to-r from-[#0097b2] to-[#00b8d4] relative"
                 style={{ width: `${(currentTime / duration) * 100 || 0}%` }}
                 animate={{ opacity: [0.8, 1, 0.8] }}
                 transition={{ duration: 2, repeat: Infinity }}
@@ -479,7 +479,7 @@ export default function MiniPlayer() {
                 className="mb-4"
               >
                 <div
-                  className="h-2 bg-white/20 rounded-full cursor-pointer group relative"
+                  className="h-2 bg-white/20 rounded-full cursor-pointer group relative overflow-hidden"
                   onClick={handleProgressChange}
                   onMouseDown={() => setIsDragging(true)}
                   onMouseUp={() => setIsDragging(false)}
@@ -487,7 +487,7 @@ export default function MiniPlayer() {
                   onMouseLeave={() => setIsDragging(false)}
                 >
                   <div
-                    className="h-full bg-gradient-to-r from-[#0097b2] to-[#00b8d4] rounded-full relative"
+                    className="h-full bg-gradient-to-r from-[#0097b2] to-[#00b8d4] relative transition-all duration-100"
                     style={{ width: `${(currentTime / duration) * 100 || 0}%` }}
                   >
                     <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity" />

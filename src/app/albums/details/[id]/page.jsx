@@ -53,19 +53,37 @@ export default function AlbumDetailsPage() {
         {album.songs?.map((song, i) => (
           <motion.div
             key={song.id || i}
-            whileHover={{ scale: 1.02 }}
-            className="flex items-center justify-between bg-white border border-gray-200 rounded-lg px-4 py-3 hover:bg-gray-50 transition-all shadow-sm hover:shadow-md"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: i * 0.05 }}
+            className="flex items-center gap-4 bg-white border border-gray-200 rounded-xl px-4 py-3 hover:bg-gray-50 transition-all shadow-sm hover:shadow-md group"
           >
-            <div>
-              <h3 className="font-semibold text-black">{song.name}</h3>
-              <p className="text-sm text-gray-600">{song.primaryArtists}</p>
+            <span className="text-gray-400 font-medium w-8">{i + 1}</span>
+            <img
+              src={song.image?.[1]?.url || song.image?.[0]?.url || album.image?.[1]?.url}
+              alt={song.name}
+              className="w-12 h-12 rounded-lg object-cover shadow-md"
+            />
+            <div className="flex-1 min-w-0">
+              <h3 className="font-semibold text-black truncate">{song.name}</h3>
+              <p className="text-sm text-gray-600 truncate">{song.primaryArtists}</p>
             </div>
-            <button
-              onClick={() => playSong(song)}
-              className="bg-[#0097b2] hover:bg-[#007a93] text-white px-4 py-1.5 rounded-full text-sm transition-all"
+            {song.duration && (
+              <span className="text-sm text-gray-500">
+                {Math.floor(song.duration / 60)}:{String(Math.floor(song.duration % 60)).padStart(2, '0')}
+              </span>
+            )}
+            <motion.button
+              onClick={() => playSong(song, album.songs)}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              className="bg-[#0097b2] hover:bg-[#007a93] text-white rounded-full w-10 h-10 flex items-center justify-center transition-all shadow-md opacity-0 group-hover:opacity-100"
+              title="Play song"
             >
-              🎵 Play
-            </button>
+              <svg className="w-5 h-5 ml-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
+              </svg>
+            </motion.button>
           </motion.div>
         ))}
       </div>

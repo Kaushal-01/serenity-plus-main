@@ -46,40 +46,36 @@ export default function AlbumsSection() {
         </div>
       </div>
 
-      {/* Album Grid */}
-      <div
-        className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6"
-      >
+      {/* Album Grid - 6 per row */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
         {albums.map((album, i) => (
           <motion.div
             key={album.id || i}
-            whileHover={{ scale: 1.05 }}
-            transition={{ type: "spring", stiffness: 200, damping: 15 }}
-            className="group relative bg-gradient-to-b from-gray-800 to-gray-900 rounded-2xl overflow-hidden shadow-lg hover:shadow-emerald-400/40 cursor-pointer"
+            whileHover={{ y: -5 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            className="group relative bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl cursor-pointer"
           >
             {/* Album Image */}
-            <div className="relative">
+            <div className="relative aspect-square overflow-hidden bg-gray-100">
               <img
                 src={album.image?.[2]?.url || album.image?.[1]?.url}
                 alt={album.name}
-                className="w-full h-56 object-cover transition-transform duration-300 group-hover:scale-110"
+                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
               />
 
-              {/* Overlay Gradient */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-70 group-hover:opacity-90 transition-opacity duration-300"></div>
+              {/* Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
-              {/* Play Button */}
+              {/* Circular Play Button */}
               <motion.div
                 whileHover={{ scale: 1.1 }}
-                className="absolute bottom-4 right-4 bg-green-500 rounded-full w-10 h-10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
+                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#0097b2] hover:bg-[#007a93] rounded-full w-12 h-12 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all shadow-lg"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="white"
                   viewBox="0 0 24 24"
-                  strokeWidth={2}
-                  stroke="none"
-                  className="w-5 h-5"
+                  className="w-6 h-6 ml-1"
                 >
                   <path d="M5 3l14 9-14 9V3z" />
                 </svg>
@@ -87,18 +83,18 @@ export default function AlbumsSection() {
             </div>
 
             {/* Album Info */}
-            <div className="p-4 flex flex-col">
-              <h3 className="text-white font-semibold text-lg truncate">
+            <div className="p-4">
+              <h3 className="text-gray-900 font-semibold text-sm truncate mb-1" title={album.name}>
                 {album.name}
               </h3>
-              <p className="text-gray-400 text-sm truncate">
+              <p className="text-gray-600 text-xs truncate mb-3" title={album.artists?.primary?.[0]?.name}>
                 {album.artists?.primary?.[0]?.name || "Unknown Artist"}
               </p>
 
               <a
                 href={album.url}
                 target="_blank"
-                className="mt-3 inline-block text-sm text-emerald-400 hover:text-emerald-300 transition-all"
+                className="inline-block text-xs text-emerald-600 hover:text-emerald-700 font-medium hover:underline transition-all"
               >
                 View Album →
               </a>

@@ -29,6 +29,17 @@ export function PlayerProvider({ children }) {
       return;
     }
     
+    // Select highest quality audio (320kbps preferred)
+    let bestQualityUrl = song.downloadUrl[0].url;
+    if (song.downloadUrl.length > 1) {
+      const highQuality = song.downloadUrl.find(dl => dl.quality === "320kbps");
+      if (highQuality) {
+        bestQualityUrl = highQuality.url;
+      } else {
+        bestQualityUrl = song.downloadUrl[song.downloadUrl.length - 1].url;
+      }
+    }
+    
     if (playlistSongs.length > 0) {
       setQueue(playlistSongs);
       const index = playlistSongs.findIndex(s => s.id === song.id);
@@ -38,7 +49,7 @@ export function PlayerProvider({ children }) {
       setCurrentIndex(0);
     }
     
-    setCurrentSong(song);
+    setCurrentSong({ ...song, selectedAudioUrl: bestQualityUrl });
     setIsPlaying(true);
     setCurrentTime(0);
     
@@ -195,7 +206,8 @@ export function PlayerProvider({ children }) {
       {/* Global Player visible on all pages */}
       <audio
         ref={audioRef}
-        src={currentSong?.downloadUrl?.[0]?.url}
+        src={currentSong?.selectedAudioUrl || currentSong?.downloadUrl?.[0]?.url}
+        preload="auto"
         onEnded={handleEnded}
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleLoadedMetadata}
