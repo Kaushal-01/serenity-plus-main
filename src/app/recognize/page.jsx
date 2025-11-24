@@ -132,12 +132,31 @@ export default function RecognizePage() {
       });
 
       mediaRecorderRef.current.ondataavailable = (event) => {
-        audioChunksRef.current.push(event.data);
+        if (event.data && event.data.size > 0) {
+          console.log(`Audio chunk received: ${event.data.size} bytes`);
+          audioChunksRef.current.push(event.data);
+        }
       };
 
       mediaRecorderRef.current.onstop = async () => {
+        console.log(`Recording stopped. Chunks collected: ${audioChunksRef.current.length}`);
+        
+        // Check if we have any recorded data
+        if (audioChunksRef.current.length === 0) {
+          setError("No audio data was recorded. Please try again.");
+          return;
+        }
+
         // Process recorded audio
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        console.log(`Audio blob created: ${audioBlob.size} bytes`);
+        
+        // Check if the blob has data
+        if (audioBlob.size === 0) {
+          setError("Recorded audio is empty. Please try again.");
+          return;
+        }
+
         const audioContext = new (window.AudioContext || window.webkitAudioContext)({
           sampleRate: 22050
         });
@@ -168,7 +187,9 @@ export default function RecognizePage() {
         await recognizeSongWithBlob(wavBlob);
       };
 
-      mediaRecorderRef.current.start();
+      // Start recording with timeslice to ensure data is captured periodically
+      // This triggers ondataavailable every 100ms
+      mediaRecorderRef.current.start(100);
       setIsRecording(true);
 
       // Start timer
@@ -268,6 +289,22 @@ export default function RecognizePage() {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
+
+  const downloadRecording = () => {
+    if (!audioBlob) {
+      setError("No recording to download");
+      return;
+    }
+
+    const url = URL.createObjectURL(audioBlob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `recording_${new Date().toISOString().replace(/[:.]/g, '-')}.wav`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -457,6 +494,23 @@ export default function RecognizePage() {
                 className="w-full py-4 rounded-full bg-red-500 hover:bg-red-600 text-white font-bold text-lg shadow-md transition-all"
               >
                 ⏹️ Stop Recording
+              </motion.button>
+            )}
+
+            {/* Download Recording Button */}
+            {audioBlob && !isRecording && !isProcessing && (
+              <motion.button
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                onClick={downloadRecording}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="w-full py-3 rounded-full bg-green-500 hover:bg-green-600 text-white font-semibold text-base shadow-md transition-all flex items-center justify-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                Download Recording
               </motion.button>
             )}
           </div>

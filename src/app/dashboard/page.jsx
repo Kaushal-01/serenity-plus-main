@@ -290,7 +290,7 @@ export default function Dashboard() {
 
       {/* 🌙 Footer */}
       <footer className="text-center text-gray-600 text-sm py-10 border-t border-gray-200">
-        Serenity 💙 
+        Serenity 
       </footer>
     </div>
   );
