@@ -17,34 +17,34 @@ export default function MoodPage() {
   const moodMap = {
     happy: {
       id: 0,
-      color: "from-yellow-400 via-orange-400 to-pink-400",
-      accent: "text-yellow-300",
-      particle: "rgba(255,200,100,0.25)",
-      aura: "rgba(255,200,100,0.15)",
+      color: "from-yellow-300 via-amber-400 to-orange-500",
+      accent: "text-amber-300",
+      particle: "rgba(255,215,0,0.3)",
+      aura: "rgba(255,200,50,0.2)",
       quote: "Feel the sunshine through the sound",
     },
     sad: {
       id: 1,
-      color: "from-blue-900 via-indigo-700 to-cyan-500",
-      accent: "text-blue-300",
-      particle: "rgba(120,180,255,0.25)",
-      aura: "rgba(80,150,255,0.15)",
+      color: "from-slate-500 via-gray-600 to-blue-800",
+      accent: "text-slate-300",
+      particle: "rgba(100,116,139,0.3)",
+      aura: "rgba(71,85,105,0.2)",
       quote: "Even the blues sing beautifully",
     },
     calm: {
       id: 2,
-      color: "from-cyan-400 via-sky-500 to-indigo-600",
-      accent: "text-cyan-300",
-      particle: "rgba(140,255,255,0.2)",
-      aura: "rgba(100,255,255,0.15)",
+      color: "from-emerald-300 via-teal-400 to-cyan-500",
+      accent: "text-teal-300",
+      particle: "rgba(45,212,191,0.3)",
+      aura: "rgba(20,184,166,0.2)",
       quote: "Breathe in the rhythm of peace",
     },
     angry: {
       id: 3,
-      color: "from-red-600 via-orange-500 to-rose-600",
-      accent: "text-red-300",
-      particle: "rgba(255,120,100,0.25)",
-      aura: "rgba(255,100,80,0.15)",
+      color: "from-rose-500 via-red-600 to-pink-700",
+      accent: "text-rose-300",
+      particle: "rgba(244,63,94,0.3)",
+      aura: "rgba(225,29,72,0.2)",
       quote: "Turn your fire into rhythm",
     },
   };
@@ -270,7 +270,7 @@ export default function MoodPage() {
             <button
               onClick={handleRecommendMore}
               disabled={reloading}
-              className="px-6 py-3 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm tracking-wide transition-all shadow-[0_0_20px_rgba(0,255,180,0.2)] hover:shadow-[0_0_30px_rgba(0,255,200,0.4)] disabled:opacity-50"
+              className="px-6 py-3 rounded-full bg-[#0097b2] hover:bg-[#007a93] text-white font-semibold text-sm tracking-wide transition-all shadow-[0_0_20px_rgba(0,151,178,0.3)] hover:shadow-[0_0_30px_rgba(0,151,178,0.5)] disabled:opacity-50"
             >
               {reloading ? "Fetching more..." : "Recommend More Songs"}
             </button>

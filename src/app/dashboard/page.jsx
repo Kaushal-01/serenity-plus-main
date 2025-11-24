@@ -19,10 +19,10 @@ export default function Dashboard() {
   const [favorites, setFavorites] = useState([]);
 
   const moodList = [
-    { id: 1, name: "Happy", emoji: "☀️", gradient: "from-yellow-400 via-orange-400 to-pink-500" },
-    { id: 2, name: "Sad", emoji: "🌧️", gradient: "from-indigo-600 via-blue-700 to-cyan-500" },
-    { id: 3, name: "Calm", emoji: "🌊", gradient: "from-cyan-400 via-sky-500 to-indigo-600" },
-    { id: 4, name: "Angry", emoji: "🔥", gradient: "from-red-600 via-orange-500 to-rose-600" },
+    { id: 1, name: "Happy", emoji: "☀️", gradient: "from-yellow-300 via-amber-400 to-orange-500" },
+    { id: 2, name: "Sad", emoji: "🌧️", gradient: "from-slate-500 via-gray-600 to-blue-800" },
+    { id: 3, name: "Calm", emoji: "🌊", gradient: "from-emerald-300 via-teal-400 to-cyan-500" },
+    { id: 4, name: "Angry", emoji: "🔥", gradient: "from-rose-500 via-red-600 to-pink-700" },
   ];
 
   useEffect(() => {
@@ -179,23 +179,47 @@ export default function Dashboard() {
       </header>
 
       {/* 🌈 Mood Selector */}
-      <section className="px-10 md:px-16 py-16 text-center">
-        <h2 className="text-3xl md:text-4xl font-bold mb-8 text-[#0097b2]">
+      <section className="px-10 md:px-16 py-16 text-center bg-gradient-to-b from-gray-50 to-white">
+        <motion.h2
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-3xl md:text-4xl font-bold mb-3 text-[#0097b2]"
+        >
           Tap Your Mood 🎧
-        </h2>
+        </motion.h2>
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          className="text-gray-600 mb-8 text-sm md:text-base"
+        >
+          Let your emotions guide your music journey
+        </motion.p>
         <div className="flex flex-wrap justify-center gap-6">
-          {moodList.map(({ id, name, emoji, gradient }) => (
+          {moodList.map(({ id, name, emoji, gradient }, index) => (
             <motion.button
               key={id}
+              initial={{ opacity: 0, scale: 0.8, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ delay: index * 0.1, type: "spring", stiffness: 200 }}
               onClick={() => router.push(`/dashboard/${name.toLowerCase()}`)}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className={`group relative w-40 h-40 rounded-3xl overflow-hidden transition-all duration-300 bg-gradient-to-br ${gradient} shadow-md hover:shadow-lg border border-gray-200`}
+              whileHover={{ scale: 1.08, rotate: 2 }}
+              whileTap={{ scale: 0.92 }}
+              className={`group relative w-40 h-40 rounded-3xl overflow-hidden transition-all duration-300 bg-gradient-to-br ${gradient} shadow-lg hover:shadow-2xl border-2 border-white/50`}
             >
-              <div className="absolute inset-0 bg-white/30 group-hover:bg-white/20 transition-all"></div>
-              <div className="relative z-10 flex flex-col items-center justify-center h-full text-black">
-                <span className="text-4xl mb-2">{emoji}</span>
-                <span className="text-lg font-semibold">{name}</span>
+              <div className="absolute inset-0 bg-white/20 group-hover:bg-white/10 transition-all"></div>
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"
+              ></motion.div>
+              <div className="relative z-10 flex flex-col items-center justify-center h-full text-white drop-shadow-lg">
+                <motion.span
+                  className="text-5xl mb-3"
+                  whileHover={{ scale: 1.2, rotate: 10 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                >
+                  {emoji}
+                </motion.span>
+                <span className="text-lg font-bold tracking-wide">{name}</span>
               </div>
             </motion.button>
           ))}
@@ -203,17 +227,28 @@ export default function Dashboard() {
       </section>
 
       {/* 🔮 Recommended for You */}
-      <section className="px-10 md:px-16 py-20">
-        <motion.h2
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-3xl font-bold mb-8 text-[#0097b2]"
-        >
-          Recommended for You
-        </motion.h2>
+      <section className="px-10 md:px-16 py-20 bg-white">
+        <div className="flex items-center justify-between mb-8">
+          <motion.h2
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="text-3xl font-bold text-[#0097b2]"
+          >
+            ✨ Recommended for You
+          </motion.h2>
+        </div>
 
         {loadingRecs ? (
-          <p className="text-gray-600 text-center animate-pulse">Loading music magic...</p>
+          <div className="flex flex-col items-center justify-center py-20">
+            <div className="relative w-20 h-20">
+              <motion.div
+                className="absolute inset-0 border-4 border-[#0097b2] border-t-transparent rounded-full"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+              />
+            </div>
+            <p className="text-gray-600 mt-4 animate-pulse">Loading music magic...</p>
+          </div>
         ) : recommendedSongs.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
             {recommendedSongs.map((song, i) => (
@@ -233,21 +268,24 @@ export default function Dashboard() {
       </section>
 
       {/* 🔥 Trending Albums */}
-      <section className="px-10 md:px-16 py-16">
+      <section className="px-10 md:px-16 py-16 bg-gradient-to-b from-white to-gray-50">
         <motion.h2
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.2 }}
           className="text-3xl font-bold mb-8 text-[#0097b2]"
         >
-          Trending Albums 🔥
+          🔥 Trending Albums
         </motion.h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
           {featuredAlbums.map((album, i) => (
             <Link key={album.id || i} href={`/albums/details/${encodeURIComponent(album.id)}`}>
               <motion.div
-                whileHover={{ y: -5 }}
-                transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all group"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.05 }}
+                whileHover={{ y: -8, scale: 1.02 }}
+                className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 group cursor-pointer"
               >
                 <div className="relative aspect-square overflow-hidden bg-gray-100">
                   <img
@@ -289,8 +327,15 @@ export default function Dashboard() {
       </div>
 
       {/* 🌙 Footer */}
-      <footer className="text-center text-gray-600 text-sm py-10 border-t border-gray-200">
-        Serenity 
+      <footer className="text-center text-gray-600 text-sm py-12 border-t border-gray-200 bg-gradient-to-t from-gray-50 to-white">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+        >
+          <p className="font-semibold text-[#0097b2] mb-2">Serenity</p>
+          <p className="text-xs text-gray-500">Your personalized music journey</p>
+        </motion.div>
       </footer>
     </div>
   );
