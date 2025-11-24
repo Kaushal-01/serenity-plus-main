@@ -291,24 +291,8 @@ export default function RecognizePage() {
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
-  const downloadRecording = () => {
-    if (!audioBlob) {
-      setError("No recording to download");
-      return;
-    }
-
-    const url = URL.createObjectURL(audioBlob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `recording_${new Date().toISOString().replace(/[:.]/g, '-')}.wav`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
-
   return (
-    <div className="min-h-screen bg-white text-black pt-20 pb-10 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 text-black dark:text-white pt-20 pb-10 px-4 transition-colors">
       <div className="max-w-2xl mx-auto">
         {/* Back Button */}
         <button
@@ -375,7 +359,7 @@ export default function RecognizePage() {
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="bg-white rounded-3xl p-8 border border-gray-200 shadow-lg"
+          className="bg-white dark:bg-gray-800 rounded-3xl p-8 border border-gray-200 dark:border-gray-700 shadow-lg transition-colors"
         >
           {/* Visual Indicator */}
           <div className="flex flex-col items-center mb-8">
@@ -385,7 +369,7 @@ export default function RecognizePage() {
                   ? "bg-red-500"
                   : isProcessing
                   ? "bg-[#0097b2]"
-                  : "bg-gray-200"
+                  : "bg-gray-200 dark:bg-gray-700"
               }`}
               animate={{
                 scale: isRecording || isProcessing ? [1, 1.05, 1] : 1,
@@ -496,23 +480,6 @@ export default function RecognizePage() {
                 ⏹️ Stop Recording
               </motion.button>
             )}
-
-            {/* Download Recording Button */}
-            {audioBlob && !isRecording && !isProcessing && (
-              <motion.button
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                onClick={downloadRecording}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="w-full py-3 rounded-full bg-green-500 hover:bg-green-600 text-white font-semibold text-base shadow-md transition-all flex items-center justify-center gap-2"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
-                Download Recording
-              </motion.button>
-            )}
           </div>
 
           {/* Error Message */}
@@ -539,17 +506,17 @@ export default function RecognizePage() {
                 className="mt-6"
               >
                 {result.status === "success" ? (
-                  <div className="p-6 bg-green-50 border border-green-300 rounded-2xl">
+                  <div className="p-6 bg-green-50 dark:bg-green-900/20 border border-green-300 dark:border-green-700 rounded-2xl transition-colors">
                     {/* Main Song */}
                     <div className="mb-4">
                       <h3 className="text-xl font-bold text-green-700 mb-3">
                         ✅ Recognized Song
                       </h3>
-                      <div className="bg-white p-4 rounded-xl border border-gray-200">
-                        <div className="text-2xl font-bold text-black mb-2">
+                      <div className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 transition-colors">
+                        <div className="text-2xl font-bold text-black dark:text-white mb-2">
                           {result.song}
                         </div>
-                        <div className="flex items-center gap-3 text-sm text-gray-700 mb-4">
+                        <div className="flex items-center gap-3 text-sm text-gray-700 dark:text-gray-300 mb-4">
                           <span className="bg-green-100 px-3 py-1 rounded-full border border-green-300">
                             Confidence: {Math.round(result.confidence * 100)}%
                           </span>
@@ -615,14 +582,14 @@ export default function RecognizePage() {
                           {result.similar_songs.map((song, index) => (
                             <div
                               key={index}
-                              className="bg-gray-50 p-3 rounded-lg hover:bg-gray-100 transition-colors group border border-gray-200"
+                              className="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors group border border-gray-200 dark:border-gray-600"
                             >
                               <div className="flex items-start justify-between gap-3">
                                 <div className="flex-1">
-                                  <div className="text-black font-medium">
+                                  <div className="text-black dark:text-white font-medium">
                                     {song.song}
                                   </div>
-                                  <div className="flex items-center gap-2 text-xs text-gray-600 mt-1">
+                                  <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 mt-1">
                                     <span>
                                       {Math.round(song.confidence * 100)}% match
                                     </span>

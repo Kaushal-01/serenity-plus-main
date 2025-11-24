@@ -308,11 +308,11 @@ export default function ChatBot() {
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-6 right-6 z-9999 w-96 h-[600px] bg-white rounded-2xl shadow-2xl flex flex-col border border-gray-200 animate-slideUp">
+        <div className="fixed bottom-6 right-6 z-9999 w-96 h-[600px] bg-white dark:bg-gray-800 rounded-2xl shadow-2xl flex flex-col border border-gray-200 dark:border-gray-700 animate-slideUp transition-colors">
           {/* Header */}
           <div className="bg-[#0097b2] text-white px-6 py-4 rounded-t-2xl flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-xl">
+              <div className="w-10 h-10 bg-white dark:bg-gray-700 rounded-full flex items-center justify-center text-xl">
                 🎵
               </div>
               <div>
@@ -332,7 +332,7 @@ export default function ChatBot() {
           </div>
 
           {/* Messages Area */}
-          <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4 bg-white">
+          <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4 bg-white dark:bg-gray-800 transition-colors">
             {messages.map((msg, index) => (
               <div
                 key={index}
@@ -342,7 +342,7 @@ export default function ChatBot() {
                   className={`max-w-[80%] px-4 py-3 rounded-2xl ${
                     msg.role === 'user'
                       ? 'bg-[#0097b2] text-white rounded-br-sm'
-                      : 'bg-gray-100 text-black rounded-bl-sm'
+                      : 'bg-gray-100 dark:bg-gray-700 text-black dark:text-white rounded-bl-sm'
                   }`}
                 >
                   <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
@@ -353,11 +353,11 @@ export default function ChatBot() {
             {/* Typing Indicator */}
             {isTyping && (
               <div className="flex justify-start">
-                <div className="bg-gray-100 text-black px-4 py-3 rounded-2xl rounded-bl-sm">
+                <div className="bg-gray-100 dark:bg-gray-700 text-black dark:text-white px-4 py-3 rounded-2xl rounded-bl-sm">
                   <div className="flex gap-1">
-                    <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
-                    <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
-                    <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                    <span className="w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                    <span className="w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                    <span className="w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
                   </div>
                 </div>
               </div>
@@ -367,11 +367,11 @@ export default function ChatBot() {
           </div>
 
           {/* Quick Actions */}
-          <div className="px-6 py-2 bg-gray-50 border-t border-gray-200 flex gap-2">
+          <div className="px-6 py-2 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 flex gap-2 transition-colors">
             <button
               onClick={requestTrivia}
               disabled={isLoading}
-              className="text-xs px-3 py-1.5 bg-white border border-gray-300 rounded-full hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="text-xs px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-black dark:text-white rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               title="Get a fun music fact"
             >
               🎵 Trivia
@@ -379,7 +379,7 @@ export default function ChatBot() {
             <button
               onClick={requestQuote}
               disabled={isLoading}
-              className="text-xs px-3 py-1.5 bg-white border border-gray-300 rounded-full hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="text-xs px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-black dark:text-white rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               title="Get an inspirational quote"
             >
               💭 Quote
@@ -387,7 +387,7 @@ export default function ChatBot() {
             <button
               onClick={clearChat}
               disabled={isLoading}
-              className="text-xs px-3 py-1.5 bg-white border border-gray-300 rounded-full hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed ml-auto"
+              className="text-xs px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-black dark:text-white rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed ml-auto"
               title="Clear conversation"
             >
               🗑️
@@ -395,7 +395,7 @@ export default function ChatBot() {
           </div>
 
           {/* Input Area */}
-          <form onSubmit={sendMessage} className="p-4 bg-white border-t border-gray-200 rounded-b-2xl">
+          <form onSubmit={sendMessage} className="p-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 rounded-b-2xl transition-colors">
             <div className="flex gap-2">
               <input
                 ref={inputRef}
@@ -403,7 +403,7 @@ export default function ChatBot() {
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 placeholder="Share how you're feeling..."
-                className="flex-1 px-4 py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-[#0097b2] focus:border-transparent transition-colors text-black placeholder-gray-400"
+                className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-full focus:outline-none focus:ring-2 focus:ring-[#0097b2] focus:border-transparent transition-colors text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
                 disabled={isLoading}
               />
               <button

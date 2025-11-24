@@ -171,7 +171,7 @@ export default function PlaylistsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white">
+      <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 transition-colors">
         <Navbar />
         <div className="pt-24 px-8 flex justify-center items-center">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#0097b2]"></div>
@@ -181,7 +181,7 @@ export default function PlaylistsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white">
+    <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 transition-colors">
       <Navbar />
       
       <div className="pt-24 px-6 pb-12 max-w-7xl mx-auto">
@@ -189,7 +189,7 @@ export default function PlaylistsPage() {
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-4xl font-bold text-[#0097b2] mb-2">My Playlists</h1>
-            <p className="text-gray-600">Create and manage your music collections</p>
+            <p className="text-gray-600 dark:text-gray-300">Create and manage your music collections</p>
           </div>
           <button
             onClick={() => {

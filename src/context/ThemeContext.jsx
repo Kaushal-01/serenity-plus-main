@@ -1,11 +1,15 @@
 "use client";
-import { useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
-export function useTheme() {
+const ThemeContext = createContext();
+
+export function ThemeProvider({ children }) {
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // Check localStorage for saved theme preference
+    setMounted(true);
+    // Sync with localStorage on mount
     const savedTheme = localStorage.getItem("theme");
     const isDark = savedTheme === "dark";
     setIsDarkMode(isDark);
@@ -35,5 +39,17 @@ export function useTheme() {
     window.dispatchEvent(new Event("theme-change"));
   };
 
-  return { isDarkMode, toggleTheme };
+  return (
+    <ThemeContext.Provider value={{ isDarkMode, toggleTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+}
+
+export function useTheme() {
+  const context = useContext(ThemeContext);
+  if (context === undefined) {
+    throw new Error("useTheme must be used within a ThemeProvider");
+  }
+  return context;
 }

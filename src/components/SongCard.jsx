@@ -38,10 +38,10 @@ export default function SongCard({
     <motion.div
       whileHover={{ y: -5 }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
-      className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all group relative"
+      className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-md hover:shadow-xl dark:shadow-gray-900/50 transition-all group relative"
     >
       {/* Image with Play Overlay */}
-      <div className="relative aspect-square overflow-hidden bg-gray-100">
+      <div className="relative aspect-square overflow-hidden bg-gray-100 dark:bg-gray-700">
         {/* Favorite Button (top-right) */}
         {showFavoriteButton && (
           <button
@@ -52,7 +52,7 @@ export default function SongCard({
             className={`absolute z-10 top-2 right-2 w-8 h-8 rounded-full flex items-center justify-center transition-all ${
               isFavorite
                 ? "bg-red-500 text-white"
-                : "bg-white/80 text-gray-600 hover:bg-red-500 hover:text-white"
+                : "bg-white/80 dark:bg-gray-800/80 text-gray-600 dark:text-gray-300 hover:bg-red-500 hover:text-white"
             }`}
             title={isFavorite ? "Remove from favorites" : "Add to favorites"}
           >
@@ -88,12 +88,12 @@ export default function SongCard({
 
       {/* Song Info */}
       <div className="p-4">
-        <h3 className="font-semibold text-gray-900 text-sm truncate mb-1" title={song.name}>
+        <h3 className="font-semibold text-gray-900 dark:text-white text-sm truncate mb-1" title={song.name}>
           {song.name}
         </h3>
         <button
           onClick={handleArtistClick}
-          className="text-xs text-gray-600 hover:text-blue-600 hover:underline truncate block w-full text-left transition-colors"
+          className="text-xs text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:underline truncate block w-full text-left transition-colors"
           title={artistName}
         >
           {artistName}
@@ -106,7 +106,7 @@ export default function SongCard({
               e.stopPropagation();
               onAddToPlaylist && onAddToPlaylist();
             }}
-            className="mt-2 w-full flex items-center justify-center gap-1 bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-lg text-xs transition-all"
+            className="mt-2 w-full flex items-center justify-center gap-1 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-3 py-1.5 rounded-lg text-xs transition-all"
             title="Add to playlist"
           >
             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

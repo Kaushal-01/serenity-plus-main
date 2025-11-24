@@ -165,21 +165,21 @@ export default function Dashboard() {
   const isFavorite = (songId) => favorites.some((f) => f.id === songId);
 
   return (
-    <div className="min-h-screen bg-white text-black overflow-x-hidden mt-20">
+    <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 text-black dark:text-white overflow-x-hidden mt-20 transition-colors">
       {/* 🎵 Header */}
-      <header className="px-10 md:px-16 py-10 flex flex-col md:flex-row justify-between items-center gap-4 bg-gray-50 rounded-b-3xl border-b border-gray-200">
+      <header className="px-10 md:px-16 py-10 flex flex-col md:flex-row justify-between items-center gap-4 bg-gray-50 dark:bg-gray-800 rounded-b-3xl border-b border-gray-200 dark:border-gray-700">
         <motion.h1
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-4xl font-extrabold tracking-tight text-black"
+          className="text-4xl font-extrabold tracking-tight text-black dark:text-white"
         >
            Welcome back, <span className="font-semibold text-[#0097b2]">{userName}👋</span> 
         </motion.h1>
       </header>
 
       {/* 🌈 Mood Selector */}
-      <section className="px-10 md:px-16 py-16 text-center bg-gradient-to-b from-gray-50 to-white">
+      <section className="px-10 md:px-16 py-16 text-center bg-gradient-to-b from-gray-50 dark:from-gray-800/50 to-white dark:to-gray-900/50">
         <motion.h2
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -191,7 +191,7 @@ export default function Dashboard() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="text-gray-600 mb-8 text-sm md:text-base"
+          className="text-gray-600 dark:text-gray-300 mb-8 text-sm md:text-base"
         >
           Let your emotions guide your music journey
         </motion.p>
@@ -227,7 +227,7 @@ export default function Dashboard() {
       </section>
 
       {/* 🔮 Recommended for You */}
-      <section className="px-10 md:px-16 py-20 bg-white">
+      <section className="px-10 md:px-16 py-20 bg-white dark:bg-gray-900">
         <div className="flex items-center justify-between mb-8">
           <motion.h2
             initial={{ opacity: 0, x: -20 }}
@@ -247,7 +247,7 @@ export default function Dashboard() {
                 transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
               />
             </div>
-            <p className="text-gray-600 mt-4 animate-pulse">Loading music magic...</p>
+            <p className="text-gray-600 dark:text-gray-400 mt-4 animate-pulse">Loading music magic...</p>
           </div>
         ) : recommendedSongs.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
@@ -263,12 +263,12 @@ export default function Dashboard() {
             ))}
           </div>
         ) : (
-          <p className="text-gray-600 text-center">No personalized songs yet 🎶</p>
+          <p className="text-gray-600 dark:text-gray-400 text-center">No personalized songs yet 🎶</p>
         )}
       </section>
 
       {/* 🔥 Trending Albums */}
-      <section className="px-10 md:px-16 py-16 bg-gradient-to-b from-white to-gray-50">
+      <section className="px-10 md:px-16 py-16 bg-gradient-to-b from-white dark:from-gray-900 to-gray-50 dark:to-gray-800">
         <motion.h2
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -285,9 +285,9 @@ export default function Dashboard() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
                 whileHover={{ y: -8, scale: 1.02 }}
-                className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 group cursor-pointer"
+                className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 group cursor-pointer"
               >
-                <div className="relative aspect-square overflow-hidden bg-gray-100">
+                <div className="relative aspect-square overflow-hidden bg-gray-100 dark:bg-gray-700">
                   <img
                     src={album.image?.[2]?.url || album.image?.[1]?.url}
                     alt={album.name}
@@ -310,8 +310,8 @@ export default function Dashboard() {
                   </div>
                 </div>
                 <div className="p-4">
-                  <h3 className="font-semibold text-sm truncate text-black" title={album.name}>{album.name}</h3>
-                  <p className="text-gray-600 text-xs truncate">
+                  <h3 className="font-semibold text-sm truncate text-black dark:text-white" title={album.name}>{album.name}</h3>
+                  <p className="text-gray-600 dark:text-gray-300 text-xs truncate">
                     {album.artists?.primary?.[0]?.name || "Unknown"}
                   </p>
                 </div>
@@ -327,7 +327,7 @@ export default function Dashboard() {
       </div>
 
       {/* 🌙 Footer */}
-      <footer className="text-center text-gray-600 text-sm py-12 border-t border-gray-200 bg-gradient-to-t from-gray-50 to-white">
+      <footer className="text-center text-gray-600 dark:text-gray-400 text-sm py-12 border-t border-gray-200 dark:border-gray-700 bg-gradient-to-t from-gray-50 dark:from-gray-800 to-white dark:to-gray-900">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

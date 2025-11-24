@@ -25,14 +25,14 @@ export default function AlbumsSection() {
     <section className="mt-16">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
-        <h2 className="text-3xl font-bold bg-gradient-to-r from-green-400 via-emerald-400 to-teal-500 bg-clip-text text-transparent">
+        <h2 className="text-3xl font-bold text-black dark:text-white">
           💿 Discover Albums
         </h2>
 
         <div className="flex items-center gap-2 mt-3 sm:mt-0">
           <input
             type="text"
-            className="border border-gray-700 bg-gray-900/70 text-white p-2 px-4 rounded-full focus:outline-none focus:ring-2 focus:ring-green-400 w-72"
+            className="border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900/70 text-black dark:text-white p-2 px-4 rounded-full focus:outline-none focus:ring-2 focus:ring-green-400 w-72 transition-colors"
             placeholder="Search for albums..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -53,10 +53,10 @@ export default function AlbumsSection() {
             key={album.id || i}
             whileHover={{ y: -5 }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
-            className="group relative bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl cursor-pointer"
+            className="group relative bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-md hover:shadow-xl dark:shadow-gray-900/50 cursor-pointer transition-colors"
           >
             {/* Album Image */}
-            <div className="relative aspect-square overflow-hidden bg-gray-100">
+            <div className="relative aspect-square overflow-hidden bg-gray-100 dark:bg-gray-700">
               <img
                 src={album.image?.[2]?.url || album.image?.[1]?.url}
                 alt={album.name}
@@ -84,10 +84,10 @@ export default function AlbumsSection() {
 
             {/* Album Info */}
             <div className="p-4">
-              <h3 className="text-gray-900 font-semibold text-sm truncate mb-1" title={album.name}>
+              <h3 className="text-gray-900 dark:text-white font-semibold text-sm truncate mb-1" title={album.name}>
                 {album.name}
               </h3>
-              <p className="text-gray-600 text-xs truncate mb-3" title={album.artists?.primary?.[0]?.name}>
+              <p className="text-gray-600 dark:text-gray-400 text-xs truncate mb-3" title={album.artists?.primary?.[0]?.name}>
                 {album.artists?.primary?.[0]?.name || "Unknown Artist"}
               </p>
 

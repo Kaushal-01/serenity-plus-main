@@ -39,7 +39,7 @@ export default function AlbumsByQuery() {
     );
 
   return (
-    <div className="min-h-screen bg-white text-black px-10 md:px-20 py-16 mt-20">
+    <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 text-black dark:text-white px-10 md:px-20 py-16 mt-20 transition-colors">
       {/* Back button */}
       <button
         onClick={() => router.back()}
@@ -67,9 +67,9 @@ export default function AlbumsByQuery() {
             <motion.div 
               whileHover={{ y: -5 }}
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all group"
+              className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden shadow-md hover:shadow-xl dark:shadow-gray-900/50 transition-all group"
             >
-              <div className="relative aspect-square overflow-hidden bg-gray-100">
+              <div className="relative aspect-square overflow-hidden bg-gray-100 dark:bg-gray-700">
                 <img
                   src={album.image?.[2]?.url || album.image?.[1]?.url}
                   alt={album.name}

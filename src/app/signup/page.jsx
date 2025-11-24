@@ -40,7 +40,7 @@ export default function Signup() {
   };
 
   return (
-    <div className="relative flex items-center justify-center min-h-screen bg-white overflow-hidden text-black">
+    <div className="relative flex items-center justify-center min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 overflow-hidden text-black dark:text-white transition-colors">
       {/* ✨ Signup Card */}
       <motion.form
         onSubmit={handleSubmit}

@@ -84,7 +84,7 @@ export default function PlaylistDetailsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white">
+      <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 transition-colors">
         <Navbar />
         <div className="pt-24 px-8 flex justify-center items-center">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#0097b2]"></div>
@@ -95,10 +95,10 @@ export default function PlaylistDetailsPage() {
 
   if (!playlist) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white">
+      <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 transition-colors">
         <Navbar />
         <div className="pt-24 px-8 text-center">
-          <p className="text-gray-600 text-xl">Playlist not found</p>
+          <p className="text-gray-600 dark:text-gray-300 text-xl">Playlist not found</p>
           <button
             onClick={() => router.push("/playlists")}
             className="mt-6 bg-[#0097b2] hover:bg-[#007a93] text-white px-6 py-3 rounded-full font-medium transition-all"
@@ -111,7 +111,7 @@ export default function PlaylistDetailsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white">
+    <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 transition-colors">
       <Navbar />
       
       <div className="pt-24 px-6 pb-12 max-w-7xl mx-auto">

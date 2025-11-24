@@ -26,14 +26,14 @@ export default function SongsSection() {
   return (
     <section className="mb-16">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
-        <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-500 bg-clip-text text-transparent">
+        <h2 className="text-3xl font-bold text-black dark:text-white">
           🎵 Discover Songs
         </h2>
 
         <div className="flex items-center gap-2 mt-3 sm:mt-0">
           <input
             type="text"
-            className="border border-gray-700 bg-gray-900/70 text-white p-2 px-4 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400 w-72"
+            className="border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900/70 text-black dark:text-white p-2 px-4 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400 w-72 transition-colors"
             placeholder="Search for songs..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}

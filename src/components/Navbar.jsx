@@ -135,7 +135,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="fixed top-0 left-0 z-50 w-full bg-white border-b border-gray-200 shadow-sm transition-all duration-300">
+    <nav className="fixed top-0 left-0 z-50 w-full bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-sm transition-all duration-300">
       <div className="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center">
         {/* 🌌 Logo */}
         <Link
@@ -156,19 +156,19 @@ export default function Navbar() {
             <>
               <Link
                 href="/dashboard"
-                className="text-black hover:text-[#0097b2] text-lg transition font-medium"
+                className="text-black dark:text-white hover:text-[#0097b2] text-lg transition font-medium"
               >
                 Dashboard
               </Link>
               <Link
                 href="/playlists"
-                className="text-black hover:text-[#0097b2] text-lg transition font-medium"
+                className="text-black dark:text-white hover:text-[#0097b2] text-lg transition font-medium"
               >
                 Playlists
               </Link>
               <Link
                 href="/favorites"
-                className="text-black hover:text-[#0097b2] text-lg transition font-medium"
+                className="text-black dark:text-white hover:text-[#0097b2] text-lg transition font-medium"
               >
                 Favorites
               </Link>
@@ -182,7 +182,7 @@ export default function Navbar() {
           {user && (
             <button
               onClick={() => setSearchOpen(true)}
-              className="flex items-center gap-2 text-black hover:text-[#0097b2] transition-all hover:scale-110"
+              className="flex items-center gap-2 text-black dark:text-white hover:text-[#0097b2] transition-all hover:scale-110"
               title="Search Music"
             >
               <svg 
@@ -205,7 +205,7 @@ export default function Navbar() {
           {user && (
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden flex items-center text-black hover:text-[#0097b2] transition-all"
+              className="md:hidden flex items-center text-black dark:text-white hover:text-[#0097b2] transition-all"
               aria-label="Toggle menu"
             >
               <svg 
@@ -237,7 +237,7 @@ export default function Navbar() {
             <>
               <Link
                 href="/login"
-                className="text-black hover:text-[#0097b2] text-lg px-3 py-1.5 rounded-full hover:bg-gray-100 transition-all font-medium"
+                className="text-black dark:text-white hover:text-[#0097b2] text-lg px-3 py-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-all font-medium"
               >
                 Login
               </Link>
@@ -253,7 +253,7 @@ export default function Navbar() {
               {/* Harmony Chat Icon */}
               <button
                 onClick={() => window.dispatchEvent(new CustomEvent('toggle-harmony-chat'))}
-                className="hidden md:flex items-center gap-2 text-black hover:text-[#0097b2] transition-all hover:scale-110 group"
+                className="hidden md:flex items-center gap-2 text-black dark:text-white hover:text-[#0097b2] transition-all hover:scale-110 group"
                 title="Chat with SerenityAI"
               >
                 <svg 
@@ -274,16 +274,16 @@ export default function Navbar() {
               <div className="hidden md:block relative">
                 <button
                 onClick={() => setMenuOpen(!menuOpen)}
-                className="flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-full hover:bg-gray-200 transition-all"
+                className="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 px-4 py-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-all"
               >
-                <motion.span layout className="text-sm font-medium text-black">
+                <motion.span layout className="text-sm font-medium text-black dark:text-white">
                   {user.name?.split(" ")[0] || "User"}
                 </motion.span>
                 <motion.svg
                   animate={{ rotate: menuOpen ? 180 : 0 }}
                   transition={{ duration: 0.2 }}
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 text-black"
+                  className="h-4 w-4 text-black dark:text-white"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -305,32 +305,32 @@ export default function Navbar() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.2 }}
-                    className="absolute right-0 mt-3 w-48 bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-lg"
+                    className="absolute right-0 mt-3 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden shadow-lg"
                   >
                     <Link
                       href="/profile"
                       onClick={() => setMenuOpen(false)}
-                      className="block px-4 py-2 text-sm text-black hover:bg-gray-100 transition-all font-medium"
+                      className="block px-4 py-2 text-sm text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition-all font-medium"
                     >
                       My Profile
                     </Link>
                     <Link
                       href="/playlists"
                       onClick={() => setMenuOpen(false)}
-                      className="block px-4 py-2 text-sm text-black hover:bg-gray-100 transition-all font-medium"
+                      className="block px-4 py-2 text-sm text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition-all font-medium"
                     >
                       My Playlists
                     </Link>
                     <Link
                       href="/favorites"
                       onClick={() => setMenuOpen(false)}
-                      className="block px-4 py-2 text-sm text-black hover:bg-gray-100 transition-all font-medium"
+                      className="block px-4 py-2 text-sm text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition-all font-medium"
                     >
                       Favorites
                     </Link>
                     <button
                       onClick={logout}
-                      className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 transition-all font-medium"
+                      className="block w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all font-medium"
                     >
                       Logout
                     </button>
@@ -351,34 +351,34 @@ export default function Navbar() {
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="md:hidden bg-white border-t border-gray-200 overflow-hidden"
+            className="md:hidden bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 overflow-hidden"
           >
             <div className="px-6 py-4 space-y-3">
               <Link
                 href="/dashboard"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block text-black hover:text-[#0097b2] text-base font-medium py-2 transition-all"
+                className="block text-black dark:text-white hover:text-[#0097b2] text-base font-medium py-2 transition-all"
               >
                 📊 Dashboard
               </Link>
               <Link
                 href="/playlists"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block text-black hover:text-[#0097b2] text-base font-medium py-2 transition-all"
+                className="block text-black dark:text-white hover:text-[#0097b2] text-base font-medium py-2 transition-all"
               >
                 🎶 Playlists
               </Link>
               <Link
                 href="/favorites"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block text-black hover:text-[#0097b2] text-base font-medium py-2 transition-all"
+                className="block text-black dark:text-white hover:text-[#0097b2] text-base font-medium py-2 transition-all"
               >
                 ❤️ Favorites
               </Link>
               <Link
                 href="/profile"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block text-black hover:text-[#0097b2] text-base font-medium py-2 transition-all"
+                className="block text-black dark:text-white hover:text-[#0097b2] text-base font-medium py-2 transition-all"
               >
                 👤 My Profile
               </Link>
@@ -387,17 +387,17 @@ export default function Navbar() {
                   window.dispatchEvent(new CustomEvent('toggle-harmony-chat'));
                   setMobileMenuOpen(false);
                 }}
-                className="block w-full text-left text-black hover:text-[#0097b2] text-base font-medium py-2 transition-all"
+                className="block w-full text-left text-black dark:text-white hover:text-[#0097b2] text-base font-medium py-2 transition-all"
               >
                 💬 Serenity AI
               </button>
-              <hr className="border-gray-200 my-2" />
+              <hr className="border-gray-200 dark:border-gray-700 my-2" />
               <button
                 onClick={() => {
                   logout();
                   setMobileMenuOpen(false);
                 }}
-                className="block w-full text-left text-red-600 hover:text-red-700 text-base font-medium py-2 transition-all"
+                className="block w-full text-left text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 text-base font-medium py-2 transition-all"
               >
                 🚪 Logout
               </button>
@@ -421,7 +421,7 @@ export default function Navbar() {
               animate={{ y: 0, opacity: 1, scale: 1 }}
               exit={{ y: -50, opacity: 0, scale: 0.95 }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="bg-white rounded-3xl p-6 md:p-8 max-w-5xl w-full shadow-2xl max-h-[85vh] overflow-y-auto"
+              className="bg-white dark:bg-gray-800 rounded-3xl p-6 md:p-8 max-w-5xl w-full shadow-2xl max-h-[85vh] overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Search Header */}
@@ -429,11 +429,11 @@ export default function Navbar() {
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <h2 className="text-3xl font-bold bg-gradient-to-r from-[#0097b2] to-[#00b8d4] bg-clip-text text-transparent">Quick Search</h2>
-                    <p className="text-sm text-gray-500 mt-1">Results appear as you type</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Results appear as you type</p>
                   </div>
                   <button
                     onClick={closeSearch}
-                    className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition-all"
+                    className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 transition-all"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -444,7 +444,7 @@ export default function Navbar() {
                 {/* Search Input */}
                 <div className="relative">
                   <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none">
-                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                   </div>
@@ -454,9 +454,9 @@ export default function Navbar() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyDown={handleSearchKeyDown}
-                    className="w-full pl-14 pr-12 py-4 text-base border-2 border-gray-200 bg-white text-black rounded-2xl 
+                    className="w-full pl-14 pr-12 py-4 text-base border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-black dark:text-white rounded-2xl 
                     focus:outline-none focus:border-[#0097b2] focus:ring-4 focus:ring-[#0097b2]/20 
-                    placeholder-gray-400 transition-all"
+                    placeholder-gray-400 dark:placeholder-gray-500 transition-all"
                     autoFocus
                   />
                   {searchLoading && (
@@ -481,7 +481,7 @@ export default function Navbar() {
               {searchLoading ? (
                 <div className="flex flex-col items-center justify-center py-12">
                   <div className="w-12 h-12 border-3 border-[#0097b2] border-t-transparent rounded-full animate-spin mb-4"></div>
-                  <p className="text-gray-600">Searching...</p>
+                  <p className="text-gray-600 dark:text-gray-400">Searching...</p>
                 </div>
               ) : (
                 <div className="space-y-8">
@@ -495,8 +495,8 @@ export default function Navbar() {
                           </svg>
                         </div>
                         <div>
-                          <h3 className="text-lg font-bold text-gray-900">Songs</h3>
-                          <p className="text-xs text-gray-500">{searchResults.songs.length} found</p>
+                          <h3 className="text-lg font-bold text-gray-900 dark:text-white">Songs</h3>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">{searchResults.songs.length} found</p>
                         </div>
                       </div>
                       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
@@ -507,13 +507,13 @@ export default function Navbar() {
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ delay: i * 0.05 }}
                             whileHover={{ y: -3 }}
-                            className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all cursor-pointer group"
+                            className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all cursor-pointer group"
                             onClick={() => {
                               playSong(song, searchResults.songs);
                               closeSearch();
                             }}
                           >
-                            <div className="relative aspect-square overflow-hidden bg-gray-100">
+                            <div className="relative aspect-square overflow-hidden bg-gray-100 dark:bg-gray-600">
                               <img
                                 src={song.image?.[2]?.url || song.image?.[1]?.url || song.image?.[0]?.url}
                                 alt={song.name}
@@ -528,8 +528,8 @@ export default function Navbar() {
                               </div>
                             </div>
                             <div className="p-3">
-                              <h4 className="font-semibold text-sm truncate text-black">{song.name}</h4>
-                              <p className="text-gray-600 text-xs truncate">{song.primaryArtists}</p>
+                              <h4 className="font-semibold text-sm truncate text-black dark:text-white">{song.name}</h4>
+                              <p className="text-gray-600 dark:text-gray-300 text-xs truncate">{song.primaryArtists}</p>
                             </div>
                           </motion.div>
                         ))}
@@ -547,8 +547,8 @@ export default function Navbar() {
                           </svg>
                         </div>
                         <div>
-                          <h3 className="text-lg font-bold text-gray-900">Albums</h3>
-                          <p className="text-xs text-gray-500">{searchResults.albums.length} found</p>
+                          <h3 className="text-lg font-bold text-gray-900 dark:text-white">Albums</h3>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">{searchResults.albums.length} found</p>
                         </div>
                       </div>
                       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
@@ -563,9 +563,9 @@ export default function Navbar() {
                               animate={{ opacity: 1, scale: 1 }}
                               transition={{ delay: i * 0.05 }}
                               whileHover={{ y: -3 }}
-                              className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all group"
+                              className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all group"
                             >
-                              <div className="relative aspect-square overflow-hidden bg-gray-100">
+                              <div className="relative aspect-square overflow-hidden bg-gray-100 dark:bg-gray-600">
                                 <img
                                   src={album.image?.[2]?.url || album.image?.[1]?.url || album.image?.[0]?.url}
                                   alt={album.name}
@@ -580,8 +580,8 @@ export default function Navbar() {
                                 </div>
                               </div>
                               <div className="p-3">
-                                <h4 className="font-semibold text-sm truncate text-black">{album.name}</h4>
-                                <p className="text-gray-600 text-xs truncate">{album.primaryArtists}</p>
+                                <h4 className="font-semibold text-sm truncate text-black dark:text-white">{album.name}</h4>
+                                <p className="text-gray-600 dark:text-gray-300 text-xs truncate">{album.primaryArtists}</p>
                               </div>
                             </motion.div>
                           </Link>
@@ -600,8 +600,8 @@ export default function Navbar() {
                           </svg>
                         </div>
                         <div>
-                          <h3 className="text-lg font-bold text-gray-900">Playlists</h3>
-                          <p className="text-xs text-gray-500">{searchResults.playlists.length} found</p>
+                          <h3 className="text-lg font-bold text-gray-900 dark:text-white">Playlists</h3>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">{searchResults.playlists.length} found</p>
                         </div>
                       </div>
                       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
@@ -616,9 +616,9 @@ export default function Navbar() {
                               animate={{ opacity: 1, scale: 1 }}
                               transition={{ delay: i * 0.05 }}
                               whileHover={{ y: -3 }}
-                              className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all group cursor-pointer"
+                              className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all group cursor-pointer"
                             >
-                              <div className="relative aspect-square overflow-hidden bg-gray-100">
+                              <div className="relative aspect-square overflow-hidden bg-gray-100 dark:bg-gray-600">
                                 <img
                                   src={playlist.image?.[1]?.url || playlist.image?.[0]?.url}
                                   alt={playlist.name}
@@ -633,8 +633,8 @@ export default function Navbar() {
                                 </div>
                               </div>
                               <div className="p-3">
-                                <h4 className="font-semibold text-sm truncate text-black">{playlist.name}</h4>
-                                <p className="text-gray-600 text-xs truncate">{playlist.language || "Mixed"}</p>
+                                <h4 className="font-semibold text-sm truncate text-black dark:text-white">{playlist.name}</h4>
+                                <p className="text-gray-600 dark:text-gray-300 text-xs truncate">{playlist.language || "Mixed"}</p>
                               </div>
                             </motion.div>
                           </Link>
@@ -649,13 +649,13 @@ export default function Navbar() {
                     searchResults.albums.length === 0 && 
                     searchResults.playlists.length === 0 && (
                       <div className="flex flex-col items-center justify-center py-16">
-                        <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                          <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div className="w-20 h-20 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
+                          <svg className="w-10 h-10 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                           </svg>
                         </div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-2">No results found</h3>
-                        <p className="text-gray-600">Try different keywords or check spelling</p>
+                        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">No results found</h3>
+                        <p className="text-gray-600 dark:text-gray-400">Try different keywords or check spelling</p>
                       </div>
                     )}
 
@@ -667,8 +667,8 @@ export default function Navbar() {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
                       </div>
-                      <h3 className="text-xl font-bold text-gray-900 mb-2">Start searching</h3>
-                      <p className="text-gray-600">Type to discover songs, albums, and playlists</p>
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Start searching</h3>
+                      <p className="text-gray-600 dark:text-gray-400">Type to discover songs, albums, and playlists</p>
                     </div>
                   )}
                 </div>

@@ -30,7 +30,7 @@ export default function AlbumDetailsPage() {
   if (!album) return <p className="text-center text-gray-600 mt-20">Album not found.</p>;
 
   return (
-    <div className="min-h-screen bg-white text-black px-10 md:px-20 py-16 mt-20">
+    <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 text-black dark:text-white px-10 md:px-20 py-16 mt-20 transition-colors">
       {/* Album Header */}
       <div className="flex flex-col md:flex-row gap-8 items-center mb-10">
         <img
@@ -56,20 +56,20 @@ export default function AlbumDetailsPage() {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: i * 0.05 }}
-            className="flex items-center gap-4 bg-white border border-gray-200 rounded-xl px-4 py-3 hover:bg-gray-50 transition-all shadow-sm hover:shadow-md group"
+            className="flex items-center gap-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all shadow-sm hover:shadow-md group"
           >
-            <span className="text-gray-400 font-medium w-8">{i + 1}</span>
+            <span className="text-gray-400 dark:text-gray-500 font-medium w-8">{i + 1}</span>
             <img
               src={song.image?.[1]?.url || song.image?.[0]?.url || album.image?.[1]?.url}
               alt={song.name}
               className="w-12 h-12 rounded-lg object-cover shadow-md"
             />
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-black truncate">{song.name}</h3>
-              <p className="text-sm text-gray-600 truncate">{song.primaryArtists}</p>
+              <h3 className="font-semibold text-black dark:text-white truncate">{song.name}</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400 truncate">{song.primaryArtists}</p>
             </div>
             {song.duration && (
-              <span className="text-sm text-gray-500">
+              <span className="text-sm text-gray-500 dark:text-gray-400">
                 {Math.floor(song.duration / 60)}:{String(Math.floor(song.duration % 60)).padStart(2, '0')}
               </span>
             )}

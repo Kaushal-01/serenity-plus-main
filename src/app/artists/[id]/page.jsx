@@ -53,7 +53,7 @@ export default function ArtistPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-white">
+      <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 transition-colors">
         <Navbar />
         <div className="pt-24 flex justify-center items-center">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-600"></div>
@@ -63,7 +63,7 @@ export default function ArtistPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-white">
+    <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 transition-colors">
       <Navbar />
       
       <div className="pt-24 px-6 pb-12 max-w-7xl mx-auto">
@@ -80,7 +80,7 @@ export default function ArtistPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-2xl shadow-lg p-8 mb-8"
+          className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-8 transition-colors"
         >
           <div className="flex items-start gap-6">
             {artist?.image?.[2]?.url || artist?.image?.[1]?.url ? (
@@ -97,8 +97,8 @@ export default function ArtistPage() {
               </div>
             )}
             <div className="flex-1">
-              <h1 className="text-4xl font-bold text-gray-900 mb-3">{artist?.name}</h1>
-              <div className="flex items-center gap-4 text-sm text-gray-600">
+              <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-3">{artist?.name}</h1>
+              <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
                 {artist?.followerCount && (
                   <span className="flex items-center gap-1">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -127,7 +127,7 @@ export default function ArtistPage() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.1 }}
         >
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
             {songs.length > 0 ? "Top Songs" : "No Songs Available"}
           </h2>
           
@@ -148,8 +148,8 @@ export default function ArtistPage() {
               ))}
             </div>
           ) : (
-            <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
-              <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-12 text-center transition-colors">
+              <div className="w-20 h-20 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
                 </svg>

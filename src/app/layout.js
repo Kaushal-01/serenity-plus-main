@@ -2,6 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import { PlayerProvider } from "./../context/PlayerContext";
+import { ThemeProvider } from "./../context/ThemeContext";
 import MiniPlayer from "../context/MiniPlayer";
 import ChatBot from "@/components/ChatBot";
 import AudioRecognitionButton from "@/components/AudioRecognitionButton";
@@ -24,15 +25,30 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                if (localStorage.getItem('theme') === 'dark') {
+                  document.documentElement.classList.add('dark');
+                }
+              } catch (e) {}
+            `,
+          }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <PlayerProvider>
-        <Navbar />
-        {children}
-        <ChatBot />
-        <AudioRecognitionButton />
-        </PlayerProvider>
+        <ThemeProvider>
+          <PlayerProvider>
+            <Navbar />
+            {children}
+            <ChatBot />
+            <AudioRecognitionButton />
+          </PlayerProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -52,7 +52,7 @@ export default function Login() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-white text-black">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 text-black dark:text-white transition-colors">
       <form
         onSubmit={handleSubmit}
         className="bg-white border border-gray-300 shadow-lg p-8 rounded-2xl w-96"

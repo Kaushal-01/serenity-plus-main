@@ -183,13 +183,13 @@ export default function MiniPlayer() {
             exit={{ y: 100, opacity: 0 }}
             transition={{ type: "spring", stiffness: 120, damping: 18 }}
             className="fixed bottom-4 left-1/2 -translate-x-1/2 w-[95%] md:w-[80%] lg:w-[70%] xl:w-[60%]
-            rounded-2xl bg-gradient-to-br from-white to-gray-50 border border-gray-200
-            shadow-2xl text-black z-[999] hover:shadow-3xl
+            rounded-2xl bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 border border-gray-200 dark:border-gray-700
+            shadow-2xl text-black dark:text-white z-[999] hover:shadow-3xl
             transition-all duration-300 backdrop-blur-lg"
           >
             {/* Progress Bar */}
             <div
-              className="absolute top-0 left-0 right-0 h-1 bg-gray-200 rounded-t-2xl cursor-pointer group overflow-hidden"
+              className="absolute top-0 left-0 right-0 h-1 bg-gray-200 dark:bg-gray-700 rounded-t-2xl cursor-pointer group overflow-hidden"
               onClick={handleProgressChange}
               onMouseDown={() => setIsDragging(true)}
               onMouseUp={() => setIsDragging(false)}
@@ -217,7 +217,7 @@ export default function MiniPlayer() {
                   <img
                     src={currentSong?.image?.[2]?.url || "/default-song.jpg"}
                     alt={currentSong?.name}
-                    className="w-14 h-14 md:w-16 md:h-16 rounded-xl object-cover border-2 border-gray-200 shadow-md"
+                    className="w-14 h-14 md:w-16 md:h-16 rounded-xl object-cover border-2 border-gray-200 dark:border-gray-600 shadow-md"
                   />
                   {isPlaying && (
                     <div className="absolute inset-0 bg-black/30 rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -227,16 +227,16 @@ export default function MiniPlayer() {
                 </motion.div>
 
                 <div className="flex flex-col min-w-0 flex-1">
-                  <h4 className="font-semibold text-sm md:text-base truncate text-black">
+                  <h4 className="font-semibold text-sm md:text-base truncate text-black dark:text-white">
                     {currentSong?.name || "Unknown Track"}
                   </h4>
-                  <p className="text-gray-600 text-xs md:text-sm truncate">
+                  <p className="text-gray-600 dark:text-gray-400 text-xs md:text-sm truncate">
                     {currentSong?.artists?.primary?.map((a) => a.name).join(", ") || "Unknown Artist"}
                   </p>
                   <div className="flex items-center gap-2 mt-1">
-                    <span className="text-xs text-gray-500">{formatTime(currentTime)}</span>
-                    <span className="text-xs text-gray-400">/</span>
-                    <span className="text-xs text-gray-500">{formatTime(duration)}</span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">{formatTime(currentTime)}</span>
+                    <span className="text-xs text-gray-400 dark:text-gray-500">/</span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">{formatTime(duration)}</span>
                   </div>
                 </div>
               </div>
@@ -338,7 +338,7 @@ export default function MiniPlayer() {
                     onClick={toggleMute}
                     whileTap={{ scale: 0.9 }}
                     className="hidden md:flex w-9 h-9 items-center justify-center rounded-full 
-                    bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-200 transition-all"
+                    bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 transition-all"
                   >
                     {getVolumeIcon()}
                   </motion.button>
@@ -349,7 +349,7 @@ export default function MiniPlayer() {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 10 }}
-                        className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-white rounded-lg shadow-lg border border-gray-200 p-3"
+                        className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-3"
                       >
                         <input
                           type="range"

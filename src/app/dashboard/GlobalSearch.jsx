@@ -201,9 +201,9 @@ export default function GlobalSearch() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && searchAll()}
-              className="w-full pl-14 pr-6 py-4 text-lg border-2 border-gray-200 bg-white text-black rounded-2xl 
+              className="w-full pl-14 pr-6 py-4 text-lg border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-black dark:text-white rounded-2xl 
               focus:outline-none focus:border-[#0097b2] focus:ring-4 focus:ring-[#0097b2]/20 
-              placeholder-gray-400 transition-all shadow-sm hover:shadow-md"
+              placeholder-gray-400 dark:placeholder-gray-500 transition-all shadow-sm hover:shadow-md"
             />
             {loading && (
               <div className="absolute inset-y-0 right-5 flex items-center">
@@ -221,7 +221,7 @@ export default function GlobalSearch() {
               </button>
             )}
           </div>
-          <div className="flex items-center justify-center gap-2 mt-4 text-sm text-gray-500">
+          <div className="flex items-center justify-center gap-2 mt-4 text-sm text-gray-500 dark:text-gray-400">
             <span>💡 Tip: Results appear as you type</span>
           </div>
         </motion.div>
@@ -263,8 +263,8 @@ export default function GlobalSearch() {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="text-3xl font-bold text-gray-900">Songs</h3>
-                    <p className="text-sm text-gray-500">{results.songs.length} results found</p>
+                    <h3 className="text-3xl font-bold text-[#0097b2]">Songs</h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{results.songs.length} results found</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
@@ -305,8 +305,8 @@ export default function GlobalSearch() {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="text-3xl font-bold text-gray-900">Albums</h3>
-                    <p className="text-sm text-gray-500">{results.albums.length} albums found</p>
+                    <h3 className="text-3xl font-bold text-[#0097b2]">Albums</h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{results.albums.length} albums found</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
@@ -321,9 +321,9 @@ export default function GlobalSearch() {
                         <motion.div
                           whileHover={{ y: -5 }}
                           transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                          className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all group"
+                          className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden shadow-md hover:shadow-xl dark:shadow-gray-900/50 transition-all group"
                         >
-                    <div className="relative aspect-square overflow-hidden bg-gray-100">
+                    <div className="relative aspect-square overflow-hidden bg-gray-100 dark:bg-gray-700">
                       <img
                         src={album.image?.[2]?.url || album.image?.[1]?.url || "/default-album.jpg"}
                         alt={album.name}
@@ -346,8 +346,8 @@ export default function GlobalSearch() {
                       </div>
                     </div>
                           <div className="p-4">
-                            <h4 className="font-semibold text-sm truncate text-black" title={album.name}>{album.name}</h4>
-                            <p className="text-gray-600 text-xs truncate">
+                            <h4 className="font-semibold text-sm truncate text-black dark:text-white" title={album.name}>{album.name}</h4>
+                            <p className="text-gray-600 dark:text-gray-400 text-xs truncate">
                               {album.primaryArtists || "Unknown Artist"}
                             </p>
                           </div>
@@ -373,8 +373,8 @@ export default function GlobalSearch() {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="text-3xl font-bold text-gray-900">Playlists</h3>
-                    <p className="text-sm text-gray-500">{results.playlists.length} playlists found</p>
+                    <h3 className="text-3xl font-bold text-[#0097b2]">Playlists</h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{results.playlists.length} playlists found</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
@@ -385,9 +385,9 @@ export default function GlobalSearch() {
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: i * 0.05, duration: 0.3 }}
                         whileHover={{ y: -5 }}
-                        className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all group cursor-pointer"
+                        className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden shadow-md hover:shadow-xl dark:shadow-gray-900/50 transition-all group cursor-pointer"
                       >
-                        <div className="relative aspect-square overflow-hidden bg-gray-100">
+                        <div className="relative aspect-square overflow-hidden bg-gray-100 dark:bg-gray-700">
                           <img
                             src={pl.image?.[2]?.url || pl.image?.[1]?.url || "/default-playlist.jpg"}
                             alt={pl.name}
@@ -407,8 +407,8 @@ export default function GlobalSearch() {
                           </div>
                         </div>
                         <div className="p-4">
-                          <h4 className="font-semibold text-sm truncate text-black" title={pl.name}>{pl.name}</h4>
-                          <p className="text-gray-600 text-xs truncate">
+                          <h4 className="font-semibold text-sm truncate text-black dark:text-white" title={pl.name}>{pl.name}</h4>
+                          <p className="text-gray-600 dark:text-gray-400 text-xs truncate">
                             {pl.language || "Mixed Languages"}
                           </p>
                         </div>
@@ -428,13 +428,13 @@ export default function GlobalSearch() {
                   animate={{ opacity: 1, y: 0 }}
                   className="flex flex-col items-center justify-center py-20"
                 >
-                  <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-6">
-                    <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-24 h-24 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-6">
+                    <svg className="w-12 h-12 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
                     </svg>
                   </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">No results found</h3>
-                  <p className="text-gray-600 text-lg text-center max-w-md">
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">No results found</h3>
+                  <p className="text-gray-600 dark:text-gray-400 text-lg text-center max-w-md">
                     {query ? `We couldn't find anything matching "${query}". Try a different search term.` : "Start typing to discover amazing music 🎶"}
                   </p>
                 </motion.div>
@@ -457,17 +457,17 @@ export default function GlobalSearch() {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl max-h-[80vh] overflow-y-auto"
+              className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-md w-full shadow-2xl max-h-[80vh] overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
             >
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Add to Playlist</h3>
-              <p className="text-sm text-gray-600 mb-6">
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Add to Playlist</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
                 Adding: <strong>{selectedSong?.name}</strong>
               </p>
 
               {userPlaylists.length === 0 ? (
                 <div className="text-center py-8">
-                  <p className="text-gray-600 mb-4">You don't have any playlists yet.</p>
+                  <p className="text-gray-600 dark:text-gray-400 mb-4">You don't have any playlists yet.</p>
                   <button
                     onClick={() => {
                       setShowPlaylistModal(false);
@@ -484,11 +484,11 @@ export default function GlobalSearch() {
                     <button
                       key={playlist._id}
                       onClick={() => addToPlaylist(playlist._id)}
-                      className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-xl transition-all text-left group"
+                      className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-xl transition-all text-left group"
                     >
                       <div>
-                        <h4 className="font-semibold text-gray-900">{playlist.name}</h4>
-                        <p className="text-xs text-gray-600">
+                        <h4 className="font-semibold text-gray-900 dark:text-white">{playlist.name}</h4>
+                        <p className="text-xs text-gray-600 dark:text-gray-400">
                           {playlist.songs?.length || 0} songs
                         </p>
                       </div>
@@ -505,7 +505,7 @@ export default function GlobalSearch() {
                   setShowPlaylistModal(false);
                   setSelectedSong(null);
                 }}
-                className="mt-6 w-full bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg font-medium transition-all"
+                className="mt-6 w-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg font-medium transition-all"
               >
                 Cancel
               </button>

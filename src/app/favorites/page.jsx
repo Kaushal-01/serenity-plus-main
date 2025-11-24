@@ -53,7 +53,7 @@ export default function FavoritesPage() {
 
   return (
     <>
-      <div className="mt-10 min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white text-black p-8">
+      <div className="mt-10 min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 text-black dark:text-white p-8 transition-colors">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
