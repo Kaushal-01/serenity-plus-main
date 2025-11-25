@@ -33,13 +33,18 @@ const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
+  gender: { type: String },
+  ageGroup: { type: String },
+  occupation: { type: String },
+  listeningHabits: { type: String },
   favorites: { type: [favoriteSchema], default: [] },
   playlists: { type: [playlistSchema], default: [] },
-   preferences: {
+  preferences: {
     genres: [String],
     artists: [String],
     isSetupComplete: { type: Boolean, default: false }
-  }
+  },
+  createdAt: { type: Date, default: Date.now }
 });
 
 export default mongoose.models.User || mongoose.model("User", userSchema);

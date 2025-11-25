@@ -17,9 +17,9 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen flex flex-col bg-white text-black">
+    <main className="h-screen flex flex-col bg-white text-black overflow-hidden">
       {/* ================= NAVBAR ================= */}
-      <nav className="w-full fixed top-0 z-20 flex justify-between items-center px-6 sm:px-10 py-4 bg-white border-b border-gray-200 shadow-sm">
+      <nav className="w-full flex justify-between items-center px-6 sm:px-10 py-3 bg-white border-b border-gray-200 shadow-sm">
         <h1 className="text-2xl sm:text-3xl font-bold text-[#0097b2] tracking-tight">
           Serenity
         </h1>
@@ -61,26 +61,26 @@ export default function Home() {
       </nav>
 
       {/* ================= HERO SECTION ================= */}
-      <section className="flex flex-col items-center justify-center text-center flex-grow px-6 pt-28 sm:pt-36">
-        <h2 className="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-6 text-[#0097b2] leading-tight">
+      <section className="flex flex-col items-center justify-center text-center px-6 py-8">
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 text-[#0097b2] leading-tight">
           Feel the Music with Serenity
         </h2>
-        <p className="text-gray-600 text-base sm:text-lg max-w-xl mb-8">
+        <p className="text-gray-600 text-sm sm:text-base max-w-xl mb-6">
           Discover songs, albums, and artists like never before — all in one elegant,
           immersive experience.
         </p>
 
         {!user ? (
-          <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-6">
             <Link
               href="/signup"
-              className="px-6 py-3 rounded-full bg-[#0097b2] hover:bg-[#007a93] transition text-base sm:text-lg font-semibold text-white"
+              className="px-6 py-2.5 rounded-full bg-[#0097b2] hover:bg-[#007a93] transition text-base font-semibold text-white"
             >
               Get Started
             </Link>
             <Link
               href="/login"
-              className="px-6 py-3 rounded-full border-2 border-[#0097b2] hover:bg-[#0097b2] hover:text-white transition text-base sm:text-lg font-semibold text-[#0097b2]"
+              className="px-6 py-2.5 rounded-full border-2 border-[#0097b2] hover:bg-[#0097b2] hover:text-white transition text-base font-semibold text-[#0097b2]"
             >
               Log In
             </Link>
@@ -88,7 +88,7 @@ export default function Home() {
         ) : (
           <Link
             href="/dashboard"
-            className="px-8 py-3 rounded-full bg-[#0097b2] hover:bg-[#007a93] transition text-lg font-semibold text-white"
+            className="px-8 py-2.5 rounded-full bg-[#0097b2] hover:bg-[#007a93] transition text-base font-semibold text-white mb-6"
           >
             Go to Dashboard →
           </Link>
@@ -96,27 +96,63 @@ export default function Home() {
       </section>
 
       {/* ================= FEATURE GRID ================= */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-8 pb-20 mt-8">
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 px-6 sm:px-8 pb-6 flex-1 content-start">
         {[
-          { title: "Top Charts", desc: "Listen to trending hits right now." },
-          { title: "New Releases", desc: "Discover the latest from your favorite artists." },
-          { title: "Made For You", desc: "Personalized playlists to match your mood." },
-          { title: "Classic Vibes", desc: "Rediscover timeless melodies." },
-          { title: "Regional Beats", desc: "Enjoy the sound of every region." },
-          { title: "Podcasts", desc: "Stream stories, shows, and talks." },
+          { 
+            title: "Mood-Based Music", 
+            icon: "🎭",
+            desc: "Get personalized recommendations based on your emotions - Happy, Sad, Calm, or Angry."
+          },
+          { 
+            title: "Smart Search", 
+            icon: "🔍",
+            desc: "Search for songs, albums, artists, and playlists across the entire music library."
+          },
+          { 
+            title: "Favorites & Playlists", 
+            icon: "❤️",
+            desc: "Save your favorite songs and create custom playlists for every occasion."
+          },
+          { 
+            title: "Audio Recognition", 
+            icon: "🎙️",
+            desc: "Identify any song by recording a short audio clip - find music instantly."
+          },
+          { 
+            title: "AI Music Assistant", 
+            icon: "🤖",
+            desc: "Chat with our AI bot for personalized music recommendations and discovery."
+          },
+          { 
+            title: "Full-Featured Player", 
+            icon: "🎵",
+            desc: "Advanced music player with shuffle, repeat, queue management, and volume control."
+          },
         ].map((feature, i) => (
           <div
             key={i}
-            className="bg-white hover:bg-gray-50 transition p-6 rounded-2xl border border-gray-200 shadow-sm"
+            className="group relative bg-white hover:bg-gray-50 
+            transition-all duration-300 p-4 rounded-2xl border border-gray-200 
+            hover:border-[#0097b2] hover:shadow-lg hover:shadow-[#0097b2]/10 
+            hover:-translate-y-1 cursor-pointer"
           >
-            <h3 className="text-xl font-semibold mb-2 text-black">{feature.title}</h3>
-            <p className="text-gray-600 text-sm">{feature.desc}</p>
+            {/* Icon */}
+            <div className="text-2xl mb-2 group-hover:scale-110 transition-transform duration-300 inline-block">
+              {feature.icon}
+            </div>
+            
+            {/* Content */}
+            <h3 className="text-lg font-semibold mb-1.5 text-black group-hover:text-[#0097b2] 
+              transition-colors duration-300">
+              {feature.title}
+            </h3>
+            <p className="text-gray-600 text-xs leading-relaxed">{feature.desc}</p>
           </div>
         ))}
       </section>
 
       {/* ================= FOOTER ================= */}
-      <footer className="py-6 text-center text-gray-500 text-sm border-t border-gray-200">
+      <footer className="py-3 text-center text-gray-500 text-xs border-t border-gray-200">
         
       </footer>
     </main>

@@ -334,7 +334,6 @@ export default function Dashboard() {
           transition={{ delay: 0.5 }}
         >
           <p className="font-semibold text-[#0097b2] mb-2">Serenity</p>
-          <p className="text-xs text-gray-500">Your personalized music journey</p>
         </motion.div>
       </footer>
     </div>
