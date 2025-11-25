@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { Drama, Search, Heart, Mic, Bot, Music } from "lucide-react";
 
 export default function Home() {
   const [user, setUser] = useState(null);
@@ -131,32 +132,32 @@ export default function Home() {
         {[
           { 
             title: "Mood-Based Music", 
-            icon: "🎭",
+            Icon: Drama,
             desc: "Get personalized recommendations based on your emotions - Happy, Sad, Calm, or Angry."
           },
           { 
             title: "Smart Search", 
-            icon: "🔍",
+            Icon: Search,
             desc: "Search for songs, albums, artists, and playlists across the entire music library."
           },
           { 
             title: "Favorites & Playlists", 
-            icon: "❤️",
+            Icon: Heart,
             desc: "Save your favorite songs and create custom playlists for every occasion."
           },
           { 
             title: "Audio Recognition", 
-            icon: "🎙️",
+            Icon: Mic,
             desc: "Identify any song by recording a short audio clip - find music instantly."
           },
           { 
             title: "AI Music Assistant", 
-            icon: "🤖",
+            Icon: Bot,
             desc: "Chat with our AI bot for personalized music recommendations and discovery."
           },
           { 
             title: "Full-Featured Player", 
-            icon: "🎵",
+            Icon: Music,
             desc: "Advanced music player with shuffle, repeat, queue management, and volume control."
           },
         ].map((feature, i) => (
@@ -168,8 +169,8 @@ export default function Home() {
             hover:-translate-y-1 cursor-pointer"
           >
             {/* Icon */}
-            <div className="text-2xl mb-2 group-hover:scale-110 transition-transform duration-300 inline-block">
-              {feature.icon}
+            <div className="text-[#0097b2] mb-2 group-hover:scale-110 transition-transform duration-300 inline-block">
+              <feature.Icon size={32} strokeWidth={1.5} />
             </div>
             
             {/* Content */}

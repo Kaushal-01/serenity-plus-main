@@ -6,6 +6,7 @@ import { usePlayer } from "@/context/PlayerContext";
 import MiniPlayer from "@/context/MiniPlayer";
 import SongCard from "@/components/SongCard";
 import Link from "next/link";
+import { Music2, Lightbulb, Disc3, ListMusic } from "lucide-react";
 
 export default function GlobalSearch() {
   const [query, setQuery] = useState("");
@@ -177,8 +178,8 @@ export default function GlobalSearch() {
           transition={{ duration: 0.6 }}
           className="text-center mb-8"
         >
-          <h2 className="text-5xl font-extrabold bg-gradient-to-r from-[#0097b2] via-[#00b8d4] to-[#0097b2] bg-clip-text text-transparent mb-3">
-            Explore Music 🎵
+          <h2 className="text-5xl font-extrabold bg-gradient-to-r from-[#0097b2] via-[#00b8d4] to-[#0097b2] bg-clip-text text-transparent mb-3 flex items-center justify-center gap-3">
+            Explore Music <Music2 size={48} strokeWidth={2.5} className="text-[#0097b2]" />
           </h2>
           <p className="text-gray-600 text-lg">Discover your next favorite song, album, or playlist</p>
         </motion.div>
@@ -222,7 +223,8 @@ export default function GlobalSearch() {
             )}
           </div>
           <div className="flex items-center justify-center gap-2 mt-4 text-sm text-gray-500 dark:text-gray-400">
-            <span>💡 Tip: Results appear as you type</span>
+            <Lightbulb size={16} strokeWidth={2} />
+            <span>Tip: Results appear as you type</span>
           </div>
         </motion.div>
       </div>
@@ -258,9 +260,7 @@ export default function GlobalSearch() {
               >
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-12 h-12 bg-gradient-to-br from-[#0097b2] to-[#00b8d4] rounded-xl flex items-center justify-center">
-                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
-                    </svg>
+                    <Music2 size={24} strokeWidth={2} className="text-white" />
                   </div>
                   <div>
                     <h3 className="text-3xl font-bold text-[#0097b2]">Songs</h3>
@@ -299,10 +299,8 @@ export default function GlobalSearch() {
                 transition={{ duration: 0.5, delay: 0.1 }}
               >
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
-                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
-                    </svg>
+                  <div className="w-12 h-12 bg-gradient-to-br from-[#0097b2] to-[#00b8d4] rounded-xl flex items-center justify-center">
+                    <Disc3 size={24} strokeWidth={2} className="text-white" />
                   </div>
                   <div>
                     <h3 className="text-3xl font-bold text-[#0097b2]">Albums</h3>
@@ -367,10 +365,8 @@ export default function GlobalSearch() {
                 transition={{ duration: 0.5, delay: 0.2 }}
               >
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center">
-                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
-                    </svg>
+                  <div className="w-12 h-12 bg-gradient-to-br from-[#0097b2] to-[#00b8d4] rounded-xl flex items-center justify-center">
+                    <ListMusic size={24} strokeWidth={2} className="text-white" />
                   </div>
                   <div>
                     <h3 className="text-3xl font-bold text-[#0097b2]">Playlists</h3>
@@ -435,7 +431,7 @@ export default function GlobalSearch() {
                   </div>
                   <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">No results found</h3>
                   <p className="text-gray-600 dark:text-gray-400 text-lg text-center max-w-md">
-                    {query ? `We couldn't find anything matching "${query}". Try a different search term.` : "Start typing to discover amazing music 🎶"}
+                    {query ? `We couldn't find anything matching "${query}". Try a different search term.` : "Start typing to discover amazing music"}
                   </p>
                 </motion.div>
               )}

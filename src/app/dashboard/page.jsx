@@ -7,6 +7,7 @@ import { usePlayer } from "@/context/PlayerContext";
 import GlobalSearch from "./GlobalSearch";
 import Link from "next/link";
 import SongCard from "@/components/SongCard";
+import { Sun, CloudRain, Waves, Flame, Sparkles, TrendingUp, Headphones } from "lucide-react";
 
 export default function Dashboard() {
   const router = useRouter();
@@ -19,10 +20,10 @@ export default function Dashboard() {
   const [favorites, setFavorites] = useState([]);
 
   const moodList = [
-    { id: 1, name: "Happy", emoji: "☀️", gradient: "from-yellow-300 via-amber-400 to-orange-500" },
-    { id: 2, name: "Sad", emoji: "🌧️", gradient: "from-slate-500 via-gray-600 to-blue-800" },
-    { id: 3, name: "Calm", emoji: "🌊", gradient: "from-emerald-300 via-teal-400 to-cyan-500" },
-    { id: 4, name: "Angry", emoji: "🔥", gradient: "from-rose-500 via-red-600 to-pink-700" },
+    { id: 1, name: "Happy", Icon: Sun, gradient: "from-yellow-300 via-amber-400 to-orange-500" },
+    { id: 2, name: "Sad", Icon: CloudRain, gradient: "from-slate-500 via-gray-600 to-blue-800" },
+    { id: 3, name: "Calm", Icon: Waves, gradient: "from-emerald-300 via-teal-400 to-cyan-500" },
+    { id: 4, name: "Angry", Icon: Flame, gradient: "from-rose-500 via-red-600 to-pink-700" },
   ];
 
   useEffect(() => {
@@ -174,7 +175,7 @@ export default function Dashboard() {
           transition={{ duration: 0.6 }}
           className="text-4xl font-extrabold tracking-tight text-black dark:text-white"
         >
-           Welcome back, <span className="font-semibold text-[#0097b2]">{userName}👋</span> 
+           Welcome back, <span className="font-semibold text-[#0097b2]">{userName}</span> 
         </motion.h1>
       </header>
 
@@ -183,9 +184,9 @@ export default function Dashboard() {
         <motion.h2
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-3xl md:text-4xl font-bold mb-3 text-[#0097b2]"
+          className="text-3xl md:text-4xl font-bold mb-3 text-[#0097b2] flex items-center justify-center gap-3"
         >
-          Tap Your Mood 🎧
+          Tap Your Mood <Headphones size={36} strokeWidth={2} />
         </motion.h2>
         <motion.p
           initial={{ opacity: 0 }}
@@ -196,7 +197,7 @@ export default function Dashboard() {
           Let your emotions guide your music journey
         </motion.p>
         <div className="flex flex-wrap justify-center gap-6">
-          {moodList.map(({ id, name, emoji, gradient }, index) => (
+          {moodList.map(({ id, name, Icon, gradient }, index) => (
             <motion.button
               key={id}
               initial={{ opacity: 0, scale: 0.8, y: 20 }}
@@ -212,13 +213,13 @@ export default function Dashboard() {
                 className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"
               ></motion.div>
               <div className="relative z-10 flex flex-col items-center justify-center h-full text-white drop-shadow-lg">
-                <motion.span
-                  className="text-5xl mb-3"
+                <motion.div
+                  className="mb-3"
                   whileHover={{ scale: 1.2, rotate: 10 }}
                   transition={{ type: "spring", stiffness: 300 }}
                 >
-                  {emoji}
-                </motion.span>
+                  <Icon size={56} strokeWidth={2} />
+                </motion.div>
                 <span className="text-lg font-bold tracking-wide">{name}</span>
               </div>
             </motion.button>
@@ -232,9 +233,9 @@ export default function Dashboard() {
           <motion.h2
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="text-3xl font-bold text-[#0097b2]"
+            className="text-3xl font-bold text-[#0097b2] flex items-center gap-3"
           >
-            ✨ Recommended for You
+            <Sparkles size={32} strokeWidth={2} /> Recommended for You
           </motion.h2>
         </div>
 
@@ -273,9 +274,9 @@ export default function Dashboard() {
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2 }}
-          className="text-3xl font-bold mb-8 text-[#0097b2]"
+          className="text-3xl font-bold mb-8 text-[#0097b2] flex items-center gap-3"
         >
-          🔥 Trending Albums
+          <TrendingUp size={32} strokeWidth={2} /> Trending Albums
         </motion.h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
           {featuredAlbums.map((album, i) => (
