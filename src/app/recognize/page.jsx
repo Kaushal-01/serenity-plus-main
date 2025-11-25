@@ -4,38 +4,46 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
 import { usePlayer } from "@/context/PlayerContext";
+import { Mic, Square, Music, CheckCircle, AlertTriangle, Play, Loader2 } from "lucide-react";
 
 // Utility function to convert AudioBuffer to WAV format
 function audioBufferToWav(buffer, numberOfChannels, sampleRate) {
-  const length = buffer.length * numberOfChannels * 2;
-  const view = new DataView(new ArrayBuffer(44 + length));
+  try {
+    const length = buffer.length * numberOfChannels * 2;
+    const arrayBuffer = new ArrayBuffer(44 + length);
+    const view = new DataView(arrayBuffer);
 
-  // Write WAV header
-  writeString(view, 0, 'RIFF');
-  view.setUint32(4, 36 + length, true);
-  writeString(view, 8, 'WAVE');
-  writeString(view, 12, 'fmt ');
-  view.setUint32(16, 16, true);
-  view.setUint16(20, 1, true);
-  view.setUint16(22, numberOfChannels, true);
-  view.setUint32(24, sampleRate, true);
-  view.setUint32(28, sampleRate * numberOfChannels * 2, true);
-  view.setUint16(32, numberOfChannels * 2, true);
-  view.setUint16(34, 16, true);
-  writeString(view, 36, 'data');
-  view.setUint32(40, length, true);
+    // Write WAV header
+    writeString(view, 0, 'RIFF');
+    view.setUint32(4, 36 + length, true);
+    writeString(view, 8, 'WAVE');
+    writeString(view, 12, 'fmt ');
+    view.setUint32(16, 16, true);
+    view.setUint16(20, 1, true);
+    view.setUint16(22, numberOfChannels, true);
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, sampleRate * numberOfChannels * 2, true);
+    view.setUint16(32, numberOfChannels * 2, true);
+    view.setUint16(34, 16, true);
+    writeString(view, 36, 'data');
+    view.setUint32(40, length, true);
 
-  // Write audio data
-  const channelData = new Float32Array(buffer.length);
-  buffer.copyFromChannel(channelData, 0, 0);
-  let offset = 44;
-  for (let i = 0; i < buffer.length; i++) {
-    const sample = Math.max(-1, Math.min(1, channelData[i]));
-    view.setInt16(offset, sample < 0 ? sample * 0x8000 : sample * 0x7FFF, true);
-    offset += 2;
+    // Write audio data
+    const channelData = buffer.getChannelData(0);
+    let offset = 44;
+    
+    for (let i = 0; i < channelData.length; i++) {
+      const sample = Math.max(-1, Math.min(1, channelData[i]));
+      const value = sample < 0 ? sample * 0x8000 : sample * 0x7FFF;
+      view.setInt16(offset, value, true);
+      offset += 2;
+    }
+
+    return arrayBuffer;
+  } catch (error) {
+    console.error("Error in audioBufferToWav:", error);
+    throw error;
   }
-
-  return view.buffer;
 }
 
 function writeString(view, offset, string) {
@@ -60,6 +68,7 @@ export default function RecognizePage() {
   const audioChunksRef = useRef([]);
   const timerRef = useRef(null);
   const streamRef = useRef(null);
+  const isProcessingRef = useRef(false); // Prevent re-entry
 
   useEffect(() => {
     // Check if user is logged in via the audio recognition backend
@@ -112,15 +121,16 @@ export default function RecognizePage() {
       setResult(null);
       setAudioBlob(null);
       setRecordingTime(0);
+      isProcessingRef.current = false; // Reset processing flag
 
       // Request microphone access with optimal settings for recognition
       const stream = await navigator.mediaDevices.getUserMedia({ 
         audio: { 
           sampleRate: 44100, // Higher initial sample rate for better quality
           channelCount: 1,   // Mono audio
-          echoCancellation: false,
-          noiseSuppression: false,
-          autoGainControl: false
+          echoCancellation: false, // Disable to preserve audio fingerprint
+          noiseSuppression: false, // Disable to preserve original audio
+          autoGainControl: false   // Disable to preserve dynamics
         } 
       });
       streamRef.current = stream;
@@ -139,11 +149,19 @@ export default function RecognizePage() {
       };
 
       mediaRecorderRef.current.onstop = async () => {
+        // Prevent re-entry
+        if (isProcessingRef.current) {
+          console.log("Already processing, skipping duplicate onstop call");
+          return;
+        }
+        isProcessingRef.current = true;
+        
         console.log(`Recording stopped. Chunks collected: ${audioChunksRef.current.length}`);
         
         // Check if we have any recorded data
         if (audioChunksRef.current.length === 0) {
           setError("No audio data was recorded. Please try again.");
+          isProcessingRef.current = false;
           return;
         }
 
@@ -154,37 +172,66 @@ export default function RecognizePage() {
         // Check if the blob has data
         if (audioBlob.size === 0) {
           setError("Recorded audio is empty. Please try again.");
+          isProcessingRef.current = false;
           return;
         }
 
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)({
-          sampleRate: 22050
-        });
-        const arrayBuffer = await audioBlob.arrayBuffer();
-        const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-        
-        // Resample to 22050 Hz mono
-        const offlineContext = new OfflineAudioContext({
-          numberOfChannels: 1,
-          length: Math.ceil(audioBuffer.duration * 22050),
-          sampleRate: 22050
-        });
-        
-        const source = offlineContext.createBufferSource();
-        source.buffer = audioBuffer;
-        source.connect(offlineContext.destination);
-        source.start();
-        
-        const renderedBuffer = await offlineContext.startRendering();
-        const wavBuffer = audioBufferToWav(renderedBuffer, 1, 22050);
-        const wavBlob = new Blob([wavBuffer], { type: 'audio/wav' });
-        
-        setAudioBlob(wavBlob);
-        stream.getTracks().forEach((track) => track.stop());
-        streamRef.current = null;
+        try {
+          // Create audio context at 22050 Hz to match backend
+          const audioContext = new (window.AudioContext || window.webkitAudioContext)({
+            sampleRate: 22050
+          });
+          const arrayBuffer = await audioBlob.arrayBuffer();
+          
+          // Decode audio data
+          let audioBuffer;
+          try {
+            audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+          } catch (decodeError) {
+            console.error("Audio decode error:", decodeError);
+            setError("Failed to process audio. Please try recording again.");
+            isProcessingRef.current = false;
+            return;
+          }
+          
+          console.log(`Audio decoded: duration=${audioBuffer.duration.toFixed(2)}s, sampleRate=${audioBuffer.sampleRate}Hz`);
+          
+          // Resample to 22050 Hz mono to match backend exactly
+          const offlineContext = new OfflineAudioContext({
+            numberOfChannels: 1,
+            length: Math.ceil(audioBuffer.duration * 22050),
+            sampleRate: 22050
+          });
+          
+          const source = offlineContext.createBufferSource();
+          source.buffer = audioBuffer;
+          source.connect(offlineContext.destination);
+          source.start();
+          
+          const renderedBuffer = await offlineContext.startRendering();
+          console.log(`Resampled buffer: length=${renderedBuffer.length}, duration=${renderedBuffer.duration.toFixed(2)}s`);
+          
+          // Convert to WAV format
+          const wavBuffer = audioBufferToWav(renderedBuffer, 1, 22050);
+          const wavBlob = new Blob([wavBuffer], { type: 'audio/wav' });
+          console.log(`Final WAV blob: ${wavBlob.size} bytes, duration: ${renderedBuffer.duration.toFixed(2)}s`);
+          
+          setAudioBlob(wavBlob);
+          
+          // Clean up stream
+          if (streamRef.current) {
+            streamRef.current.getTracks().forEach((track) => track.stop());
+            streamRef.current = null;
+          }
 
-        // Automatically recognize the song after processing
-        await recognizeSongWithBlob(wavBlob);
+          // Automatically recognize the song after processing
+          await recognizeSongWithBlob(wavBlob);
+        } catch (err) {
+          console.error("Error processing audio:", err);
+          setError("An error occurred while processing the audio. Please try again.");
+        } finally {
+          isProcessingRef.current = false;
+        }
       };
 
       // Start recording with timeslice to ensure data is captured periodically
@@ -203,13 +250,18 @@ export default function RecognizePage() {
   };
 
   const stopRecording = () => {
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
-      mediaRecorderRef.current.stop();
-      setIsRecording(false);
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-        timerRef.current = null;
-      }
+    if (!mediaRecorderRef.current || mediaRecorderRef.current.state !== "recording") {
+      return;
+    }
+    
+    // Stop the media recorder
+    mediaRecorderRef.current.stop();
+    setIsRecording(false);
+    
+    // Clear the timer
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
     }
   };
 
@@ -450,7 +502,7 @@ export default function RecognizePage() {
             {/* Status Text */}
             <p className="mt-4 text-lg text-gray-600">
               {isRecording
-                ? "Recording... Press to stop"
+                ? "Recording... Press to stop and recognize"
                 : isProcessing
                 ? "Recognizing song..."
                 : audioBlob
@@ -466,18 +518,20 @@ export default function RecognizePage() {
                 onClick={startRecording}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="w-full py-4 rounded-full bg-[#0097b2] hover:bg-[#007a93] text-white font-bold text-lg shadow-md transition-all"
+                className="w-full py-4 rounded-full bg-[#0097b2] hover:bg-[#007a93] text-white font-bold text-lg shadow-md transition-all flex items-center justify-center gap-2"
               >
-                🎤 Start Recording
+                <Mic className="w-5 h-5" />
+                Start Recording
               </motion.button>
             ) : (
               <motion.button
                 onClick={stopRecording}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="w-full py-4 rounded-full bg-red-500 hover:bg-red-600 text-white font-bold text-lg shadow-md transition-all"
+                className="w-full py-4 rounded-full bg-red-500 hover:bg-red-600 text-white font-bold text-lg shadow-md transition-all flex items-center justify-center gap-2"
               >
-                ⏹️ Stop Recording
+                <Square className="w-5 h-5" />
+                Stop & Recognize
               </motion.button>
             )}
           </div>
@@ -509,8 +563,9 @@ export default function RecognizePage() {
                   <div className="p-6 bg-green-50 dark:bg-green-900/20 border border-green-300 dark:border-green-700 rounded-2xl transition-colors">
                     {/* Main Song */}
                     <div className="mb-4">
-                      <h3 className="text-xl font-bold text-green-700 mb-3">
-                        ✅ Recognized Song
+                      <h3 className="text-xl font-bold text-green-700 mb-3 flex items-center gap-2">
+                        <CheckCircle className="w-5 h-5" />
+                        Recognized Song
                       </h3>
                       <div className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 transition-colors">
                         <div className="text-2xl font-bold text-black dark:text-white mb-2">
@@ -575,8 +630,9 @@ export default function RecognizePage() {
                     {/* Similar Songs */}
                     {result.similar_songs && result.similar_songs.length > 0 && (
                       <div>
-                        <h4 className="text-lg font-semibold text-[#0097b2] mb-3">
-                          🎵 Similar Songs
+                        <h4 className="text-lg font-semibold text-[#0097b2] mb-3 flex items-center gap-2">
+                          <Music className="w-5 h-5" />
+                          Similar Songs
                         </h4>
                         <div className="space-y-2">
                           {result.similar_songs.map((song, index) => (
@@ -620,14 +676,15 @@ export default function RecognizePage() {
 
                     {/* Processing Time */}
                     {result.processing_time && (
-                      <div className="mt-4 text-xs text-gray-600 text-center">
-                        ⚡ Processed in {result.processing_time}s
+                      <div className="mt-4 text-xs text-gray-600 text-center flex items-center justify-center gap-1">
+                        <Loader2 className="w-3 h-3" />
+                        Processed in {result.processing_time}s
                       </div>
                     )}
                   </div>
                 ) : (
                   <div className="p-6 bg-yellow-50 border border-yellow-300 rounded-2xl text-center">
-                    <div className="text-4xl mb-3">⚠️</div>
+                    <AlertTriangle className="w-12 h-12 text-yellow-600 mx-auto mb-3" />
                     <h3 className="text-xl font-bold text-yellow-700 mb-2">
                       No Match Found
                     </h3>
@@ -646,12 +703,8 @@ export default function RecognizePage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
-          className="mt-8 text-center text-gray-600 text-sm"
+          className="mt-8 bg-blue-50 dark:bg-blue-900/20 rounded-2xl p-6 border border-blue-200 dark:border-blue-800"
         >
-          <p>📱 Make sure your device has microphone access enabled</p>
-          <p className="mt-2">
-            🎵 Record at least 5-10 seconds of audio for best results
-          </p>
         </motion.div>
       </div>
     </div>
