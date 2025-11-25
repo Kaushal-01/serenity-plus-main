@@ -4,9 +4,11 @@ import { useEffect, useState } from "react";
 
 export default function Home() {
   const [user, setUser] = useState(null);
+  const [mounted, setMounted] = useState(false);
 
   // Simulated auth check — replace with your real API/auth logic
   useEffect(() => {
+    setMounted(true);
     const storedUser = localStorage.getItem("user");
     if (storedUser) setUser(JSON.parse(storedUser));
   }, []);
@@ -15,6 +17,35 @@ export default function Home() {
     localStorage.removeItem("user");
     setUser(null);
   };
+
+  // Prevent hydration mismatch by not rendering user-dependent content until mounted
+  if (!mounted) {
+    return (
+      <main className="h-screen flex flex-col bg-white text-black overflow-hidden">
+        {/* ================= NAVBAR ================= */}
+        <nav className="w-full flex justify-between items-center px-6 sm:px-10 py-3 bg-white border-b border-gray-200 shadow-sm">
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#0097b2] tracking-tight">
+            Serenity
+          </h1>
+          <div className="flex items-center gap-3 sm:gap-5">
+            <div className="text-sm sm:text-base px-4 py-2 rounded-full bg-gray-100 animate-pulse">
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </div>
+          </div>
+        </nav>
+        {/* Loading skeleton */}
+        <section className="flex flex-col items-center justify-center text-center px-6 py-8">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 text-[#0097b2] leading-tight">
+            Feel the Music with Serenity
+          </h2>
+          <p className="text-gray-600 text-sm sm:text-base max-w-xl mb-6">
+            Discover songs, albums, and artists like never before — all in one elegant,
+            immersive experience.
+          </p>
+        </section>
+      </main>
+    );
+  }
 
   return (
     <main className="h-screen flex flex-col bg-white text-black overflow-hidden">
