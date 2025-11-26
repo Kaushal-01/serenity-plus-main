@@ -3,6 +3,7 @@ import { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import { Sparkles, User, PartyPopper } from "lucide-react";
 
 export default function Signup() {
   const [step, setStep] = useState(1);
@@ -88,8 +89,20 @@ export default function Signup() {
           ))}
         </div>
 
-        <h2 className="text-3xl font-bold mb-2 text-center text-[#0097b2]">
-          {step === 1 ? "Create Your Account ✨" : step === 2 ? "Tell Us About You 👤" : "Almost Done! 🎉"}
+        <h2 className="text-3xl font-bold mb-2 text-center text-[#0097b2] flex items-center justify-center gap-2">
+          {step === 1 ? (
+            <>
+              Create Your Account <Sparkles className="w-7 h-7" />
+            </>
+          ) : step === 2 ? (
+            <>
+              Tell Us About You <User className="w-7 h-7" />
+            </>
+          ) : (
+            <>
+              Almost Done! <PartyPopper className="w-7 h-7" />
+            </>
+          )}
         </h2>
         <p className="text-sm text-gray-600 text-center mb-6">
           {step === 1 ? "Let's get started with the basics" : step === 2 ? "Help us personalize your experience" : "Just a few more details"}

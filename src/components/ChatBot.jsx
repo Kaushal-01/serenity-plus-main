@@ -53,6 +53,30 @@ export default function ChatBot() {
     };
   }, []);
 
+  // Clear chat when user logs out
+  useEffect(() => {
+    const handleAuthChange = () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        // User logged out - clear all chat state
+        setMessages([]);
+        setHasContext(false);
+        setIsOpen(false);
+        setInputMessage('');
+        setIsTyping(false);
+        setIsLoading(false);
+      }
+    };
+
+    window.addEventListener('serenity-auth-update', handleAuthChange);
+    window.addEventListener('storage', handleAuthChange);
+    
+    return () => {
+      window.removeEventListener('serenity-auth-update', handleAuthChange);
+      window.removeEventListener('storage', handleAuthChange);
+    };
+  }, []);
+
   const loadContext = async () => {
     try {
       const token = localStorage.getItem('token');

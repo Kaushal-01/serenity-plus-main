@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
 import { usePlayer } from "@/context/PlayerContext";
 import { Mic, Square, Music, CheckCircle, AlertTriangle, Play, Loader2 } from "lucide-react";
+import SongCard from "@/components/SongCard";
 
 // Utility function to convert AudioBuffer to WAV format
 function audioBufferToWav(buffer, numberOfChannels, sampleRate) {
@@ -63,6 +64,7 @@ export default function RecognizePage() {
   const [recordingTime, setRecordingTime] = useState(0);
   const [userId, setUserId] = useState(null);
   const [isLoadingSong, setIsLoadingSong] = useState(false);
+  const [recognizedSongs, setRecognizedSongs] = useState([]);
 
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
@@ -278,6 +280,7 @@ export default function RecognizePage() {
 
     setIsProcessing(true);
     setError(null);
+    setRecognizedSongs([]);
 
     try {
       const formData = new FormData();
@@ -293,6 +296,11 @@ export default function RecognizePage() {
 
       // The backend returns the result directly
       setResult(response.data);
+
+      // If recognition was successful, fetch song details for top 3
+      if (response.data.status === "success") {
+        await fetchSongDetails(response.data);
+      }
     } catch (err) {
       console.error("Recognition error:", err);
       
@@ -308,6 +316,59 @@ export default function RecognizePage() {
       }
     } finally {
       setIsProcessing(false);
+    }
+  };
+
+  const fetchSongDetails = async (recognitionResult) => {
+    try {
+      // Collect all songs: main song + similar songs (top 3 total)
+      const songsToFetch = [];
+      
+      if (recognitionResult.song) {
+        songsToFetch.push({
+          name: recognitionResult.song,
+          confidence: recognitionResult.confidence,
+          votes: recognitionResult.votes,
+        });
+      }
+
+      if (recognitionResult.similar_songs) {
+        recognitionResult.similar_songs.slice(0, 2).forEach(song => {
+          songsToFetch.push({
+            name: song.song,
+            confidence: song.confidence,
+            votes: song.votes,
+          });
+        });
+      }
+
+      // Fetch song details from Saavn API for each song
+      const songDetailsPromises = songsToFetch.map(async (songInfo) => {
+        try {
+          const response = await axios.get("/api/serenity/search", {
+            params: { query: songInfo.name },
+          });
+
+          if (response.data?.success && response.data?.data?.songs?.results?.length > 0) {
+            const songData = response.data.data.songs.results[0];
+            return {
+              ...songData,
+              recognitionConfidence: songInfo.confidence,
+              recognitionVotes: songInfo.votes,
+            };
+          }
+          return null;
+        } catch (err) {
+          console.error(`Failed to fetch details for ${songInfo.name}:`, err);
+          return null;
+        }
+      });
+
+      const fetchedSongs = await Promise.all(songDetailsPromises);
+      const validSongs = fetchedSongs.filter(song => song !== null);
+      setRecognizedSongs(validSongs);
+    } catch (err) {
+      console.error("Error fetching song details:", err);
     }
   };
 
@@ -560,135 +621,157 @@ export default function RecognizePage() {
                 className="mt-6"
               >
                 {result.status === "success" ? (
-                  <div className="p-6 bg-green-50 dark:bg-green-900/20 border border-green-300 dark:border-green-700 rounded-2xl transition-colors">
-                    {/* Main Song */}
-                    <div className="mb-4">
-                      <h3 className="text-xl font-bold text-green-700 mb-3 flex items-center gap-2">
-                        <CheckCircle className="w-5 h-5" />
-                        Recognized Song
-                      </h3>
-                      <div className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 transition-colors">
-                        <div className="text-2xl font-bold text-black dark:text-white mb-2">
-                          {result.song}
-                        </div>
-                        <div className="flex items-center gap-3 text-sm text-gray-700 dark:text-gray-300 mb-4">
-                          <span className="bg-green-100 px-3 py-1 rounded-full border border-green-300">
-                            Confidence: {Math.round(result.confidence * 100)}%
-                          </span>
-                          <span className="bg-blue-100 px-3 py-1 rounded-full border border-blue-300">
-                            Votes: {result.votes}
-                          </span>
-                        </div>
-
-                        {/* Play Button */}
-                        <motion.button
-                          onClick={() => handlePlaySong(result.song)}
-                          disabled={isLoadingSong}
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                          className="w-full py-3 rounded-xl bg-[#0097b2] hover:bg-[#007a93] text-white font-bold text-base shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                        >
-                          {isLoadingSong ? (
-                            <>
-                              <svg
-                                className="animate-spin h-5 w-5"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                              >
-                                <circle
-                                  className="opacity-25"
-                                  cx="12"
-                                  cy="12"
-                                  r="10"
-                                  stroke="currentColor"
-                                  strokeWidth="4"
-                                />
-                                <path
-                                  className="opacity-75"
-                                  fill="currentColor"
-                                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                />
-                              </svg>
-                              Loading Song...
-                            </>
-                          ) : (
-                            <>
-                              <svg
-                                className="w-6 h-6"
-                                fill="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path d="M8 5v14l11-7z" />
-                              </svg>
-                              Play Song
-                            </>
-                          )}
-                        </motion.button>
-                      </div>
+                  <div className="space-y-6">
+                    {/* Success Header */}
+                    <div className="flex items-center justify-center gap-2 text-green-600 dark:text-green-400">
+                      <CheckCircle className="w-6 h-6" />
+                      <h3 className="text-2xl font-bold">Recognition Complete!</h3>
                     </div>
 
-                    {/* Similar Songs */}
-                    {result.similar_songs && result.similar_songs.length > 0 && (
+                    {/* Recognition Info */}
+                    <div className="text-center text-sm text-gray-600 dark:text-gray-400">
+                      {result.processing_time && (
+                        <span className="flex items-center justify-center gap-1">
+                          <Loader2 className="w-3 h-3" />
+                          Processed in {result.processing_time}s
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Song Cards Grid */}
+                    {recognizedSongs.length > 0 ? (
                       <div>
-                        <h4 className="text-lg font-semibold text-[#0097b2] mb-3 flex items-center gap-2">
-                          <Music className="w-5 h-5" />
-                          Similar Songs
+                        <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                          <Music className="w-5 h-5 text-[#0097b2]" />
+                          Top {recognizedSongs.length} {recognizedSongs.length === 1 ? 'Match' : 'Matches'}
                         </h4>
-                        <div className="space-y-2">
-                          {result.similar_songs.map((song, index) => (
-                            <div
-                              key={index}
-                              className="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors group border border-gray-200 dark:border-gray-600"
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          {recognizedSongs.map((song, index) => (
+                            <motion.div
+                              key={song.id || index}
+                              initial={{ opacity: 0, y: 20 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ delay: index * 0.1 }}
                             >
-                              <div className="flex items-start justify-between gap-3">
-                                <div className="flex-1">
-                                  <div className="text-black dark:text-white font-medium">
-                                    {song.song}
-                                  </div>
-                                  <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 mt-1">
-                                    <span>
-                                      {Math.round(song.confidence * 100)}% match
-                                    </span>
-                                    <span>•</span>
-                                    <span>{song.votes} votes</span>
-                                  </div>
-                                </div>
-                                <button
-                                  onClick={() => handlePlaySong(song.song)}
-                                  disabled={isLoadingSong}
-                                  className="p-2 rounded-full bg-[#0097b2]/10 hover:bg-[#0097b2] text-[#0097b2] hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                                  title="Play this song"
-                                >
-                                  <svg
-                                    className="w-5 h-5"
-                                    fill="currentColor"
-                                    viewBox="0 0 24 24"
-                                  >
-                                    <path d="M8 5v14l11-7z" />
-                                  </svg>
-                                </button>
-                              </div>
-                            </div>
+                              <SongCard
+                                song={song}
+                                onPlay={playSong}
+                              />
+                            </motion.div>
                           ))}
                         </div>
                       </div>
-                    )}
+                    ) : (
+                      /* Fallback to text display if song details couldn't be fetched */
+                      <div className="p-6 bg-green-50 dark:bg-green-900/20 border border-green-300 dark:border-green-700 rounded-2xl transition-colors">
+                        <div className="mb-4">
+                          <h3 className="text-xl font-bold text-green-700 dark:text-green-400 mb-3">
+                            Recognized Song
+                          </h3>
+                          <div className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 transition-colors">
+                            <div className="text-2xl font-bold text-black dark:text-white mb-2">
+                              {result.song}
+                            </div>
+                            <div className="flex items-center gap-3 text-sm text-gray-700 dark:text-gray-300 mb-4">
+                              <span className="bg-green-100 dark:bg-green-800 px-3 py-1 rounded-full border border-green-300 dark:border-green-600">
+                                Confidence: {Math.round(result.confidence * 100)}%
+                              </span>
+                              <span className="bg-blue-100 dark:bg-blue-800 px-3 py-1 rounded-full border border-blue-300 dark:border-blue-600">
+                                Votes: {result.votes}
+                              </span>
+                            </div>
 
-                    {/* Processing Time */}
-                    {result.processing_time && (
-                      <div className="mt-4 text-xs text-gray-600 text-center flex items-center justify-center gap-1">
-                        <Loader2 className="w-3 h-3" />
-                        Processed in {result.processing_time}s
+                            {/* Play Button */}
+                            <motion.button
+                              onClick={() => handlePlaySong(result.song)}
+                              disabled={isLoadingSong}
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.98 }}
+                              className="w-full py-3 rounded-xl bg-[#0097b2] hover:bg-[#007a93] text-white font-bold text-base shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                            >
+                              {isLoadingSong ? (
+                                <>
+                                  <svg
+                                    className="animate-spin h-5 w-5"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                  >
+                                    <circle
+                                      className="opacity-25"
+                                      cx="12"
+                                      cy="12"
+                                      r="10"
+                                      stroke="currentColor"
+                                      strokeWidth="4"
+                                    />
+                                    <path
+                                      className="opacity-75"
+                                      fill="currentColor"
+                                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                    />
+                                  </svg>
+                                  Loading Song...
+                                </>
+                              ) : (
+                                <>
+                                  <Play className="w-5 h-5" fill="white" />
+                                  Play Song
+                                </>
+                              )}
+                            </motion.button>
+                          </div>
+                        </div>
+
+                        {/* Similar Songs - Text Only Fallback */}
+                        {result.similar_songs && result.similar_songs.length > 0 && (
+                          <div className="mt-4">
+                            <h4 className="text-lg font-semibold text-[#0097b2] mb-3 flex items-center gap-2">
+                              <Music className="w-5 h-5" />
+                              Similar Songs
+                            </h4>
+                            <div className="space-y-2">
+                              {result.similar_songs.map((song, index) => (
+                                <div
+                                  key={index}
+                                  className="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors group border border-gray-200 dark:border-gray-600"
+                                >
+                                  <div className="flex items-start justify-between gap-3">
+                                    <div className="flex-1">
+                                      <div className="text-black dark:text-white font-medium">
+                                        {song.song}
+                                      </div>
+                                      <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 mt-1">
+                                        <span>
+                                          {Math.round(song.confidence * 100)}% match
+                                        </span>
+                                        <span>•</span>
+                                        <span>{song.votes} votes</span>
+                                      </div>
+                                    </div>
+                                    <button
+                                      onClick={() => handlePlaySong(song.song)}
+                                      disabled={isLoadingSong}
+                                      className="p-2 rounded-full bg-[#0097b2]/10 hover:bg-[#0097b2] text-[#0097b2] hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                      title="Play this song"
+                                    >
+                                      <Play className="w-5 h-5" />
+                                    </button>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
                 ) : (
-                  <div className="p-6 bg-yellow-50 border border-yellow-300 rounded-2xl text-center">
-                    <AlertTriangle className="w-12 h-12 text-yellow-600 mx-auto mb-3" />
-                    <h3 className="text-xl font-bold text-yellow-700 mb-2">
+                  <div className="p-6 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-300 dark:border-yellow-700 rounded-2xl text-center transition-colors">
+                    <AlertTriangle className="w-12 h-12 text-yellow-600 dark:text-yellow-400 mx-auto mb-3" />
+                    <h3 className="text-xl font-bold text-yellow-700 dark:text-yellow-400 mb-2">
                       No Match Found
                     </h3>
-                    <p className="text-gray-600">
+                    <p className="text-gray-600 dark:text-gray-400">
                       Try recording again with clearer audio or a longer sample
                     </p>
                   </div>
@@ -696,15 +779,6 @@ export default function RecognizePage() {
               </motion.div>
             )}
           </AnimatePresence>
-        </motion.div>
-
-        {/* Instructions */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="mt-8 bg-blue-50 dark:bg-blue-900/20 rounded-2xl p-6 border border-blue-200 dark:border-blue-800"
-        >
         </motion.div>
       </div>
     </div>
