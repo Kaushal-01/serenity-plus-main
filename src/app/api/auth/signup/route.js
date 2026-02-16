@@ -1,6 +1,8 @@
+import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import User from "../../../../models/user";
 import bcrypt from "bcryptjs";
+import { createToken } from "@/lib/jwt";
 
 export async function POST(req) {
   const { 
@@ -17,7 +19,7 @@ export async function POST(req) {
 
   const existing = await User.findOne({ email });
   if (existing)
-    return Response.json({ error: "User already exists" }, { status: 400 });
+    return NextResponse.json({ error: "User already exists" }, { status: 400 });
 
   const hashed = await bcrypt.hash(password, 10);
   const newUser = await User.create({ 
@@ -30,5 +32,19 @@ export async function POST(req) {
     listeningHabits
   });
   
-  return Response.json({ success: true, user: newUser });
+  // Create JWT token
+  const token = createToken(newUser);
+  
+  // Return user without password
+  const userResponse = {
+    _id: newUser._id,
+    name: newUser.name,
+    email: newUser.email,
+    gender: newUser.gender,
+    ageGroup: newUser.ageGroup,
+    occupation: newUser.occupation,
+    listeningHabits: newUser.listeningHabits
+  };
+  
+  return NextResponse.json({ success: true, token, user: userResponse });
 }
