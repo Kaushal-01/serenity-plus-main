@@ -5,6 +5,7 @@ import Link from "next/link";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePlayer } from "@/context/PlayerContext";
+import InstallPWA from "./InstallPWA";
 
 export default function Navbar() {
   const [user, setUser] = useState(null);
@@ -178,7 +179,10 @@ export default function Navbar() {
 
         {/* 🧍 User Menu */}
         <div className="flex items-center gap-3">
-          {/* 🔍 Search Button */}
+          {/* � Install PWA Button */}
+          <InstallPWA />
+
+          {/* �🔍 Search Button */}
           {user && (
             <button
               onClick={() => setSearchOpen(true)}

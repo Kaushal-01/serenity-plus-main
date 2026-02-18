@@ -24,12 +24,35 @@ export const metadata = {
     icon: '/new-logo.png',
     apple: '/new-logo.png',
   },
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'Serenity+',
+  },
+};
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  themeColor: '#0097b2',
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
+        <meta name="application-name" content="Serenity+" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="Serenity+" />
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="msapplication-TileColor" content="#0097b2" />
+        <meta name="msapplication-tap-highlight" content="no" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/new-logo.png" />
         <script
           dangerouslySetInnerHTML={{
             __html: `
