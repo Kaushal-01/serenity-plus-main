@@ -156,12 +156,14 @@ User's current message: ${message}
 Respond as Harmony. Keep it natural, warm, and concise. Show you understand their emotional state and remember your past conversations.`;
 
     // Generate response using Gemini
-    const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash-exp",
-      contents: fullPrompt,
+    const result = await ai.models.generateContent({
+      model: "gemini-2.0-flash",
+      contents: fullPrompt
     });
 
-    const aiResponse = response.text;
+    const aiResponse = result.text;
+
+    console.log(aiResponse);
 
     // Add messages to conversation history
     chatContext.conversationHistory.push({
@@ -219,12 +221,14 @@ Provide a JSON response with:
 
 Keep it brief and actionable. Only include real insights from this conversation.`;
 
-    const analysisResponse = await ai.models.generateContent({
-      model: "gemini-2.0-flash-exp",
-      contents: analysisPrompt,
+    const result = await ai.models.generateContent({
+      model: "gemini-2.0-flash",
+      contents: analysisPrompt
     });
 
-    const analysisText = analysisResponse.text;
+    const analysisText = result.text;
+
+    console.log('Analysis:', analysisText);
     
     // Extract JSON from response
     const jsonMatch = analysisText.match(/\{[\s\S]*\}/);

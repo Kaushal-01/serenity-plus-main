@@ -56,7 +56,6 @@ export default function MobileFooter() {
     { href: "/search", icon: Search, label: "Search" },
     { href: "/playlists", icon: Music, label: "Playlists" },
     { href: "/favorites", icon: Heart, label: "Favorites" },
-    { href: "/profile", icon: User, label: "Profile" },
   ];
 
   const isActive = (href) => {

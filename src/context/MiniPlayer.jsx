@@ -55,6 +55,29 @@ export default function MiniPlayer() {
   const [loadingPlaylists, setLoadingPlaylists] = useState(false);
   const [addingToPlaylist, setAddingToPlaylist] = useState(null);
   const [showQueue, setShowQueue] = useState(false);
+  const [user, setUser] = useState(null);
+
+  // Check if user is logged in
+  useEffect(() => {
+    const updateUserState = () => {
+      const token = localStorage.getItem("token");
+      const storedUser = localStorage.getItem("user");
+      if (token && storedUser) {
+        setUser(JSON.parse(storedUser));
+      } else {
+        setUser(null);
+      }
+    };
+
+    updateUserState();
+    window.addEventListener("serenity-auth-update", updateUserState);
+    window.addEventListener("storage", updateUserState);
+
+    return () => {
+      window.removeEventListener("serenity-auth-update", updateUserState);
+      window.removeEventListener("storage", updateUserState);
+    };
+  }, []);
 
   // Emit player expanded state changes
   useEffect(() => {
@@ -114,7 +137,8 @@ export default function MiniPlayer() {
     }
   };
 
-  if (!currentSong) return null;
+  // Don't show player if user is not logged in or no current song
+  if (!user || !currentSong) return null;
 
   const formatTime = (time) => {
     if (!time || isNaN(time)) return "0:00";
@@ -453,11 +477,11 @@ export default function MiniPlayer() {
             exit={{ opacity: 0, scale: 0.9 }}
             className="fixed inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-black z-[1000] flex items-center justify-center p-4 md:p-8 overflow-y-auto"
           >
-            {/* Close Button - Hidden on mobile */}
+            {/* Close Button */}
             <motion.button
               onClick={() => setIsExpanded(false)}
               whileTap={{ scale: 0.9 }}
-              className="hidden md:flex fixed top-4 right-4 md:top-6 md:right-6 w-10 h-10 items-center justify-center 
+              className="flex fixed top-4 right-4 md:top-6 md:right-6 w-10 h-10 items-center justify-center 
               rounded-full bg-white/10 hover:bg-white/20 text-white backdrop-blur-lg transition-all z-20"
             >
               <X className="w-5 h-5" />
@@ -533,7 +557,7 @@ export default function MiniPlayer() {
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.4 }}
-                className="flex items-center justify-center gap-3 sm:gap-4 md:gap-6 mb-6 md:mb-8 px-4"
+                className="flex items-center justify-center gap-6 sm:gap-8 md:gap-10 mb-6 md:mb-8 px-4 max-w-md mx-auto w-full"
               >
                 <motion.button
                   onClick={toggleShuffle}
@@ -611,7 +635,7 @@ export default function MiniPlayer() {
                 className="flex flex-col items-center gap-4 px-4"
               >
                 {/* Volume and Actions Row */}
-                <div className="flex items-center justify-center gap-3 flex-wrap">
+                <div className="flex items-center justify-center gap-6 sm:gap-8 flex-wrap max-w-xs mx-auto w-full">
                   <motion.button
                     onClick={toggleFavorite}
                     whileTap={{ scale: 0.9 }}
@@ -624,16 +648,15 @@ export default function MiniPlayer() {
                   </motion.button>
 
                   <div 
-                    className="relative group"
-                    onMouseEnter={() => setShowVolumeSlider(true)}
-                    onMouseLeave={() => setShowVolumeSlider(false)}
+                    className="relative"
                   >
                     <motion.button
-                      onClick={toggleMute}
+                      onClick={() => setShowVolumeSlider(!showVolumeSlider)}
+                      onMouseEnter={() => setShowVolumeSlider(true)}
                       whileTap={{ scale: 0.9 }}
                       className="w-11 h-11 flex items-center justify-center rounded-full 
                       bg-white/10 hover:bg-white/20 transition-all text-white"
-                      title="Mute/Unmute"
+                      title="Volume"
                     >
                       {getVolumeIcon()}
                     </motion.button>
@@ -644,20 +667,27 @@ export default function MiniPlayer() {
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: 10 }}
-                          className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-white/10 backdrop-blur-md rounded-lg shadow-lg border border-white/20 px-4 py-3 whitespace-nowrap"
+                          onMouseLeave={() => setShowVolumeSlider(false)}
+                          className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-white/10 backdrop-blur-md rounded-lg shadow-lg border border-white/20 px-4 py-4 whitespace-nowrap z-10"
                         >
-                          <input
-                            type="range"
-                            min="0"
-                            max="1"
-                            step="0.01"
-                            value={volume}
-                            onChange={(e) => changeVolume(parseFloat(e.target.value))}
-                            className="w-32 h-1 bg-white/20 rounded-lg appearance-none cursor-pointer 
-                            [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 
-                            [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full 
-                            [&::-webkit-slider-thumb]:bg-white"
-                          />
+                          <div className="flex flex-col items-center gap-2">
+                            <input
+                              type="range"
+                              min="0"
+                              max="1"
+                              step="0.01"
+                              value={volume}
+                              onChange={(e) => changeVolume(parseFloat(e.target.value))}
+                              className="w-32 h-2 bg-white/20 rounded-lg appearance-none cursor-pointer 
+                              [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 
+                              [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full 
+                              [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:cursor-pointer
+                              [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 
+                              [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-white 
+                              [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
+                            />
+                            <span className="text-white text-xs">{Math.round(volume * 100)}%</span>
+                          </div>
                         </motion.div>
                       )}
                     </AnimatePresence>

@@ -178,7 +178,7 @@ export default function PlaylistsPage() {
           <div className="flex justify-end items-center mb-8">
             <div className="h-12 w-40 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse" />
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
             {Array.from({ length: 8 }).map((_, i) => (
               <div key={i} className="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-lg animate-pulse">
                 <div className="h-48 bg-gray-200 dark:bg-gray-700" />
@@ -262,7 +262,7 @@ export default function PlaylistsPage() {
             </button>
           </motion.div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
             {playlists.map((playlist, idx) => {
               // Get the last added song's image (most recent song)
               const lastSong = playlist.songs && playlist.songs.length > 0 
