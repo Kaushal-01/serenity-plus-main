@@ -5,6 +5,8 @@ import { useParams, useRouter } from "next/navigation";
 import Navbar from "../../../components/Navbar";
 import { usePlayer } from "@/context/PlayerContext";
 import { motion, AnimatePresence } from "framer-motion";
+import Breadcrumb from "@/components/Breadcrumb";
+import { PlaylistHeaderSkeleton, SongListSkeleton } from "@/components/LoadingSkeleton";
 
 export default function PlaylistDetailsPage() {
   const { id } = useParams();
@@ -86,8 +88,11 @@ export default function PlaylistDetailsPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 transition-colors">
         <Navbar />
-        <div className="pt-24 px-8 flex justify-center items-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#0097b2]"></div>
+        <div className="pt-24 px-6 pb-12 max-w-7xl mx-auto">
+          <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-64 mb-6 animate-pulse" />
+          <PlaylistHeaderSkeleton />
+          <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-32 mb-6 animate-pulse" />
+          <SongListSkeleton count={8} />
         </div>
       </div>
     );
@@ -115,16 +120,13 @@ export default function PlaylistDetailsPage() {
       <Navbar />
       
       <div className="pt-24 px-6 pb-12 max-w-7xl mx-auto">
-        {/* Back Button */}
-        <button
-          onClick={() => router.push("/playlists")}
-          className="mb-6 flex items-center gap-2 text-gray-600 hover:text-[#0097b2] transition-all"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-          </svg>
-          Back to Playlists
-        </button>
+        {/* Breadcrumb */}
+        <Breadcrumb
+          items={[
+            { label: "Playlists", href: "/playlists" },
+            { label: playlist?.name || "Playlist" },
+          ]}
+        />
 
         {/* Message Alert */}
         <AnimatePresence>

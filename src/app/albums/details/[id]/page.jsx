@@ -1,12 +1,15 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
 import { motion } from "framer-motion";
 import { usePlayer } from "@/context/PlayerContext";
+import Breadcrumb from "@/components/Breadcrumb";
+import { SongListSkeleton } from "@/components/LoadingSkeleton";
 
 export default function AlbumDetailsPage() {
   const { id } = useParams();
+  const router = useRouter();
   const [album, setAlbum] = useState(null);
   const [loading, setLoading] = useState(true);
   const { playSong } = usePlayer();
@@ -26,11 +29,35 @@ export default function AlbumDetailsPage() {
     }
   };
 
-  if (loading) return <p className="text-center text-gray-600 mt-20">Loading album...</p>;
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 text-black dark:text-white px-10 md:px-20 py-16 mt-20 transition-colors">
+        <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-64 mb-8 animate-pulse" />
+        <div className="flex flex-col md:flex-row gap-8 items-center mb-10">
+          <div className="w-60 h-60 rounded-2xl bg-gray-200 dark:bg-gray-700 animate-pulse" />
+          <div className="flex-1 space-y-4 w-full">
+            <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded w-3/4 animate-pulse" />
+            <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/2 animate-pulse" />
+            <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-32 animate-pulse" />
+          </div>
+        </div>
+        <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-48 mb-4 animate-pulse" />
+        <SongListSkeleton count={8} />
+      </div>
+    );
+  }
   if (!album) return <p className="text-center text-gray-600 mt-20">Album not found.</p>;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 text-black dark:text-white px-10 md:px-20 py-16 mt-20 transition-colors">
+      {/* Breadcrumb */}
+      <Breadcrumb
+        items={[
+          { label: "Albums", href: "/search" },
+          { label: album?.name || "Album Details" },
+        ]}
+      />
+
       {/* Album Header */}
       <div className="flex flex-col md:flex-row gap-8 items-center mb-10">
         <img

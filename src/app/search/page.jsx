@@ -5,6 +5,7 @@ import Link from "next/link";
 import axios from "axios";
 import { motion } from "framer-motion";
 import { usePlayer } from "@/context/PlayerContext";
+import { SongCardSkeleton } from "@/components/LoadingSkeleton";
 
 export default function SearchPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -86,9 +87,37 @@ export default function SearchPage() {
 
         {/* Search Results */}
         {searchLoading ? (
-          <div className="flex flex-col items-center justify-center py-12">
-            <div className="w-12 h-12 border-3 border-[#0097b2] border-t-transparent rounded-full animate-spin mb-4"></div>
-            <p className="text-gray-600 dark:text-gray-400">Searching...</p>
+          <div className="space-y-8">
+            {/* Songs Skeleton */}
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />
+                <div className="space-y-2">
+                  <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-24 animate-pulse" />
+                  <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-16 animate-pulse" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                {Array.from({ length: 10 }).map((_, i) => (
+                  <SongCardSkeleton key={i} />
+                ))}
+              </div>
+            </div>
+            {/* Albums Skeleton */}
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />
+                <div className="space-y-2">
+                  <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-24 animate-pulse" />
+                  <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-16 animate-pulse" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <SongCardSkeleton key={i} />
+                ))}
+              </div>
+            </div>
           </div>
         ) : (
           <div className="space-y-8">

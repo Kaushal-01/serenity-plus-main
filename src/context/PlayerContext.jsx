@@ -18,12 +18,119 @@ export function PlayerProvider({ children }) {
   const audioRef = useRef(null);
   const previousVolumeRef = useRef(0.7);
   const hasTrackedPlayRef = useRef(false);
+  const isRestoringRef = useRef(false);
+  const hasMountedRef = useRef(false);
+  const lastSaveTimeRef = useRef(0);
 
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.volume = isMuted ? 0 : volume;
     }
   }, [volume, isMuted]);
+
+  // Restore player state from localStorage on mount
+  useEffect(() => {
+    if (hasMountedRef.current) return;
+    hasMountedRef.current = true;
+
+    try {
+      const savedState = localStorage.getItem("serenity-player-state");
+      if (savedState) {
+        const { 
+          song, 
+          queueData, 
+          index, 
+          time, 
+          volumeData, 
+          repeat, 
+          shuffleMode 
+        } = JSON.parse(savedState);
+        
+        if (song) {
+          isRestoringRef.current = true;
+          setCurrentSong(song);
+          setQueue(queueData || [song]);
+          setCurrentIndex(index || 0);
+          setVolume(volumeData || 0.7);
+          setRepeatMode(repeat || "off");
+          setShuffle(shuffleMode || false);
+          
+          // Restore playback position after audio loads
+          setTimeout(() => {
+            if (audioRef.current && time) {
+              audioRef.current.currentTime = time;
+              setCurrentTime(time);
+            }
+            isRestoringRef.current = false;
+          }, 500);
+        }
+      }
+    } catch (err) {
+      console.error("Error restoring player state:", err);
+    }
+  }, []);
+
+  // Save player state to localStorage whenever it changes
+  useEffect(() => {
+    if (!hasMountedRef.current || isRestoringRef.current || !currentSong) return;
+
+    try {
+      const playerState = {
+        song: currentSong,
+        queueData: queue,
+        index: currentIndex,
+        time: currentTime,
+        volumeData: volume,
+        repeat: repeatMode,
+        shuffleMode: shuffle
+      };
+      localStorage.setItem("serenity-player-state", JSON.stringify(playerState));
+    } catch (err) {
+      console.error("Error saving player state:", err);
+    }
+  }, [currentSong, queue, currentIndex, volume, repeatMode, shuffle]);
+
+  // Save currentTime separately with throttling (every 2 seconds)
+  useEffect(() => {
+    if (!hasMountedRef.current || isRestoringRef.current || !currentSong) return;
+
+    const now = Date.now();
+    if (now - lastSaveTimeRef.current < 2000) return;
+    
+    lastSaveTimeRef.current = now;
+
+    try {
+      const savedState = localStorage.getItem("serenity-player-state");
+      if (savedState) {
+        const playerState = JSON.parse(savedState);
+        playerState.time = currentTime;
+        localStorage.setItem("serenity-player-state", JSON.stringify(playerState));
+      }
+    } catch (err) {
+      console.error("Error saving playback time:", err);
+    }
+  }, [currentTime]);
+
+  // Save state before page unload to capture exact playback position
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (currentSong && audioRef.current) {
+        try {
+          const savedState = localStorage.getItem("serenity-player-state");
+          if (savedState) {
+            const playerState = JSON.parse(savedState);
+            playerState.time = audioRef.current.currentTime;
+            localStorage.setItem("serenity-player-state", JSON.stringify(playerState));
+          }
+        } catch (err) {
+          console.error("Error saving state on unload:", err);
+        }
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [currentSong]);
 
   // Track song play after user listens for 5 seconds
   useEffect(() => {
@@ -117,6 +224,8 @@ export function PlayerProvider({ children }) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
     }
+    // Clear saved player state when user explicitly closes player
+    localStorage.removeItem("serenity-player-state");
   };
 
   const playNext = () => {

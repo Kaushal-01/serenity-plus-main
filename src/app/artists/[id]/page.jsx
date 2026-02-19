@@ -6,6 +6,8 @@ import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import { usePlayer } from "@/context/PlayerContext";
 import SongCard from "@/components/SongCard";
+import Breadcrumb from "@/components/Breadcrumb";
+import { ArtistHeaderSkeleton, SongCardSkeleton } from "@/components/LoadingSkeleton";
 
 export default function ArtistPage() {
   const { id } = useParams();
@@ -55,8 +57,15 @@ export default function ArtistPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 transition-colors">
         <Navbar />
-        <div className="pt-24 flex justify-center items-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-600"></div>
+        <div className="pt-24 px-6 pb-12 max-w-7xl mx-auto">
+          <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-64 mb-6 animate-pulse" />
+          <ArtistHeaderSkeleton />
+          <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-48 mb-6 animate-pulse" />
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+            {Array.from({ length: 12 }).map((_, i) => (
+              <SongCardSkeleton key={i} />
+            ))}
+          </div>
         </div>
       </div>
     );
@@ -67,15 +76,13 @@ export default function ArtistPage() {
       <Navbar />
       
       <div className="pt-24 px-6 pb-12 max-w-7xl mx-auto">
-        <button
-          onClick={() => router.back()}
-          className="mb-6 flex items-center gap-2 text-gray-600 hover:text-purple-600 transition-all"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-          </svg>
-          Back
-        </button>
+        {/* Breadcrumb */}
+        <Breadcrumb
+          items={[
+            { label: "Artists", href: "/search" },
+            { label: artist?.name || "Artist" },
+          ]}
+        />
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}

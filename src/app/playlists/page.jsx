@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Navbar from "../../components/Navbar";
 import { usePlayer } from "@/context/PlayerContext";
 import { motion, AnimatePresence } from "framer-motion";
+import { SongCardSkeleton } from "@/components/LoadingSkeleton";
 
 export default function PlaylistsPage() {
   const [playlists, setPlaylists] = useState([]);
@@ -173,8 +174,23 @@ export default function PlaylistsPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 transition-colors">
         <Navbar />
-        <div className="pt-24 px-8 flex justify-center items-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#0097b2]"></div>
+        <div className="pt-24 px-6 pb-12 max-w-7xl mx-auto">
+          <div className="flex justify-end items-center mb-8">
+            <div className="h-12 w-40 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse" />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-lg animate-pulse">
+                <div className="h-48 bg-gray-200 dark:bg-gray-700" />
+                <div className="p-4 space-y-3">
+                  <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-3/4" />
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full" />
+                  <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2" />
+                  <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded" />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     );

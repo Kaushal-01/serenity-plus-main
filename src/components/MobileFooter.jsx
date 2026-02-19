@@ -52,10 +52,11 @@ export default function MobileFooter() {
   }
 
   const navItems = [
-    { href: "/playlists", icon: Music, label: "Playlists" },
-    { href: "/search", icon: Search, label: "Search" },
     { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+    { href: "/search", icon: Search, label: "Search" },
+    { href: "/playlists", icon: Music, label: "Playlists" },
     { href: "/favorites", icon: Heart, label: "Favorites" },
+    { href: "/profile", icon: User, label: "Profile" },
   ];
 
   const isActive = (href) => {

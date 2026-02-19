@@ -4,6 +4,8 @@ import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import Breadcrumb from "@/components/Breadcrumb";
+import { AlbumGridSkeleton } from "@/components/LoadingSkeleton";
 
 export default function AlbumsByQuery() {
   const { id: query } = useParams(); // here [id] is treated as query
@@ -28,8 +30,15 @@ export default function AlbumsByQuery() {
     }
   };
 
-  if (loading)
-    return <p className="text-center text-gray-600 mt-20">Loading albums...</p>;
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 text-black dark:text-white px-10 md:px-20 py-16 mt-20 transition-colors">
+        <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-64 mb-8 animate-pulse" />
+        <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded w-96 mb-8 animate-pulse" />
+        <AlbumGridSkeleton count={12} />
+      </div>
+    );
+  }
 
   if (!albums || albums.length === 0)
     return (
@@ -40,13 +49,13 @@ export default function AlbumsByQuery() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 text-black dark:text-white px-10 md:px-20 py-16 mt-20 transition-colors">
-      {/* Back button */}
-      <button
-        onClick={() => router.back()}
-        className="mb-8 bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-full text-sm text-gray-700 hover:text-black transition-all border border-gray-200"
-      >
-        ← Back
-      </button>
+      {/* Breadcrumb */}
+      <Breadcrumb
+        items={[
+          { label: "Search", href: "/search" },
+          { label: `Albums: "${decodeURIComponent(query)}"` },
+        ]}
+      />
 
       {/* Page title */}
       <h1 className="text-4xl font-bold mb-8">

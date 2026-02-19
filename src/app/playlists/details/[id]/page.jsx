@@ -4,6 +4,8 @@ import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
 import { motion } from "framer-motion";
 import { usePlayer } from "@/context/PlayerContext";
+import Breadcrumb from "@/components/Breadcrumb";
+import { SongListSkeleton } from "@/components/LoadingSkeleton";
 
 export default function PlaylistDetailsPage() {
   const { id } = useParams();
@@ -27,21 +29,34 @@ export default function PlaylistDetailsPage() {
     }
   };
 
-  if (loading) return <p className="text-center text-gray-600 mt-20">Loading playlist...</p>;
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 text-black dark:text-white px-10 md:px-20 py-16 mt-20 transition-colors">
+        <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-64 mb-8 animate-pulse" />
+        <div className="flex flex-col md:flex-row gap-8 items-center mb-10">
+          <div className="w-60 h-60 rounded-2xl bg-gray-200 dark:bg-gray-700 animate-pulse" />
+          <div className="flex-1 space-y-4 w-full">
+            <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded w-3/4 animate-pulse" />
+            <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-full animate-pulse" />
+            <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-32 animate-pulse" />
+          </div>
+        </div>
+        <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-48 mb-4 animate-pulse" />
+        <SongListSkeleton count={10} />
+      </div>
+    );
+  }
   if (!playlist) return <p className="text-center text-gray-600 mt-20">Playlist not found.</p>;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 text-black dark:text-white px-10 md:px-20 py-16 mt-20 transition-colors">
-      {/* Back Button */}
-      <button
-        onClick={() => router.back()}
-        className="mb-6 flex items-center gap-2 text-gray-600 hover:text-[#0097b2] transition-all"
-      >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-        </svg>
-        Back
-      </button>
+      {/* Breadcrumb */}
+      <Breadcrumb
+        items={[
+          { label: "Playlists", href: "/search" },
+          { label: playlist?.name || "Playlist Details" },
+        ]}
+      />
 
       {/* Playlist Header */}
       <div className="flex flex-col md:flex-row gap-8 items-center mb-10">

@@ -77,7 +77,7 @@ export default function Home() {
               Hi, {user.name || "Listener"} 👋
             </p>
             <Link
-              href="/explore"
+              href="/dashboard"
               className="text-sm sm:text-base px-4 py-2 rounded-full bg-[#0097b2] hover:bg-[#007a93] transition font-medium text-white"
             >
               Dashboard
