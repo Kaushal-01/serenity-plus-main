@@ -56,6 +56,11 @@ export default function MiniPlayer() {
   const [addingToPlaylist, setAddingToPlaylist] = useState(null);
   const [showQueue, setShowQueue] = useState(false);
 
+  // Emit player expanded state changes
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent('player-expanded', { detail: { isExpanded } }));
+  }, [isExpanded]);
+
   // Fetch playlists when modal opens
   useEffect(() => {
     if (showPlaylistModal) {
@@ -182,14 +187,22 @@ export default function MiniPlayer() {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 100, opacity: 0 }}
             transition={{ type: "spring", stiffness: 120, damping: 18 }}
-            className="fixed bottom-4 left-1/2 -translate-x-1/2 w-[95%] md:w-[80%] lg:w-[70%] xl:w-[60%]
+            drag="y"
+            dragConstraints={{ top: 0, bottom: 0 }}
+            dragElastic={0.2}
+            onDragEnd={(e, { offset, velocity }) => {
+              if (offset.y > 100 || velocity.y > 500) {
+                closePlayer();
+              }
+            }}
+            className="fixed bottom-[64px] md:bottom-4 left-1/2 -translate-x-1/2 w-[95%] md:w-[80%] lg:w-[70%] xl:w-[60%]
             rounded-2xl bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 border border-gray-200 dark:border-gray-700
             shadow-2xl text-black dark:text-white z-[999] hover:shadow-3xl
-            transition-all duration-300 backdrop-blur-lg"
+            transition-all duration-300 backdrop-blur-lg cursor-grab active:cursor-grabbing"
           >
             {/* Progress Bar */}
             <div
-              className="absolute top-0 left-0 right-0 h-1 bg-gray-200 dark:bg-gray-700 rounded-t-2xl cursor-pointer group overflow-hidden"
+              className="absolute bottom-0 left-0 right-0 h-1 bg-gray-200 dark:bg-gray-700 rounded-b-2xl cursor-pointer group overflow-hidden"
               onClick={handleProgressChange}
               onMouseDown={() => setIsDragging(true)}
               onMouseUp={() => setIsDragging(false)}
@@ -206,9 +219,9 @@ export default function MiniPlayer() {
               </motion.div>
             </div>
 
-            <div className="flex items-center justify-between gap-4 p-4">
+            <div className="flex items-center justify-between gap-3 p-2.5 md:p-4">
               {/* Left: Song Info */}
-              <div className="flex items-center gap-4 flex-1 min-w-0">
+              <div className="flex items-center gap-3 md:gap-4 flex-1 min-w-0">
                 <motion.div
                   className="relative group cursor-pointer"
                   whileHover={{ scale: 1.05 }}
@@ -217,7 +230,7 @@ export default function MiniPlayer() {
                   <img
                     src={currentSong?.image?.[2]?.url || "/default-song.jpg"}
                     alt={currentSong?.name}
-                    className="w-14 h-14 md:w-16 md:h-16 rounded-xl object-cover border-2 border-gray-200 dark:border-gray-600 shadow-md"
+                    className="w-12 h-12 md:w-16 md:h-16 rounded-lg md:rounded-xl object-cover border-2 border-gray-200 dark:border-gray-600 shadow-md"
                   />
                   {isPlaying && (
                     <div className="absolute inset-0 bg-black/30 rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -233,7 +246,7 @@ export default function MiniPlayer() {
                   <p className="text-gray-600 dark:text-gray-400 text-xs md:text-sm truncate">
                     {currentSong?.artists?.primary?.map((a) => a.name).join(", ") || "Unknown Artist"}
                   </p>
-                  <div className="flex items-center gap-2 mt-1">
+                  <div className="hidden md:flex items-center gap-2 mt-1">
                     <span className="text-xs text-gray-500 dark:text-gray-400">{formatTime(currentTime)}</span>
                     <span className="text-xs text-gray-400 dark:text-gray-500">/</span>
                     <span className="text-xs text-gray-500 dark:text-gray-400">{formatTime(duration)}</span>
@@ -241,13 +254,13 @@ export default function MiniPlayer() {
                 </div>
               </div>
 
-              {/* Center: Main Controls */}
-              <div className="flex items-center gap-2 md:gap-3">
+              {/* Center: Main Controls - Desktop Only */}
+              <div className="hidden md:flex items-center gap-2 md:gap-3">
                 {/* Shuffle */}
                 <motion.button
                   onClick={toggleShuffle}
                   whileTap={{ scale: 0.9 }}
-                  className={`hidden md:flex w-9 h-9 items-center justify-center rounded-full 
+                  className={`w-9 h-9 flex items-center justify-center rounded-full 
                   ${shuffle ? "bg-[#0097b2] text-white" : "bg-gray-100 hover:bg-gray-200 text-gray-600"}
                   border border-gray-200 transition-all`}
                   title="Shuffle"
@@ -275,14 +288,14 @@ export default function MiniPlayer() {
                   onClick={togglePlay}
                   whileTap={{ scale: 0.95 }}
                   whileHover={{ scale: 1.05 }}
-                  className="flex items-center justify-center w-12 h-12 md:w-14 md:h-14 
+                  className="flex items-center justify-center w-14 h-14 
                   rounded-full shadow-lg bg-gradient-to-br from-[#0097b2] to-[#00b8d4] 
                   text-white hover:shadow-xl transition-all relative overflow-hidden"
                 >
                   {isPlaying ? (
-                    <Pause className="w-5 h-5 md:w-6 md:h-6" />
+                    <Pause className="w-6 h-6" />
                   ) : (
-                    <Play className="w-5 h-5 md:w-6 md:h-6 ml-0.5" />
+                    <Play className="w-6 h-6 ml-0.5" />
                   )}
                 </motion.button>
 
@@ -305,7 +318,7 @@ export default function MiniPlayer() {
                 <motion.button
                   onClick={toggleRepeat}
                   whileTap={{ scale: 0.9 }}
-                  className={`hidden md:flex w-9 h-9 items-center justify-center rounded-full 
+                  className={`w-9 h-9 flex items-center justify-center rounded-full 
                   ${repeatMode !== "off" ? "bg-[#0097b2] text-white" : "bg-gray-100 hover:bg-gray-200 text-gray-600"}
                   border border-gray-200 transition-all`}
                   title={`Repeat: ${repeatMode}`}
@@ -381,16 +394,21 @@ export default function MiniPlayer() {
                   <Plus className="w-4 h-4" />
                 </motion.button>
 
-                {/* Close Player */}
+                {/* Play/Pause - Mobile */}
                 <motion.button
-                  onClick={closePlayer}
-                  whileTap={{ scale: 0.9 }}
-                  className="w-9 h-9 flex items-center justify-center rounded-full 
-                  bg-gray-100 hover:bg-red-500 text-gray-600 hover:text-white
-                  border border-gray-200 transition-all"
-                  title="Close Player"
+                  onClick={togglePlay}
+                  whileTap={{ scale: 0.95 }}
+                  whileHover={{ scale: 1.05 }}
+                  className="flex items-center justify-center w-11 h-11 md:w-9 md:h-9
+                  rounded-full shadow-lg bg-gradient-to-br from-[#0097b2] to-[#00b8d4] 
+                  text-white hover:shadow-xl transition-all relative overflow-hidden"
+                  title="Play/Pause"
                 >
-                  <X className="w-4 h-4" />
+                  {isPlaying ? (
+                    <Pause className="w-5 h-5 md:w-4 md:h-4" />
+                  ) : (
+                    <Play className="w-5 h-5 md:w-4 md:h-4 ml-0.5" />
+                  )}
                 </motion.button>
 
                 {/* Queue Info */}

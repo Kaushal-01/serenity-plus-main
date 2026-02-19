@@ -4,18 +4,19 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import { motion } from "framer-motion";
 import { usePlayer } from "@/context/PlayerContext";
-import GlobalSearch from "./GlobalSearch";
-import Link from "next/link";
 import SongCard from "@/components/SongCard";
-import { Sun, CloudRain, Waves, Flame, Sparkles, TrendingUp, Headphones } from "lucide-react";
+import { Sun, CloudRain, Waves, Flame, Sparkles, TrendingUp, Headphones, History } from "lucide-react";
 
 export default function Dashboard() {
   const router = useRouter();
   const { playSong } = usePlayer();
   const [userName, setUserName] = useState("Music Lover");
-  const [featuredAlbums, setFeaturedAlbums] = useState([]);
   const [recommendedSongs, setRecommendedSongs] = useState([]);
+  const [trendingSongs, setTrendingSongs] = useState([]);
+  const [listeningHistory, setListeningHistory] = useState([]);
   const [loadingRecs, setLoadingRecs] = useState(false);
+  const [loadingTrending, setLoadingTrending] = useState(false);
+  const [loadingHistory, setLoadingHistory] = useState(false);
   const [selectedMood, setSelectedMood] = useState(null);
   const [favorites, setFavorites] = useState([]);
 
@@ -34,9 +35,10 @@ export default function Dashboard() {
     }
 
     fetchUser(token);
-    fetchAlbums();
     fetchRecommendations(token);
     fetchFavorites(token);
+    fetchTrendingSongs();
+    fetchListeningHistory(token);
   }, [router]);
 
   const fetchUser = async (token) => {
@@ -50,40 +52,33 @@ export default function Dashboard() {
     }
   };
 
-  const fetchAlbums = async () => {
+  const fetchTrendingSongs = async () => {
+    setLoadingTrending(true);
     try {
-      // Fetch multiple trending sources and combine them
-      const queries = [
-        "trending global",
-        "bollywood hits 2024",
-        "top charts india",
-        "latest albums"
-      ];
-      
-      const requests = queries.map(q => 
-        axios.get(`/api/serenity/albums?query=${encodeURIComponent(q)}`)
-      );
-      
-      const responses = await Promise.all(requests);
-      
-      // Combine and deduplicate albums
-      const allAlbums = responses.flatMap(res => res.data.data.results || []);
-      const uniqueAlbums = Array.from(
-        new Map(allAlbums.map(album => [album.id, album])).values()
-      );
-      
-      // Shuffle and take top 12 for variety
-      const shuffled = uniqueAlbums.sort(() => Math.random() - 0.5);
-      setFeaturedAlbums(shuffled.slice(0, 12));
-    } catch (err) {
-      console.error("Error fetching albums:", err);
-      // Fallback to simple query
-      try {
-        const res = await axios.get(`/api/serenity/albums?query=trending`);
-        setFeaturedAlbums(res.data.data.results.slice(0, 12));
-      } catch (fallbackErr) {
-        console.error("Fallback error:", fallbackErr);
+      const res = await axios.get("/api/user/trending");
+      if (res.data.success) {
+        setTrendingSongs(res.data.songs || []);
       }
+    } catch (err) {
+      console.error("Error fetching trending songs:", err);
+    } finally {
+      setLoadingTrending(false);
+    }
+  };
+
+  const fetchListeningHistory = async (token) => {
+    setLoadingHistory(true);
+    try {
+      const res = await axios.get("/api/user/listening-history", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.data.success) {
+        setListeningHistory(res.data.songs || []);
+      }
+    } catch (err) {
+      console.error("Error fetching listening history:", err);
+    } finally {
+      setLoadingHistory(false);
     }
   };
 
@@ -116,12 +111,12 @@ export default function Dashboard() {
         (res) => res.data.data?.songs?.results || []
       );
 
-      // Deduplicate songs by ID and ensure exactly 6 songs
+      // Deduplicate songs by ID and ensure exactly 12 songs
       const uniqueSongs = Array.from(
         new Map(allSongs.map(song => [song.id, song])).values()
       );
       
-      setRecommendedSongs(uniqueSongs.slice(0, 6));
+      setRecommendedSongs(uniqueSongs.slice(0, 12));
     } catch (err) {
       console.error("Error fetching recommendations:", err);
     } finally {
@@ -173,7 +168,7 @@ export default function Dashboard() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-4xl font-extrabold tracking-tight text-black dark:text-white"
+          className="text-2xl md:text-4xl font-extrabold tracking-tight text-black dark:text-white"
         >
            Welcome back, <span className="font-semibold text-[#0097b2]">{userName}</span> 
         </motion.h1>
@@ -228,12 +223,12 @@ export default function Dashboard() {
       </section>
 
       {/* 🔮 Recommended for You */}
-      <section className="px-10 md:px-16 py-20 bg-white dark:bg-gray-900">
+      <section className="px-10 md:px-16 py-12 bg-white dark:bg-gray-900">
         <div className="flex items-center justify-between mb-8">
           <motion.h2
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="text-3xl font-bold text-[#0097b2] flex items-center gap-3"
+            className="text-xl md:text-3xl font-bold text-[#0097b2] flex items-center gap-3"
           >
             <Sparkles size={32} strokeWidth={2} /> Recommended for You
           </motion.h2>
@@ -251,81 +246,227 @@ export default function Dashboard() {
             <p className="text-gray-600 dark:text-gray-400 mt-4 animate-pulse">Loading music magic...</p>
           </div>
         ) : recommendedSongs.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-            {recommendedSongs.map((song, i) => (
-              <SongCard
-                key={song.id || i}
-                song={song}
-                onPlay={(s) => playSong(s, recommendedSongs)}
-                isFavorite={isFavorite(song.id)}
-                onToggleFavorite={() => toggleFavorite(song)}
-                showFavoriteButton={true}
-              />
-            ))}
-          </div>
+          <>
+            {/* Mobile: Horizontal Swipe Rows */}
+            <div className="md:hidden space-y-4">
+              {/* First Row - First 6 songs */}
+              <div className="overflow-x-auto scrollbar-hide">
+                <div className="flex gap-4 pb-2" style={{ width: 'max-content' }}>
+                  {recommendedSongs.slice(0, 6).map((song, i) => (
+                    <div key={song.id || i} className="flex-shrink-0" style={{ width: '160px' }}>
+                      <SongCard
+                        song={song}
+                        onPlay={(s) => playSong(s, recommendedSongs)}
+                        isFavorite={isFavorite(song.id)}
+                        onToggleFavorite={() => toggleFavorite(song)}
+                        showFavoriteButton={true}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+              {/* Second Row - Last 6 songs */}
+              {recommendedSongs.length > 6 && (
+                <div className="overflow-x-auto scrollbar-hide">
+                  <div className="flex gap-4 pb-2" style={{ width: 'max-content' }}>
+                    {recommendedSongs.slice(6, 12).map((song, i) => (
+                      <div key={song.id || i} className="flex-shrink-0" style={{ width: '160px' }}>
+                        <SongCard
+                          song={song}
+                          onPlay={(s) => playSong(s, recommendedSongs)}
+                          isFavorite={isFavorite(song.id)}
+                          onToggleFavorite={() => toggleFavorite(song)}
+                          showFavoriteButton={true}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+            {/* Desktop: Grid Layout */}
+            <div className="hidden md:grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+              {recommendedSongs.map((song, i) => (
+                <SongCard
+                  key={song.id || i}
+                  song={song}
+                  onPlay={(s) => playSong(s, recommendedSongs)}
+                  isFavorite={isFavorite(song.id)}
+                  onToggleFavorite={() => toggleFavorite(song)}
+                  showFavoriteButton={true}
+                />
+              ))}
+            </div>
+          </>
         ) : (
           <p className="text-gray-600 dark:text-gray-400 text-center">No personalized songs yet 🎶</p>
         )}
       </section>
 
-      {/* 🔥 Trending Albums */}
-      <section className="px-10 md:px-16 py-16 bg-gradient-to-b from-white dark:from-gray-900 to-gray-50 dark:to-gray-800">
-        <motion.h2
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.2 }}
-          className="text-3xl font-bold mb-8 text-[#0097b2] flex items-center gap-3"
-        >
-          <TrendingUp size={32} strokeWidth={2} /> Trending Albums
-        </motion.h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-          {featuredAlbums.map((album, i) => (
-            <Link key={album.id || i} href={`/albums/details/${encodeURIComponent(album.id)}`}>
+      {/* 🌍 World Trending Songs */}
+      <section className="px-10 md:px-16 py-12 bg-gradient-to-b from-white dark:from-gray-900 to-gray-50 dark:to-gray-800">
+        <div className="flex items-center justify-between mb-8">
+          <motion.h2
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="text-xl md:text-3xl font-bold text-[#0097b2] flex items-center gap-3"
+          >
+            <TrendingUp size={32} strokeWidth={2} /> World Trending Songs
+          </motion.h2>
+        </div>
+
+        {loadingTrending ? (
+          <div className="flex flex-col items-center justify-center py-20">
+            <div className="relative w-20 h-20">
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.05 }}
-                whileHover={{ y: -8, scale: 1.02 }}
-                className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 group cursor-pointer"
-              >
-                <div className="relative aspect-square overflow-hidden bg-gray-100 dark:bg-gray-700">
-                  <img
-                    src={album.image?.[2]?.url || album.image?.[1]?.url}
-                    alt={album.name}
-                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center">
-                    <motion.div
-                      whileHover={{ scale: 1.1 }}
-                      className="bg-[#0097b2] hover:bg-[#007a93] rounded-full w-12 h-12 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="white"
-                        viewBox="0 0 24 24"
-                        className="w-6 h-6 ml-1"
-                      >
-                        <path d="M5 3l14 9-14 9V3z" />
-                      </svg>
-                    </motion.div>
+                className="absolute inset-0 border-4 border-[#0097b2] border-t-transparent rounded-full"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+              />
+            </div>
+            <p className="text-gray-600 dark:text-gray-400 mt-4 animate-pulse">Loading global trends...</p>
+          </div>
+        ) : trendingSongs.length > 0 ? (
+          <>
+            {/* Mobile: Horizontal Swipe Rows */}
+            <div className="md:hidden space-y-4">
+              {/* First Row - First 6 songs */}
+              <div className="overflow-x-auto scrollbar-hide">
+                <div className="flex gap-4 pb-2" style={{ width: 'max-content' }}>
+                  {trendingSongs.slice(0, 6).map((song, i) => (
+                    <div key={song.id || i} className="flex-shrink-0" style={{ width: '160px' }}>
+                      <SongCard
+                        song={song}
+                        onPlay={(s) => playSong(s, trendingSongs)}
+                        isFavorite={isFavorite(song.id)}
+                        onToggleFavorite={() => toggleFavorite(song)}
+                        showFavoriteButton={true}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+              {/* Second Row - Last 4 songs (if more than 6) */}
+              {trendingSongs.length > 6 && (
+                <div className="overflow-x-auto scrollbar-hide">
+                  <div className="flex gap-4 pb-2" style={{ width: 'max-content' }}>
+                    {trendingSongs.slice(6, 10).map((song, i) => (
+                      <div key={song.id || i} className="flex-shrink-0" style={{ width: '160px' }}>
+                        <SongCard
+                          song={song}
+                          onPlay={(s) => playSong(s, trendingSongs)}
+                          isFavorite={isFavorite(song.id)}
+                          onToggleFavorite={() => toggleFavorite(song)}
+                          showFavoriteButton={true}
+                        />
+                      </div>
+                    ))}
                   </div>
                 </div>
-                <div className="p-4">
-                  <h3 className="font-semibold text-sm truncate text-black dark:text-white" title={album.name}>{album.name}</h3>
-                  <p className="text-gray-600 dark:text-gray-300 text-xs truncate">
-                    {album.artists?.primary?.[0]?.name || "Unknown"}
-                  </p>
-                </div>
-              </motion.div>
-            </Link>
-          ))}
-        </div>
+              )}
+            </div>
+            {/* Desktop: Grid Layout */}
+            <div className="hidden md:grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+              {trendingSongs.map((song, i) => (
+                <SongCard
+                  key={song.id || i}
+                  song={song}
+                  onPlay={(s) => playSong(s, trendingSongs)}
+                  isFavorite={isFavorite(song.id)}
+                  onToggleFavorite={() => toggleFavorite(song)}
+                  showFavoriteButton={true}
+                />
+              ))}
+            </div>
+          </>
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No trending songs yet</p>
+            <p className="text-gray-500 dark:text-gray-500 text-sm">Start listening to build the global trending list! 🎧</p>
+          </div>
+        )}
       </section>
 
-      {/* 🔍 Search */}
-      <div className="px-10 md:px-16 py-20">
-        <GlobalSearch />
-      </div>
+      {/* 🕒 Recently Played */}
+      {listeningHistory.length > 0 && (
+        <section className="px-10 md:px-16 py-12 bg-white dark:bg-gray-900">
+          <div className="flex items-center justify-between mb-8">
+            <motion.h2
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="text-xl md:text-3xl font-bold text-[#0097b2] flex items-center gap-3"
+            >
+              <History size={32} strokeWidth={2} /> Recently Played
+            </motion.h2>
+          </div>
+
+          {loadingHistory ? (
+            <div className="flex flex-col items-center justify-center py-20">
+              <div className="relative w-20 h-20">
+                <motion.div
+                  className="absolute inset-0 border-4 border-[#0097b2] border-t-transparent rounded-full"
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                />
+              </div>
+              <p className="text-gray-600 dark:text-gray-400 mt-4 animate-pulse">Loading history...</p>
+            </div>
+          ) : (
+            <>
+              {/* Mobile: Horizontal Swipe Rows */}
+              <div className="md:hidden space-y-4">
+                {/* First Row - First 6 songs */}
+                <div className="overflow-x-auto scrollbar-hide">
+                  <div className="flex gap-4 pb-2" style={{ width: 'max-content' }}>
+                    {listeningHistory.slice(0, 6).map((song, i) => (
+                      <div key={song.id || i} className="flex-shrink-0" style={{ width: '160px' }}>
+                        <SongCard
+                          song={song}
+                          onPlay={(s) => playSong(s, listeningHistory)}
+                          isFavorite={isFavorite(song.id)}
+                          onToggleFavorite={() => toggleFavorite(song)}
+                          showFavoriteButton={true}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                {/* Second Row - Last 6 songs */}
+                {listeningHistory.length > 6 && (
+                  <div className="overflow-x-auto scrollbar-hide">
+                    <div className="flex gap-4 pb-2" style={{ width: 'max-content' }}>
+                      {listeningHistory.slice(6, 12).map((song, i) => (
+                        <div key={song.id || i} className="flex-shrink-0" style={{ width: '160px' }}>
+                          <SongCard
+                            song={song}
+                            onPlay={(s) => playSong(s, listeningHistory)}
+                            isFavorite={isFavorite(song.id)}
+                            onToggleFavorite={() => toggleFavorite(song)}
+                            showFavoriteButton={true}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+              {/* Desktop: Grid Layout */}
+              <div className="hidden md:grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                {listeningHistory.map((song, i) => (
+                  <SongCard
+                    key={song.id || i}
+                    song={song}
+                    onPlay={(s) => playSong(s, listeningHistory)}
+                    isFavorite={isFavorite(song.id)}
+                    onToggleFavorite={() => toggleFavorite(song)}
+                    showFavoriteButton={true}
+                  />
+                ))}
+              </div>
+            </>
+          )}
+        </section>
+      )}
 
       {/* 🌙 Footer */}
       <footer className="text-center text-gray-600 dark:text-gray-400 text-sm py-12 border-t border-gray-200 dark:border-gray-700 bg-gradient-to-t from-gray-50 dark:from-gray-800 to-white dark:to-gray-900">

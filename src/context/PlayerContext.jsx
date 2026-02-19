@@ -1,5 +1,6 @@
 "use client";
 import { createContext, useContext, useState, useRef, useEffect } from "react";
+import axios from "axios";
 import MiniPlayer from "./MiniPlayer";
 const PlayerContext = createContext();
 
@@ -16,6 +17,7 @@ export function PlayerProvider({ children }) {
   const [duration, setDuration] = useState(0);
   const audioRef = useRef(null);
   const previousVolumeRef = useRef(0.7);
+  const hasTrackedPlayRef = useRef(false);
 
   useEffect(() => {
     if (audioRef.current) {
@@ -23,11 +25,37 @@ export function PlayerProvider({ children }) {
     }
   }, [volume, isMuted]);
 
+  // Track song play after user listens for 5 seconds
+  useEffect(() => {
+    if (currentSong && currentTime >= 5 && !hasTrackedPlayRef.current) {
+      hasTrackedPlayRef.current = true;
+      trackSongPlay(currentSong);
+    }
+  }, [currentTime, currentSong]);
+
+  const trackSongPlay = async (song) => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.post(
+        "/api/user/track-play",
+        { song },
+        {
+          headers: token ? { Authorization: `Bearer ${token}` } : {}
+        }
+      );
+    } catch (err) {
+      console.error("Error tracking song play:", err);
+    }
+  };
+
   const playSong = (song, playlistSongs = []) => {
     if (!song?.downloadUrl?.[0]?.url) {
       alert("No audio available for this song.");
       return;
     }
+    
+    // Reset tracking for new song
+    hasTrackedPlayRef.current = false;
     
     // Select highest quality audio (320kbps preferred)
     let bestQualityUrl = song.downloadUrl[0].url;

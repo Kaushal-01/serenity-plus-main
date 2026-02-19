@@ -205,8 +205,8 @@ export default function ProfilePage() {
       <div className="pt-24 px-6 pb-12 max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-[#0097b2] mb-2">My Profile</h1>
-          <p className="text-gray-600 dark:text-gray-300">Manage your account settings and preferences</p>
+          <h1 className="text-2xl md:text-4xl font-bold text-[#0097b2] mb-2">My Profile</h1>
+          <p className="text-sm md:text-base text-gray-600 dark:text-gray-300">Manage your account settings and preferences</p>
         </div>
 
         {/* Message Alert */}
@@ -241,7 +241,7 @@ export default function ProfilePage() {
             <div className="flex-1">
               {!editing ? (
                 <>
-                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{user.name}</h2>
+                  <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">{user.name}</h2>
                   <p className="text-gray-600 dark:text-gray-300">{user.email}</p>
                   <button
                     onClick={() => setEditing(true)}
@@ -299,7 +299,7 @@ export default function ProfilePage() {
                 </svg>
                 <div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Favorites</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{user.favoritesCount}</p>
+                  <p className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">{user.favoritesCount}</p>
                 </div>
               </div>
             </div>
@@ -311,7 +311,7 @@ export default function ProfilePage() {
                 </svg>
                 <div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Genres</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{user.preferences?.genres?.length || 0}</p>
+                  <p className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">{user.preferences?.genres?.length || 0}</p>
                 </div>
               </div>
             </div>
@@ -332,7 +332,7 @@ export default function ProfilePage() {
           {/* Preferences */}
           {user.preferences?.isSetupComplete && (
             <div className="mb-8">
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Music Preferences</h3>
+              <h3 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-4">Music Preferences</h3>
               
               {user.preferences.genres && user.preferences.genres.length > 0 && (
                 <div className="mb-4">
@@ -453,6 +453,26 @@ export default function ProfilePage() {
                 <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${isDarkMode ? "translate-x-6" : ""}`}></div>
               </div>
             </button>
+
+            <button
+              onClick={() => {
+                localStorage.removeItem("token");
+                localStorage.removeItem("user");
+                window.dispatchEvent(new Event("serenity-auth-update"));
+                router.push("/login");
+              }}
+              className="w-full flex items-center justify-between px-6 py-4 bg-red-50 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/30 rounded-xl transition-all group border-2 border-red-200 dark:border-red-800"
+            >
+              <div className="flex items-center gap-3">
+                <svg className="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                <span className="font-medium text-red-600 dark:text-red-400">Logout</span>
+              </div>
+              <svg className="w-5 h-5 text-red-400 dark:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
           </div>
         </motion.div>
 
@@ -463,7 +483,7 @@ export default function ProfilePage() {
           transition={{ delay: 0.1 }}
           className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 border-2 border-red-200 dark:border-red-800 transition-colors"
         >
-          <h3 className="text-xl font-bold text-red-600 dark:text-red-400 mb-4 flex items-center gap-2">
+          <h3 className="text-lg md:text-xl font-bold text-red-600 dark:text-red-400 mb-4 flex items-center gap-2">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
@@ -496,7 +516,7 @@ export default function ProfilePage() {
               className="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-md w-full shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Change Password</h3>
+              <h3 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-6">Change Password</h3>
               <form onSubmit={handleChangePassword} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Current Password</label>
@@ -577,7 +597,7 @@ export default function ProfilePage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                   </svg>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Delete Account?</h3>
+                <h3 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-2">Delete Account?</h3>
                 <p className="text-gray-600 dark:text-gray-300">This action cannot be undone. All your data will be permanently deleted.</p>
               </div>
               <div className="space-y-4">

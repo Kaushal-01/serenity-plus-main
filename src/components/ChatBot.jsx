@@ -1,8 +1,10 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { usePlayer } from '@/context/PlayerContext';
 
 export default function ChatBot() {
+  const { currentSong } = usePlayer();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
@@ -311,11 +313,15 @@ export default function ChatBot() {
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 z-50 bg-[#0097b2] text-white rounded-full w-16 h-16 flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 group"
+          className={`fixed z-50 bg-[#0097b2] text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 group flex items-center justify-center ${
+            currentSong 
+              ? 'bottom-[232px] md:bottom-6 w-14 h-14 md:w-16 md:h-16 right-4 md:right-6' 
+              : 'bottom-[160px] md:bottom-6 w-14 h-14 md:w-16 md:h-16 right-4 md:right-6'
+          }`}
           aria-label="Open chat"
         >
           <svg 
-            className="w-8 h-8" 
+            className={`${currentSong ? 'w-7 h-7 md:w-8 md:h-8' : 'w-7 h-7 md:w-8 md:h-8'}`}
             fill="none" 
             stroke="currentColor" 
             viewBox="0 0 24 24"
@@ -332,7 +338,11 @@ export default function ChatBot() {
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-6 right-6 z-9999 w-96 h-[600px] bg-white dark:bg-gray-800 rounded-2xl shadow-2xl flex flex-col border border-gray-200 dark:border-gray-700 animate-slideUp transition-colors">
+        <div className={`fixed z-9999 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl flex flex-col border border-gray-200 dark:border-gray-700 animate-slideUp transition-colors ${
+          currentSong 
+            ? 'bottom-[80px] md:bottom-6 right-4 md:right-6 w-[90%] sm:w-80 md:w-96 h-[500px] md:h-[600px]' 
+            : 'bottom-[80px] md:bottom-6 right-4 md:right-6 w-[90%] sm:w-80 md:w-96 h-[500px] md:h-[600px]'
+        }`}>
           {/* Header */}
           <div className="bg-[#0097b2] text-white px-6 py-4 rounded-t-2xl flex items-center justify-between">
             <div className="flex items-center gap-3">

@@ -55,19 +55,6 @@ export default function FavoritesPage() {
     <>
       <div className="mt-10 min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 text-black dark:text-white p-8 transition-colors">
         <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-8"
-          >
-            <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-[#0097b2] to-[#007a93] bg-clip-text text-transparent">
-              ❤️ My Favorites
-            </h1>
-            <p className="text-gray-600">
-              {favorites.length} {favorites.length === 1 ? "song" : "songs"} in your collection
-            </p>
-          </motion.div>
-
           {loading ? (
             <div className="flex justify-center items-center py-20">
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#0097b2]"></div>
@@ -85,7 +72,7 @@ export default function FavoritesPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold text-gray-700 mb-2">No Favorites Yet</h3>
+              <h3 className="text-lg md:text-xl font-bold text-gray-700 mb-2">No Favorites Yet</h3>
               <p className="text-gray-600 mb-6">Start adding songs from the dashboard</p>
               <button
                 onClick={() => router.push("/dashboard")}

@@ -370,7 +370,7 @@ export default function Home() {
         </div>
 
         <p className="text-center text-gray-400 mt-6 text-sm">
-          Made with 💜 by Kaushal
+          Serenity
         </p>
       </div>
     </div>

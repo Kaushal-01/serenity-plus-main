@@ -2,8 +2,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import { usePlayer } from "@/context/PlayerContext";
 
 export default function AudioRecognitionButton() {
+  const { currentSong } = usePlayer();
   const [isHovered, setIsHovered] = useState(false);
   const router = useRouter();
 
@@ -13,7 +15,11 @@ export default function AudioRecognitionButton() {
 
   return (
     <motion.div
-      className="fixed bottom-24 right-6 z-40 group"
+      className={`fixed z-40 group ${
+        currentSong 
+          ? 'bottom-[160px] md:bottom-24 right-4 md:right-6' 
+          : 'bottom-[88px] md:bottom-24 right-4 md:right-6'
+      }`}
       initial={{ scale: 0, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={{ delay: 0.5, duration: 0.5, type: "spring" }}
@@ -22,7 +28,8 @@ export default function AudioRecognitionButton() {
         onClick={handleClick}
         onHoverStart={() => setIsHovered(true)}
         onHoverEnd={() => setIsHovered(false)}
-        className="relative w-16 h-16 rounded-full bg-[#0097b2] shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center overflow-hidden hover:bg-[#007a93]"
+        className={`relative rounded-full bg-[#0097b2] shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center overflow-hidden hover:bg-[#007a93]
+          ${currentSong ? 'w-14 h-14 md:w-16 md:h-16' : 'w-14 h-14 md:w-16 md:h-16'}`}
         whileHover={{ scale: 1.1, rotate: 5 }}
         whileTap={{ scale: 0.95 }}
       >
@@ -42,7 +49,7 @@ export default function AudioRecognitionButton() {
 
         {/* Microphone Icon */}
         <svg
-          className="w-8 h-8 text-white z-10 relative"
+          className={`text-white z-10 relative ${currentSong ? 'w-7 h-7 md:w-8 md:h-8' : 'w-7 h-7 md:w-8 md:h-8'}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"

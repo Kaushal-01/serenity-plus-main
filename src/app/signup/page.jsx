@@ -4,6 +4,7 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Sparkles, User, PartyPopper } from "lucide-react";
+import ReCaptcha from "@/components/ReCaptcha";
 
 export default function Signup() {
   const [step, setStep] = useState(1);
@@ -16,6 +17,7 @@ export default function Signup() {
     occupation: "",
     listeningHabits: ""
   });
+  const [captchaToken, setCaptchaToken] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -41,10 +43,16 @@ export default function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    
+    if (!captchaToken) {
+      setError("Please complete the CAPTCHA verification");
+      return;
+    }
+    
     setLoading(true);
 
     try {
-      const res = await axios.post("/api/auth/signup", form);
+      const res = await axios.post("/api/auth/signup", { ...form, captchaToken });
 
       if (res.data.success) {
         // ✅ Save token and user if returned
@@ -75,7 +83,7 @@ export default function Signup() {
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="relative z-10 bg-white border border-gray-300 shadow-lg rounded-2xl p-8 w-[90%] max-w-2xl"
+        className="relative z-10 bg-white border border-gray-300 shadow-lg rounded-2xl p-4 md:p-8 w-[90%] max-w-2xl"
       >
         {/* Progress Indicator */}
         <div className="flex justify-center mb-6 gap-2">
@@ -89,22 +97,22 @@ export default function Signup() {
           ))}
         </div>
 
-        <h2 className="text-3xl font-bold mb-2 text-center text-[#0097b2] flex items-center justify-center gap-2">
+        <h2 className="text-xl md:text-3xl font-bold mb-2 text-center text-[#0097b2] flex items-center justify-center gap-2">
           {step === 1 ? (
             <>
-              Create Your Account <Sparkles className="w-7 h-7" />
+              Create Your Account <Sparkles className="w-5 h-5 md:w-7 md:h-7" />
             </>
           ) : step === 2 ? (
             <>
-              Tell Us About You <User className="w-7 h-7" />
+              Tell Us About You <User className="w-5 h-5 md:w-7 md:h-7" />
             </>
           ) : (
             <>
-              Almost Done! <PartyPopper className="w-7 h-7" />
+              Almost Done! <PartyPopper className="w-5 h-5 md:w-7 md:h-7" />
             </>
           )}
         </h2>
-        <p className="text-sm text-gray-600 text-center mb-6">
+        <p className="text-xs md:text-sm text-gray-600 text-center mb-4 md:mb-6">
           {step === 1 ? "Let's get started with the basics" : step === 2 ? "Help us personalize your experience" : "Just a few more details"}
         </p>
 
@@ -133,7 +141,7 @@ export default function Signup() {
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
               required
-              className="w-full px-4 py-2 rounded-full bg-white border border-gray-300 placeholder-gray-500 text-black focus:ring-2 focus:ring-[#0097b2] focus:outline-none"
+              className="w-full px-3 md:px-4 py-2 text-sm md:text-base rounded-full bg-white border border-gray-300 placeholder-gray-500 text-black focus:ring-2 focus:ring-[#0097b2] focus:outline-none"
             />
 
             <input
@@ -142,7 +150,7 @@ export default function Signup() {
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
               required
-              className="w-full px-4 py-2 rounded-full bg-white border border-gray-300 placeholder-gray-500 text-black focus:ring-2 focus:ring-[#0097b2] focus:outline-none"
+              className="w-full px-3 md:px-4 py-2 text-sm md:text-base rounded-full bg-white border border-gray-300 placeholder-gray-500 text-black focus:ring-2 focus:ring-[#0097b2] focus:outline-none"
             />
 
             <input
@@ -152,14 +160,14 @@ export default function Signup() {
               onChange={(e) => setForm({ ...form, password: e.target.value })}
               required
               minLength={6}
-              className="w-full px-4 py-2 rounded-full bg-white border border-gray-300 placeholder-gray-500 text-black focus:ring-2 focus:ring-[#0097b2] focus:outline-none"
+              className="w-full px-3 md:px-4 py-2 text-sm md:text-base rounded-full bg-white border border-gray-300 placeholder-gray-500 text-black focus:ring-2 focus:ring-[#0097b2] focus:outline-none"
             />
 
             <motion.button
               type="button"
               onClick={handleNext}
               whileTap={{ scale: 0.95 }}
-              className="w-full py-2 rounded-full bg-[#0097b2] hover:bg-[#007a93] transition-all text-white font-semibold mt-2"
+              className="w-full py-2 text-sm md:text-base rounded-full bg-[#0097b2] hover:bg-[#007a93] transition-all text-white font-semibold mt-2"
             >
               Continue →
             </motion.button>
@@ -176,14 +184,14 @@ export default function Signup() {
             className="space-y-4"
           >
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Gender</label>
-              <div className="grid grid-cols-3 gap-3">
+              <label className="block text-xs md:text-sm font-medium text-gray-700 mb-2">Gender</label>
+              <div className="grid grid-cols-3 gap-2 md:gap-3">
                 {["Male", "Female", "Other"].map((gender) => (
                   <button
                     key={gender}
                     type="button"
                     onClick={() => setForm({ ...form, gender })}
-                    className={`py-2 px-4 rounded-full border-2 transition-all ${
+                    className={`py-1.5 md:py-2 px-2 md:px-4 text-xs md:text-base rounded-full border-2 transition-all ${
                       form.gender === gender
                         ? "border-[#0097b2] bg-[#0097b2] text-white"
                         : "border-gray-300 bg-white text-gray-700 hover:border-[#0097b2]"
@@ -196,11 +204,11 @@ export default function Signup() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Age Group</label>
+              <label className="block text-xs md:text-sm font-medium text-gray-700 mb-2">Age Group</label>
               <select
                 value={form.ageGroup}
                 onChange={(e) => setForm({ ...form, ageGroup: e.target.value })}
-                className="w-full px-4 py-2 rounded-full bg-white border border-gray-300 text-black focus:ring-2 focus:ring-[#0097b2] focus:outline-none"
+                className="w-full px-3 md:px-4 py-2 text-sm md:text-base rounded-full bg-white border border-gray-300 text-black focus:ring-2 focus:ring-[#0097b2] focus:outline-none"
               >
                 <option value="">Select your age group</option>
                 <option value="13-17">13-17</option>
@@ -213,11 +221,11 @@ export default function Signup() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Listening Habits</label>
+              <label className="block text-xs md:text-sm font-medium text-gray-700 mb-2">Listening Habits</label>
               <select
                 value={form.listeningHabits}
                 onChange={(e) => setForm({ ...form, listeningHabits: e.target.value })}
-                className="w-full px-4 py-2 rounded-full bg-white border border-gray-300 text-black focus:ring-2 focus:ring-[#0097b2] focus:outline-none"
+                className="w-full px-3 md:px-4 py-2 text-sm md:text-base rounded-full bg-white border border-gray-300 text-black focus:ring-2 focus:ring-[#0097b2] focus:outline-none"
               >
                 <option value="">How often do you listen to music?</option>
                 <option value="daily">Daily - Music is my life</option>
@@ -227,12 +235,12 @@ export default function Signup() {
               </select>
             </div>
 
-            <div className="flex gap-3 mt-6">
+            <div className="flex gap-2 md:gap-3 mt-4 md:mt-6">
               <motion.button
                 type="button"
                 onClick={handleBack}
                 whileTap={{ scale: 0.95 }}
-                className="flex-1 py-2 rounded-full border-2 border-gray-300 hover:bg-gray-50 transition-all text-gray-700 font-semibold"
+                className="flex-1 py-1.5 md:py-2 text-sm md:text-base rounded-full border-2 border-gray-300 hover:bg-gray-50 transition-all text-gray-700 font-semibold"
               >
                 ← Back
               </motion.button>
@@ -240,7 +248,7 @@ export default function Signup() {
                 type="button"
                 onClick={handleNext}
                 whileTap={{ scale: 0.95 }}
-                className="flex-1 py-2 rounded-full bg-[#0097b2] hover:bg-[#007a93] transition-all text-white font-semibold"
+                className="flex-1 py-1.5 md:py-2 text-sm md:text-base rounded-full bg-[#0097b2] hover:bg-[#007a93] transition-all text-white font-semibold"
               >
                 Continue →
               </motion.button>
@@ -258,11 +266,11 @@ export default function Signup() {
             className="space-y-4"
           >
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Occupation / Profession</label>
+              <label className="block text-xs md:text-sm font-medium text-gray-700 mb-2">Occupation / Profession</label>
               <select
                 value={form.occupation}
                 onChange={(e) => setForm({ ...form, occupation: e.target.value })}
-                className="w-full px-4 py-2 rounded-full bg-white border border-gray-300 text-black focus:ring-2 focus:ring-[#0097b2] focus:outline-none"
+                className="w-full px-3 md:px-4 py-2 text-sm md:text-base rounded-full bg-white border border-gray-300 text-black focus:ring-2 focus:ring-[#0097b2] focus:outline-none"
               >
                 <option value="">Select your occupation</option>
                 <option value="Student">Student</option>
@@ -282,20 +290,30 @@ export default function Signup() {
               </select>
             </div>
 
-            <div className="flex gap-3 mt-6">
+            {/* CAPTCHA */}
+            <ReCaptcha
+              onVerify={(token) => {
+                setCaptchaToken(token);
+                setError("");
+              }}
+              onExpired={() => setCaptchaToken("")}
+              onError={() => setError("CAPTCHA verification failed. Please try again.")}
+            />
+
+            <div className="flex gap-2 md:gap-3 mt-4 md:mt-6">
               <motion.button
                 type="button"
                 onClick={handleBack}
                 whileTap={{ scale: 0.95 }}
-                className="flex-1 py-2 rounded-full border-2 border-gray-300 hover:bg-gray-50 transition-all text-gray-700 font-semibold"
+                className="flex-1 py-1.5 md:py-2 text-sm md:text-base rounded-full border-2 border-gray-300 hover:bg-gray-50 transition-all text-gray-700 font-semibold"
               >
                 ← Back
               </motion.button>
               <motion.button
                 type="submit"
                 whileTap={{ scale: 0.95 }}
-                disabled={loading}
-                className="flex-1 py-2 rounded-full bg-[#0097b2] hover:bg-[#007a93] transition-all text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={loading || !captchaToken}
+                className="flex-1 py-1.5 md:py-2 text-sm md:text-base rounded-full bg-[#0097b2] hover:bg-[#007a93] transition-all text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? "Creating Account..." : "Create Account"}
               </motion.button>
@@ -303,7 +321,7 @@ export default function Signup() {
           </motion.div>
         )}
 
-        <p className="text-sm text-gray-600 text-center mt-6">
+        <p className="text-xs md:text-sm text-gray-600 text-center mt-4 md:mt-6">
           Already have an account?{" "}
           <a
             href="/login"

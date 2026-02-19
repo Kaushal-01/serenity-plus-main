@@ -6,6 +6,7 @@ import { ThemeProvider } from "./../context/ThemeContext";
 import MiniPlayer from "../context/MiniPlayer";
 import ChatBot from "@/components/ChatBot";
 import AudioRecognitionButton from "@/components/AudioRecognitionButton";
+import MobileFooter from "@/components/MobileFooter";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -72,6 +73,7 @@ export default function RootLayout({ children }) {
           <PlayerProvider>
             <Navbar />
             {children}
+            <MobileFooter />
             <ChatBot />
             <AudioRecognitionButton />
           </PlayerProvider>

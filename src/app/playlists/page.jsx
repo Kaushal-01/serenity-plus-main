@@ -186,11 +186,7 @@ export default function PlaylistsPage() {
       
       <div className="pt-24 px-6 pb-12 max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-4xl font-bold text-[#0097b2] mb-2">My Playlists</h1>
-            <p className="text-gray-600 dark:text-gray-300">Create and manage your music collections</p>
-          </div>
+        <div className="flex justify-end items-center mb-8">
           <button
             onClick={() => {
               setShowCreateModal(true);
@@ -236,7 +232,7 @@ export default function PlaylistsPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
               </svg>
             </div>
-            <h3 className="text-2xl font-bold text-gray-700 mb-2">No Playlists Yet</h3>
+            <h3 className="text-xl md:text-2xl font-bold text-gray-700 mb-2">No Playlists Yet</h3>
             <p className="text-gray-600 mb-6">Create your first playlist and start organizing your favorite music</p>
             <button
               onClick={() => {
@@ -353,7 +349,7 @@ export default function PlaylistsPage() {
               className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">Create New Playlist</h3>
+              <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-6">Create New Playlist</h3>
               <form onSubmit={handleCreatePlaylist} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Playlist Name *</label>
@@ -419,7 +415,7 @@ export default function PlaylistsPage() {
               className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">Edit Playlist</h3>
+              <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-6">Edit Playlist</h3>
               <form onSubmit={handleUpdatePlaylist} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Playlist Name *</label>
@@ -492,7 +488,7 @@ export default function PlaylistsPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                   </svg>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">Delete Playlist?</h3>
+                <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">Delete Playlist?</h3>
                 <p className="text-gray-600">
                   Are you sure you want to delete "<strong>{selectedPlaylist?.name}</strong>"? This action cannot be undone.
                 </p>

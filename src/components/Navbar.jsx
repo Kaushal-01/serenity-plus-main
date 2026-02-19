@@ -6,8 +6,10 @@ import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePlayer } from "@/context/PlayerContext";
 import InstallPWA from "./InstallPWA";
+import { LayoutDashboard, Music, Heart, User, MessageCircle, LogOut, Menu, X } from "lucide-react";
 
 export default function Navbar() {
+  const { currentSong } = usePlayer();
   const [user, setUser] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -178,15 +180,24 @@ export default function Navbar() {
         </div>
 
         {/* 🧍 User Menu */}
-        <div className="flex items-center gap-3">
-          {/* � Install PWA Button */}
+        <div className="flex items-center gap-3">          {/* Mobile Profile Icon */}
+          {user && (
+            <Link
+              href="/profile"
+              className="md:hidden flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all"
+              title="Profile"
+            >
+              <User className="w-5 h-5 text-[#0097b2]" />
+            </Link>
+          )}
+                    {/* � Install PWA Button */}
           <InstallPWA />
 
           {/* �🔍 Search Button */}
           {user && (
             <button
               onClick={() => setSearchOpen(true)}
-              className="flex items-center gap-2 text-black dark:text-white hover:text-[#0097b2] transition-all hover:scale-110"
+              className="hidden md:flex items-center gap-2 text-black dark:text-white hover:text-[#0097b2] transition-all hover:scale-110"
               title="Search Music"
             >
               <svg 
@@ -201,38 +212,6 @@ export default function Navbar() {
                   strokeWidth={2} 
                   d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" 
                 />
-              </svg>
-            </button>
-          )}
-
-          {/* 🍔 Hamburger Menu Button (Mobile) */}
-          {user && (
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden flex items-center text-black dark:text-white hover:text-[#0097b2] transition-all"
-              aria-label="Toggle menu"
-            >
-              <svg 
-                className="w-6 h-6" 
-                fill="none" 
-                stroke="currentColor" 
-                viewBox="0 0 24 24"
-              >
-                {mobileMenuOpen ? (
-                  <path 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round" 
-                    strokeWidth={2} 
-                    d="M6 18L18 6M6 6l12 12" 
-                  />
-                ) : (
-                  <path 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round" 
-                    strokeWidth={2} 
-                    d="M4 6h16M4 12h16M4 18h16" 
-                  />
-                )}
               </svg>
             </button>
           )}
@@ -347,68 +326,8 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* � Mobile Menu */}
-      <AnimatePresence>
-        {mobileMenuOpen && user && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="md:hidden bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 overflow-hidden"
-          >
-            <div className="px-6 py-4 space-y-3">
-              <Link
-                href="/dashboard"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block text-black dark:text-white hover:text-[#0097b2] text-base font-medium py-2 transition-all"
-              >
-                📊 Dashboard
-              </Link>
-              <Link
-                href="/playlists"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block text-black dark:text-white hover:text-[#0097b2] text-base font-medium py-2 transition-all"
-              >
-                🎶 Playlists
-              </Link>
-              <Link
-                href="/favorites"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block text-black dark:text-white hover:text-[#0097b2] text-base font-medium py-2 transition-all"
-              >
-                ❤️ Favorites
-              </Link>
-              <Link
-                href="/profile"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block text-black dark:text-white hover:text-[#0097b2] text-base font-medium py-2 transition-all"
-              >
-                👤 My Profile
-              </Link>
-              <button
-                onClick={() => {
-                  window.dispatchEvent(new CustomEvent('toggle-harmony-chat'));
-                  setMobileMenuOpen(false);
-                }}
-                className="block w-full text-left text-black dark:text-white hover:text-[#0097b2] text-base font-medium py-2 transition-all"
-              >
-                💬 Serenity AI
-              </button>
-              <hr className="border-gray-200 dark:border-gray-700 my-2" />
-              <button
-                onClick={() => {
-                  logout();
-                  setMobileMenuOpen(false);
-                }}
-                className="block w-full text-left text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 text-base font-medium py-2 transition-all"
-              >
-                🚪 Logout
-              </button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Mobile Menu - Hidden (replaced by MobileFooter) */}
+      {/* Hamburger menu button and dropdown removed - using bottom navigation instead */}
 
       {/* 🔍 Search Modal */}
       <AnimatePresence>
