@@ -453,11 +453,11 @@ export default function MiniPlayer() {
             exit={{ opacity: 0, scale: 0.9 }}
             className="fixed inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-black z-[1000] flex items-center justify-center p-4 md:p-8 overflow-y-auto"
           >
-            {/* Close Button */}
+            {/* Close Button - Hidden on mobile */}
             <motion.button
               onClick={() => setIsExpanded(false)}
               whileTap={{ scale: 0.9 }}
-              className="fixed top-4 right-4 md:top-6 md:right-6 w-10 h-10 flex items-center justify-center 
+              className="hidden md:flex fixed top-4 right-4 md:top-6 md:right-6 w-10 h-10 items-center justify-center 
               rounded-full bg-white/10 hover:bg-white/20 text-white backdrop-blur-lg transition-all z-20"
             >
               <X className="w-5 h-5" />
