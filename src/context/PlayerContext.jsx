@@ -166,13 +166,21 @@ export function PlayerProvider({ children }) {
     
     // Select highest quality audio (320kbps preferred)
     let bestQualityUrl = song.downloadUrl[0].url;
-    if (song.downloadUrl.length > 1) {
-      const highQuality = song.downloadUrl.find(dl => dl.quality === "320kbps");
-      if (highQuality) {
-        bestQualityUrl = highQuality.url;
-      } else {
-        bestQualityUrl = song.downloadUrl[song.downloadUrl.length - 1].url;
+    
+    // Priority order: 320kbps > 160kbps > 96kbps > 48kbps > 12kbps
+    const qualityPriority = ["320kbps", "160kbps", "96kbps", "48kbps", "12kbps"];
+    
+    for (const quality of qualityPriority) {
+      const match = song.downloadUrl.find(dl => dl.quality === quality);
+      if (match) {
+        bestQualityUrl = match.url;
+        break;
       }
+    }
+    
+    // Fallback to last element if no quality match found
+    if (bestQualityUrl === song.downloadUrl[0].url && song.downloadUrl.length > 1) {
+      bestQualityUrl = song.downloadUrl[song.downloadUrl.length - 1].url;
     }
     
     if (playlistSongs.length > 0) {

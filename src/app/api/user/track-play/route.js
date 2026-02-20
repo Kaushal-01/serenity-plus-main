@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import SongPlay from "@/models/songPlay";
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 
 export async function POST(request) {
   try {
@@ -15,6 +16,11 @@ export async function POST(request) {
       try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         userId = decoded.id;
+        
+        // Convert to ObjectId if it's a valid ObjectId string
+        if (userId && mongoose.Types.ObjectId.isValid(userId)) {
+          userId = new mongoose.Types.ObjectId(userId);
+        }
       } catch (err) {
         console.log("Invalid token, tracking anonymously");
       }
@@ -42,6 +48,14 @@ export async function POST(request) {
     });
 
     await songPlay.save();
+    
+    console.log("Song play tracked:", {
+      songId: song.id,
+      songName: song.name,
+      userId: userId,
+      hasDownloadUrl: !!(song.downloadUrl && song.downloadUrl.length > 0),
+      hasImage: !!(song.image && song.image.length > 0)
+    });
 
     return NextResponse.json({
       success: true,

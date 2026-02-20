@@ -72,11 +72,14 @@ export default function Dashboard() {
       const res = await axios.get("/api/user/listening-history", {
         headers: { Authorization: `Bearer ${token}` },
       });
+      console.log("Listening history API response:", res.data);
       if (res.data.success) {
+        console.log("Setting listening history:", res.data.songs);
         setListeningHistory(res.data.songs || []);
       }
     } catch (err) {
       console.error("Error fetching listening history:", err);
+      console.error("Error response:", err.response?.data);
     } finally {
       setLoadingHistory(false);
     }

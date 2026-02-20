@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import SongPlay from "@/models/songPlay";
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 
 export async function GET(request) {
   try {
@@ -28,11 +29,22 @@ export async function GET(request) {
       );
     }
 
+    // Convert userId to ObjectId for MongoDB query
+    let userIdQuery;
+    try {
+      userIdQuery = new mongoose.Types.ObjectId(userId);
+    } catch (e) {
+      // If conversion fails, use as string
+      userIdQuery = userId;
+    }
+
     // Get last 12 unique songs listened by this user
+    console.log("Fetching listening history for userId:", userId, "Query:", userIdQuery);
+    
     const listeningHistory = await SongPlay.aggregate([
       {
         // Filter by userId
-        $match: { userId: userId }
+        $match: { userId: userIdQuery }
       },
       {
         // Sort by most recent first
@@ -74,6 +86,9 @@ export async function GET(request) {
         }
       }
     ]);
+
+    console.log("Found listening history:", listeningHistory.length, "songs");
+    console.log("Sample song:", listeningHistory[0]);
 
     return NextResponse.json({
       success: true,

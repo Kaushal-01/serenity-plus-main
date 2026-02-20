@@ -95,7 +95,17 @@ export default function MusicPlayer({ recognizedSong }) {
             {/* Audio Element */}
             <audio 
                 ref={audioRef} 
-                src={songDetails.downloadUrl?.[4]?.url} 
+                src={(() => {
+                    // Select highest quality audio
+                    const qualityPriority = ["320kbps", "160kbps", "96kbps", "48kbps", "12kbps"];
+                    for (const quality of qualityPriority) {
+                        const match = songDetails.downloadUrl?.find(dl => dl.quality === quality);
+                        if (match) return match.url;
+                    }
+                    // Fallback to last or first available
+                    return songDetails.downloadUrl?.[songDetails.downloadUrl.length - 1]?.url || 
+                           songDetails.downloadUrl?.[0]?.url;
+                })()} 
                 preload="metadata"
             />
 
