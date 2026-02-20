@@ -19,6 +19,8 @@ import {
   Plus,
   X,
   Maximize2,
+  ChevronDown,
+  MoreVertical,
 } from "lucide-react";
 
 export default function MiniPlayer() {
@@ -56,6 +58,7 @@ export default function MiniPlayer() {
   const [addingToPlaylist, setAddingToPlaylist] = useState(null);
   const [showQueue, setShowQueue] = useState(false);
   const [user, setUser] = useState(null);
+  const [showOptionsMenu, setShowOptionsMenu] = useState(false);
 
   // Check if user is logged in
   useEffect(() => {
@@ -470,252 +473,453 @@ export default function MiniPlayer() {
           </motion.div>
         ) : (
           /* ========== EXPANDED PLAYER ========== */
-          <motion.div
-            key="expanded-player"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            className="fixed inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-black z-[1000] flex items-center justify-center p-4 md:p-8 overflow-y-auto"
-          >
-            {/* Close Button */}
-            <motion.button
+          <>
+            {/* Desktop: Centered Popup Modal */}
+            <motion.div
+              key="expanded-player-desktop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="hidden md:flex fixed inset-0 bg-black/60 backdrop-blur-sm z-[1000] items-center justify-center p-8"
               onClick={() => setIsExpanded(false)}
-              whileTap={{ scale: 0.9 }}
-              className="flex fixed top-4 right-4 md:top-6 md:right-6 w-10 h-10 items-center justify-center 
-              rounded-full bg-white/10 hover:bg-white/20 text-white backdrop-blur-lg transition-all z-20"
             >
-              <X className="w-5 h-5" />
-            </motion.button>
-
-            <div className="w-full max-w-lg mx-auto">
-              {/* Album Art */}
               <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
+                initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.1 }}
-                className="relative w-64 h-64 sm:w-72 sm:h-72 md:w-80 md:h-80 mx-auto mb-6 md:mb-8"
+                exit={{ scale: 0.9, opacity: 0 }}
+                onClick={(e) => e.stopPropagation()}
+                className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-black rounded-3xl shadow-2xl p-6 w-full max-w-xl max-h-[85vh] overflow-y-auto"
               >
-                <img
-                  src={currentSong?.image?.[2]?.url || "/default-song.jpg"}
-                  alt={currentSong?.name}
-                  className="w-full h-full rounded-3xl object-cover shadow-2xl"
-                />
-                {isPlaying && (
-                  <motion.div
-                    className="absolute inset-0 rounded-3xl border-4 border-[#0097b2]"
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                  />
-                )}
-              </motion.div>
-
-              {/* Song Info */}
-              <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.2 }}
-                className="text-center mb-6 md:mb-8 px-4"
-              >
-                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 text-white truncate">
-                  {currentSong?.name}
-                </h2>
-                <p className="text-sm sm:text-base md:text-lg text-gray-300 truncate">
-                  {currentSong?.artists?.primary?.map((a) => a.name).join(", ")}
-                </p>
-              </motion.div>
-
-              {/* Progress Bar */}
-              <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.3 }}
-                className="mb-6 md:mb-8 px-4"
-              >
-                <div
-                  className="h-1 bg-white/20 rounded-full cursor-pointer group relative overflow-hidden"
-                  onClick={handleProgressChange}
-                  onMouseDown={() => setIsDragging(true)}
-                  onMouseUp={() => setIsDragging(false)}
-                  onMouseMove={handleProgressDrag}
-                  onMouseLeave={() => setIsDragging(false)}
-                >
-                  <div
-                    className="h-full bg-gradient-to-r from-[#0097b2] to-[#00b8d4] relative transition-all duration-100"
-                    style={{ width: `${(currentTime / duration) * 100 || 0}%` }}
-                  >
-                    <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </div>
-                </div>
-                <div className="flex justify-between text-sm text-gray-400 mt-2">
-                  <span>{formatTime(currentTime)}</span>
-                  <span>{formatTime(duration)}</span>
-                </div>
-              </motion.div>
-
-              {/* Main Controls */}
-              <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.4 }}
-                className="flex items-center justify-center gap-6 sm:gap-8 md:gap-10 mb-6 md:mb-8 px-4 max-w-md mx-auto w-full"
-              >
-                <motion.button
-                  onClick={toggleShuffle}
-                  whileTap={{ scale: 0.9 }}
-                  className={`w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 flex items-center justify-center rounded-full 
-                  ${shuffle ? "bg-[#0097b2] text-white" : "bg-white/10 hover:bg-white/20 text-white"}
-                  transition-all`}
-                  title="Shuffle"
-                >
-                  <Shuffle className="w-4 h-4 sm:w-5 sm:h-5" />
-                </motion.button>
-
-                <motion.button
-                  onClick={playPrevious}
-                  whileTap={{ scale: 0.9 }}
-                  className={`w-11 h-11 sm:w-12 sm:h-12 md:w-14 md:h-14 flex items-center justify-center rounded-full 
-                  transition-all text-white
-                  ${queue.length <= 1 
-                    ? "bg-white/5 cursor-not-allowed" 
-                    : "bg-white/10 hover:bg-white/20"
-                  }`}
-                  disabled={queue.length <= 1}
-                  title="Previous"
-                >
-                  <SkipBack className="w-5 h-5 sm:w-6 sm:h-6" />
-                </motion.button>
-
-                <motion.button
-                  onClick={togglePlay}
-                  whileTap={{ scale: 0.95 }}
-                  whileHover={{ scale: 1.05 }}
-                  className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 flex items-center justify-center rounded-full 
-                  bg-gradient-to-br from-[#0097b2] to-[#00b8d4] text-white shadow-2xl"
-                  title={isPlaying ? "Pause" : "Play"}
-                >
-                  {isPlaying ? (
-                    <Pause className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8" />
-                  ) : (
-                    <Play className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 ml-0.5" />
-                  )}
-                </motion.button>
-
-                <motion.button
-                  onClick={playNext}
-                  whileTap={{ scale: 0.9 }}
-                  className={`w-11 h-11 sm:w-12 sm:h-12 md:w-14 md:h-14 flex items-center justify-center rounded-full 
-                  transition-all text-white
-                  ${queue.length <= 1 
-                    ? "bg-white/5 cursor-not-allowed" 
-                    : "bg-white/10 hover:bg-white/20"
-                  }`}
-                  disabled={queue.length <= 1}
-                  title="Next"
-                >
-                  <SkipForward className="w-5 h-5 sm:w-6 sm:h-6" />
-                </motion.button>
-
-                <motion.button
-                  onClick={toggleRepeat}
-                  whileTap={{ scale: 0.9 }}
-                  className={`w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 flex items-center justify-center rounded-full 
-                  ${repeatMode !== "off" ? "bg-[#0097b2] text-white" : "bg-white/10 hover:bg-white/20 text-white"}
-                  transition-all`}
-                  title={`Repeat: ${repeatMode}`}
-                >
-                  {getRepeatIcon()}
-                </motion.button>
-              </motion.div>
-
-              {/* Secondary Controls */}
-              <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.5 }}
-                className="flex flex-col items-center gap-4 px-4"
-              >
-                {/* Volume and Actions Row */}
-                <div className="flex items-center justify-center gap-6 sm:gap-8 flex-wrap max-w-xs mx-auto w-full">
-                  <motion.button
-                    onClick={toggleFavorite}
-                    whileTap={{ scale: 0.9 }}
-                    className={`w-11 h-11 flex items-center justify-center rounded-full 
-                    ${isFavorite ? "bg-red-500 text-white" : "bg-white/10 hover:bg-white/20 text-white"}
-                    transition-all`}
-                    title="Favorite"
-                  >
-                    <Heart className={`w-4 h-4 ${isFavorite ? "fill-white" : ""}`} />
-                  </motion.button>
-
-                  <div 
-                    className="relative"
-                  >
+                <div className="w-full max-w-lg mx-auto">
+                  {/* Header with Minimize and Options */}
+                  <div className="flex items-center justify-between mb-4">
+                    {/* Minimize Button - Top Left */}
                     <motion.button
-                      onClick={() => setShowVolumeSlider(!showVolumeSlider)}
-                      onMouseEnter={() => setShowVolumeSlider(true)}
+                      onClick={() => setIsExpanded(false)}
                       whileTap={{ scale: 0.9 }}
-                      className="w-11 h-11 flex items-center justify-center rounded-full 
-                      bg-white/10 hover:bg-white/20 transition-all text-white"
-                      title="Volume"
+                      className="flex w-10 h-10 items-center justify-center 
+                      rounded-full bg-white/10 hover:bg-white/20 text-white backdrop-blur-lg transition-all"
+                      title="Minimize"
                     >
-                      {getVolumeIcon()}
+                      <ChevronDown className="w-5 h-5" />
                     </motion.button>
 
-                    <AnimatePresence>
-                      {showVolumeSlider && (
-                        <motion.div
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: 10 }}
-                          onMouseLeave={() => setShowVolumeSlider(false)}
-                          className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-white/10 backdrop-blur-md rounded-lg shadow-lg border border-white/20 px-4 py-4 whitespace-nowrap z-10"
-                        >
-                          <div className="flex flex-col items-center gap-2">
-                            <input
-                              type="range"
-                              min="0"
-                              max="1"
-                              step="0.01"
-                              value={volume}
-                              onChange={(e) => changeVolume(parseFloat(e.target.value))}
-                              className="w-32 h-2 bg-white/20 rounded-lg appearance-none cursor-pointer 
-                              [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 
-                              [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full 
-                              [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:cursor-pointer
-                              [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 
-                              [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-white 
-                              [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
-                            />
-                            <span className="text-white text-xs">{Math.round(volume * 100)}%</span>
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
+                    {/* 3-Dot Options Menu - Top Right */}
+                    <div className="relative">
+                      <motion.button
+                        onClick={() => setShowOptionsMenu(!showOptionsMenu)}
+                        whileTap={{ scale: 0.9 }}
+                        className="flex w-10 h-10 items-center justify-center 
+                        rounded-full bg-white/10 hover:bg-white/20 text-white backdrop-blur-lg transition-all"
+                        title="More Options"
+                      >
+                        <MoreVertical className="w-5 h-5" />
+                      </motion.button>
+
+                      {/* Options Dropdown */}
+                      <AnimatePresence>
+                        {showOptionsMenu && (
+                          <motion.div
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            className="absolute right-0 mt-2 w-48 bg-white/10 backdrop-blur-md rounded-xl shadow-lg border border-white/20 overflow-hidden z-30"
+                          >
+                            <button
+                              onClick={() => {
+                                toggleFavorite();
+                                setShowOptionsMenu(false);
+                              }}
+                              className="w-full flex items-center gap-3 px-4 py-3 text-white hover:bg-white/10 transition-all text-left"
+                            >
+                              <Heart className={`w-4 h-4 ${isFavorite ? 'fill-red-500 text-red-500' : ''}`} />
+                              <span>{isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}</span>
+                            </button>
+                            <button
+                              onClick={() => {
+                                setShowPlaylistModal(true);
+                                setShowOptionsMenu(false);
+                              }}
+                              className="w-full flex items-center gap-3 px-4 py-3 text-white hover:bg-white/10 transition-all text-left"
+                            >
+                              <Plus className="w-4 h-4" />
+                              <span>Add to Playlist</span>
+                            </button>
+                            <button
+                              onClick={() => {
+                                closePlayer();
+                                setShowOptionsMenu(false);
+                              }}
+                              className="w-full flex items-center gap-3 px-4 py-3 text-red-400 hover:bg-white/10 transition-all text-left border-t border-white/10"
+                            >
+                              <X className="w-4 h-4" />
+                              <span>Close Player</span>
+                            </button>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
                   </div>
 
-                  <motion.button
-                    onClick={() => setShowPlaylistModal(true)}
-                    whileTap={{ scale: 0.9 }}
-                    className="w-11 h-11 flex items-center justify-center rounded-full 
-                    bg-white/10 hover:bg-white/20 transition-all text-white"
-                    title="Add to Playlist"
+                  {/* Album Art */}
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.1 }}
+                    className="relative w-56 h-56 mx-auto mb-4"
                   >
-                    <Plus className="w-4 h-4" />
+                    <img
+                      src={currentSong?.image?.[2]?.url || "/default-song.jpg"}
+                      alt={currentSong?.name}
+                      className="w-full h-full rounded-3xl object-cover shadow-2xl"
+                    />
+                    {isPlaying && (
+                      <motion.div
+                        className="absolute inset-0 rounded-3xl border-4 border-[#0097b2]"
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                      />
+                    )}
+                  </motion.div>
+
+                  {/* Song Info */}
+                  <motion.div
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.2 }}
+                    className="text-center mb-4 px-4"
+                  >
+                    <h2 className="text-xl md:text-2xl font-bold mb-1 text-white truncate">
+                      {currentSong?.name}
+                    </h2>
+                    <p className="text-sm md:text-base text-gray-300 truncate">
+                      {currentSong?.artists?.primary?.map((a) => a.name).join(", ")}
+                    </p>
+                  </motion.div>
+
+                  {/* Progress Bar */}
+                  <motion.div
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.3 }}
+                    className="mb-4 px-4"
+                  >
+                    <div
+                      className="h-1 bg-white/20 rounded-full cursor-pointer group relative overflow-hidden"
+                      onClick={handleProgressChange}
+                      onMouseDown={() => setIsDragging(true)}
+                      onMouseUp={() => setIsDragging(false)}
+                      onMouseMove={handleProgressDrag}
+                      onMouseLeave={() => setIsDragging(false)}
+                    >
+                      <div
+                        className="h-full bg-gradient-to-r from-[#0097b2] to-[#00b8d4] relative transition-all duration-100"
+                        style={{ width: `${(currentTime / duration) * 100 || 0}%` }}
+                      >
+                        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </div>
+                    </div>
+                    <div className="flex justify-between text-sm text-gray-400 mt-2">
+                      <span>{formatTime(currentTime)}</span>
+                      <span>{formatTime(duration)}</span>
+                    </div>
+                  </motion.div>
+
+                  {/* Simplified Main Controls - One Line */}
+                  <motion.div
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.4 }}
+                    className="flex items-center justify-center gap-3 px-4"
+                  >
+                    <motion.button
+                      onClick={toggleShuffle}
+                      whileTap={{ scale: 0.9 }}
+                      className={`w-10 h-10 flex items-center justify-center rounded-full 
+                      ${shuffle ? "bg-[#0097b2] text-white" : "bg-white/10 hover:bg-white/20 text-white"}
+                      transition-all`}
+                      title="Shuffle"
+                    >
+                      <Shuffle className="w-4 h-4" />
+                    </motion.button>
+
+                    <motion.button
+                      onClick={playPrevious}
+                      whileTap={{ scale: 0.9 }}
+                      className={`w-11 h-11 flex items-center justify-center rounded-full 
+                      transition-all text-white
+                      ${queue.length <= 1 
+                        ? "bg-white/5 cursor-not-allowed" 
+                        : "bg-white/10 hover:bg-white/20"
+                      }`}
+                      disabled={queue.length <= 1}
+                      title="Previous"
+                    >
+                      <SkipBack className="w-5 h-5" />
+                    </motion.button>
+
+                    <motion.button
+                      onClick={togglePlay}
+                      whileTap={{ scale: 0.95 }}
+                      whileHover={{ scale: 1.05 }}
+                      className="w-14 h-14 flex items-center justify-center rounded-full 
+                      bg-gradient-to-br from-[#0097b2] to-[#00b8d4] text-white shadow-2xl"
+                      title={isPlaying ? "Pause" : "Play"}
+                    >
+                      {isPlaying ? (
+                        <Pause className="w-6 h-6" />
+                      ) : (
+                        <Play className="w-6 h-6 ml-0.5" />
+                      )}
+                    </motion.button>
+
+                    <motion.button
+                      onClick={playNext}
+                      whileTap={{ scale: 0.9 }}
+                      className={`w-11 h-11 flex items-center justify-center rounded-full 
+                      transition-all text-white
+                      ${queue.length <= 1 
+                        ? "bg-white/5 cursor-not-allowed" 
+                        : "bg-white/10 hover:bg-white/20"
+                      }`}
+                      disabled={queue.length <= 1}
+                      title="Next"
+                    >
+                      <SkipForward className="w-5 h-5" />
+                    </motion.button>
+
+                    <motion.button
+                      onClick={toggleRepeat}
+                      whileTap={{ scale: 0.9 }}
+                      className={`w-10 h-10 flex items-center justify-center rounded-full 
+                      ${repeatMode !== "off" ? "bg-[#0097b2] text-white" : "bg-white/10 hover:bg-white/20 text-white"}
+                      transition-all`}
+                      title={`Repeat: ${repeatMode}`}
+                    >
+                      {getRepeatIcon()}
+                    </motion.button>
+                  </motion.div>
+                </div>
+              </motion.div>
+            </motion.div>
+
+            {/* Mobile: Full Screen Layout */}
+            <motion.div
+              key="expanded-player-mobile"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="md:hidden fixed inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-black z-[1000] flex items-center justify-center p-4 overflow-y-auto"
+            >
+              <div className="w-full max-w-lg mx-auto">
+                {/* Minimize Button - Top Left */}
+                <motion.button
+                  onClick={() => setIsExpanded(false)}
+                  whileTap={{ scale: 0.9 }}
+                  className="flex fixed top-4 left-4 w-10 h-10 items-center justify-center 
+                  rounded-full bg-white/10 hover:bg-white/20 text-white backdrop-blur-lg transition-all z-20"
+                  title="Minimize"
+                >
+                  <ChevronDown className="w-5 h-5" />
+                </motion.button>
+
+                {/* 3-Dot Options Menu - Top Right */}
+                <div className="fixed top-4 right-4 z-20">
+                  <motion.button
+                    onClick={() => setShowOptionsMenu(!showOptionsMenu)}
+                    whileTap={{ scale: 0.9 }}
+                    className="flex w-10 h-10 items-center justify-center 
+                    rounded-full bg-white/10 hover:bg-white/20 text-white backdrop-blur-lg transition-all"
+                    title="More Options"
+                  >
+                    <MoreVertical className="w-5 h-5" />
+                  </motion.button>
+
+                  {/* Options Dropdown */}
+                  <AnimatePresence>
+                    {showOptionsMenu && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                       animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="absolute right-0 mt-2 w-48 bg-white/10 backdrop-blur-md rounded-xl shadow-lg border border-white/20 overflow-hidden"
+                      >
+                        <button
+                          onClick={() => {
+                            toggleFavorite();
+                            setShowOptionsMenu(false);
+                          }}
+                          className="w-full flex items-center gap-3 px-4 py-3 text-white hover:bg-white/10 transition-all text-left"
+                        >
+                          <Heart className={`w-4 h-4 ${isFavorite ? 'fill-red-500 text-red-500' : ''}`} />
+                          <span>{isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}</span>
+                        </button>
+                        <button
+                          onClick={() => {
+                            setShowPlaylistModal(true);
+                            setShowOptionsMenu(false);
+                          }}
+                          className="w-full flex items-center gap-3 px-4 py-3 text-white hover:bg-white/10 transition-all text-left"
+                        >
+                          <Plus className="w-4 h-4" />
+                          <span>Add to Playlist</span>
+                        </button>
+                        <button
+                          onClick={() => {
+                            closePlayer();
+                            setShowOptionsMenu(false);
+                          }}
+                          className="w-full flex items-center gap-3 px-4 py-3 text-red-400 hover:bg-white/10 transition-all text-left border-t border-white/10"
+                        >
+                          <X className="w-4 h-4" />
+                          <span>Close Player</span>
+                        </button>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                {/* Album Art */}
+                <motion.div
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.1 }}
+                  className="relative w-64 h-64 sm:w-72 sm:h-72 mx-auto mb-6 mt-16"
+                >
+                  <img
+                    src={currentSong?.image?.[2]?.url || "/default-song.jpg"}
+                    alt={currentSong?.name}
+                    className="w-full h-full rounded-3xl object-cover shadow-2xl"
+                  />
+                  {isPlaying && (
+                    <motion.div
+                      className="absolute inset-0 rounded-3xl border-4 border-[#0097b2]"
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                    />
+                  )}
+                </motion.div>
+
+                {/* Song Info */}
+                <motion.div
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.2 }}
+                  className="text-center mb-6 px-4"
+                >
+                  <h2 className="text-2xl sm:text-3xl font-bold mb-2 text-white truncate">
+                    {currentSong?.name}
+                  </h2>
+                  <p className="text-sm sm:text-base text-gray-300 truncate">
+                    {currentSong?.artists?.primary?.map((a) => a.name).join(", ")}
+                  </p>
+                </motion.div>
+
+                {/* Progress Bar */}
+                <motion.div
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                  className="mb-6 px-4"
+                >
+                  <div
+                    className="h-1 bg-white/20 rounded-full cursor-pointer group relative overflow-hidden"
+                    onClick={handleProgressChange}
+                    onMouseDown={() => setIsDragging(true)}
+                    onMouseUp={() => setIsDragging(false)}
+                    onMouseMove={handleProgressDrag}
+                    onMouseLeave={() => setIsDragging(false)}
+                  >
+                    <div
+                      className="h-full bg-gradient-to-r from-[#0097b2] to-[#00b8d4] relative transition-all duration-100"
+                      style={{ width: `${(currentTime / duration) * 100 || 0}%` }}
+                    >
+                      <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </div>
+                  </div>
+                  <div className="flex justify-between text-sm text-gray-400 mt-2">
+                    <span>{formatTime(currentTime)}</span>
+                    <span>{formatTime(duration)}</span>
+                  </div>
+                </motion.div>
+
+                {/* Simplified Main Controls - One Line */}
+                <motion.div
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.4 }}
+                  className="flex items-center justify-center gap-4 px-4"
+                >
+                  <motion.button
+                    onClick={toggleShuffle}
+                    whileTap={{ scale: 0.9 }}
+                    className={`w-11 h-11 flex items-center justify-center rounded-full 
+                    ${shuffle ? "bg-[#0097b2] text-white" : "bg-white/10 hover:bg-white/20 text-white"}
+                    transition-all`}
+                    title="Shuffle"
+                  >
+                    <Shuffle className="w-5 h-5" />
                   </motion.button>
 
                   <motion.button
-                    onClick={closePlayer}
+                    onClick={playPrevious}
                     whileTap={{ scale: 0.9 }}
-                    className="w-11 h-11 flex items-center justify-center rounded-full 
-                    bg-white/10 hover:bg-red-500 transition-all text-white"
-                    title="Close Player"
+                    className={`w-12 h-12 flex items-center justify-center rounded-full 
+                    transition-all text-white
+                    ${queue.length <= 1 
+                      ? "bg-white/5 cursor-not-allowed" 
+                      : "bg-white/10 hover:bg-white/20"
+                    }`}
+                    disabled={queue.length <= 1}
+                    title="Previous"
                   >
-                    <X className="w-4 h-4" />
+                    <SkipBack className="w-6 h-6" />
                   </motion.button>
-                </div>
-              </motion.div>
-            </div>
-          </motion.div>
+
+                  <motion.button
+                    onClick={togglePlay}
+                    whileTap={{ scale: 0.95 }}
+                    whileHover={{ scale: 1.05 }}
+                    className="w-16 h-16 flex items-center justify-center rounded-full 
+                    bg-gradient-to-br from-[#0097b2] to-[#00b8d4] text-white shadow-2xl"
+                    title={isPlaying ? "Pause" : "Play"}
+                  >
+                    {isPlaying ? (
+                      <Pause className="w-7 h-7" />
+                    ) : (
+                      <Play className="w-7 h-7 ml-0.5" />
+                    )}
+                  </motion.button>
+
+                  <motion.button
+                    onClick={playNext}
+                    whileTap={{ scale: 0.9 }}
+                    className={`w-12 h-12 flex items-center justify-center rounded-full 
+                    transition-all text-white
+                    ${queue.length <= 1 
+                      ? "bg-white/5 cursor-not-allowed" 
+                      : "bg-white/10 hover:bg-white/20"
+                    }`}
+                    disabled={queue.length <= 1}
+                    title="Next"
+                  >
+                    <SkipForward className="w-6 h-6" />
+                  </motion.button>
+
+                  <motion.button
+                    onClick={toggleRepeat}
+                    whileTap={{ scale: 0.9 }}
+                    className={`w-11 h-11 flex items-center justify-center rounded-full 
+                    ${repeatMode !== "off" ? "bg-[#0097b2] text-white" : "bg-white/10 hover:bg-white/20 text-white"}
+                    transition-all`}
+                    title={`Repeat: ${repeatMode}`}
+                  >
+                    {getRepeatIcon()}
+                  </motion.button>
+                </motion.div>
+              </div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
 
