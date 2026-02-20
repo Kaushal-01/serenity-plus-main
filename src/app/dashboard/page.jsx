@@ -388,37 +388,53 @@ export default function Dashboard() {
       </section>
 
       {/* 🕒 Recently Played */}
-      {listeningHistory.length > 0 && (
-        <section className="px-10 md:px-16 py-12 bg-white dark:bg-gray-900">
-          <div className="flex items-center justify-between mb-8">
-            <motion.h2
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="text-xl md:text-3xl font-bold text-[#0097b2] flex items-center gap-3"
-            >
-              <History size={32} strokeWidth={2} /> Recently Played
-            </motion.h2>
-          </div>
+      <section className="px-10 md:px-16 py-12 bg-white dark:bg-gray-900">
+        <div className="flex items-center justify-between mb-8">
+          <motion.h2
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="text-xl md:text-3xl font-bold text-[#0097b2] flex items-center gap-3"
+          >
+            <History size={32} strokeWidth={2} /> Recently Played
+          </motion.h2>
+        </div>
 
-          {loadingHistory ? (
-            <div className="flex flex-col items-center justify-center py-20">
-              <div className="relative w-20 h-20">
-                <motion.div
-                  className="absolute inset-0 border-4 border-[#0097b2] border-t-transparent rounded-full"
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                />
-              </div>
-              <p className="text-gray-600 dark:text-gray-400 mt-4 animate-pulse">Loading history...</p>
+        {loadingHistory ? (
+          <div className="flex flex-col items-center justify-center py-20">
+            <div className="relative w-20 h-20">
+              <motion.div
+                className="absolute inset-0 border-4 border-[#0097b2] border-t-transparent rounded-full"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+              />
             </div>
-          ) : (
-            <>
-              {/* Mobile: Horizontal Swipe Rows */}
-              <div className="md:hidden space-y-4">
-                {/* First Row - First 6 songs */}
+            <p className="text-gray-600 dark:text-gray-400 mt-4 animate-pulse">Loading history...</p>
+          </div>
+        ) : listeningHistory.length > 0 ? (
+          <>
+            {/* Mobile: Horizontal Swipe Rows */}
+            <div className="md:hidden space-y-4">
+              {/* First Row - First 6 songs */}
+              <div className="overflow-x-auto scrollbar-hide">
+                <div className="flex gap-4 pb-2" style={{ width: 'max-content' }}>
+                  {listeningHistory.slice(0, 6).map((song, i) => (
+                    <div key={song.id || i} className="flex-shrink-0" style={{ width: '160px' }}>
+                      <SongCard
+                        song={song}
+                        onPlay={(s) => playSong(s, listeningHistory)}
+                        isFavorite={isFavorite(song.id)}
+                        onToggleFavorite={() => toggleFavorite(song)}
+                        showFavoriteButton={true}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+              {/* Second Row - Last 6 songs */}
+              {listeningHistory.length > 6 && (
                 <div className="overflow-x-auto scrollbar-hide">
                   <div className="flex gap-4 pb-2" style={{ width: 'max-content' }}>
-                    {listeningHistory.slice(0, 6).map((song, i) => (
+                    {listeningHistory.slice(6, 12).map((song, i) => (
                       <div key={song.id || i} className="flex-shrink-0" style={{ width: '160px' }}>
                         <SongCard
                           song={song}
@@ -431,42 +447,29 @@ export default function Dashboard() {
                     ))}
                   </div>
                 </div>
-                {/* Second Row - Last 6 songs */}
-                {listeningHistory.length > 6 && (
-                  <div className="overflow-x-auto scrollbar-hide">
-                    <div className="flex gap-4 pb-2" style={{ width: 'max-content' }}>
-                      {listeningHistory.slice(6, 12).map((song, i) => (
-                        <div key={song.id || i} className="flex-shrink-0" style={{ width: '160px' }}>
-                          <SongCard
-                            song={song}
-                            onPlay={(s) => playSong(s, listeningHistory)}
-                            isFavorite={isFavorite(song.id)}
-                            onToggleFavorite={() => toggleFavorite(song)}
-                            showFavoriteButton={true}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-              {/* Desktop: Grid Layout */}
-              <div className="hidden md:grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-                {listeningHistory.map((song, i) => (
-                  <SongCard
-                    key={song.id || i}
-                    song={song}
-                    onPlay={(s) => playSong(s, listeningHistory)}
-                    isFavorite={isFavorite(song.id)}
-                    onToggleFavorite={() => toggleFavorite(song)}
-                    showFavoriteButton={true}
-                  />
-                ))}
-              </div>
-            </>
-          )}
-        </section>
-      )}
+              )}
+            </div>
+            {/* Desktop: Grid Layout */}
+            <div className="hidden md:grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+              {listeningHistory.map((song, i) => (
+                <SongCard
+                  key={song.id || i}
+                  song={song}
+                  onPlay={(s) => playSong(s, listeningHistory)}
+                  isFavorite={isFavorite(song.id)}
+                  onToggleFavorite={() => toggleFavorite(song)}
+                  showFavoriteButton={true}
+                />
+              ))}
+            </div>
+          </>
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No listening history yet</p>
+            <p className="text-gray-500 dark:text-gray-500 text-sm">Start playing songs to see your recently played tracks! 🎵</p>
+          </div>
+        )}
+      </section>
 
       {/* 🌙 Footer */}
       <footer className="text-center text-gray-600 dark:text-gray-400 text-sm py-12 border-t border-gray-200 dark:border-gray-700 bg-gradient-to-t from-gray-50 dark:from-gray-800 to-white dark:to-gray-900">
