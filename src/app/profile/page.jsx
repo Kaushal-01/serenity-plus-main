@@ -202,7 +202,7 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 transition-colors">
       <Navbar />
       
-      <div className="pt-24 px-6 pb-12 max-w-4xl mx-auto">
+      <div className="pt-24 px-6 pb-40 md:pb-12 max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-2xl md:text-4xl font-bold text-[#0097b2] mb-2">My Profile</h1>

@@ -161,7 +161,7 @@ export default function Dashboard() {
   const isFavorite = (songId) => favorites.some((f) => f.id === songId);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 text-black dark:text-white overflow-x-hidden mt-20 transition-colors">
+    <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 text-black dark:text-white overflow-x-hidden mt-20 pb-40 md:pb-0 transition-colors">
       {/* 🎵 Header */}
       <header className="px-10 md:px-16 py-10 flex flex-col md:flex-row justify-between items-center gap-4 bg-gray-50 dark:bg-gray-800 rounded-b-3xl border-b border-gray-200 dark:border-gray-700">
         <motion.h1

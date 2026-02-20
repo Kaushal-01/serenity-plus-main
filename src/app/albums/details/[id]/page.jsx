@@ -31,7 +31,7 @@ export default function AlbumDetailsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 text-black dark:text-white px-10 md:px-20 py-16 mt-20 transition-colors">
+      <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 text-black dark:text-white px-10 md:px-20 py-16 pb-40 md:pb-16 mt-20 transition-colors">
         <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-64 mb-8 animate-pulse" />
         <div className="flex flex-col md:flex-row gap-8 items-center mb-10">
           <div className="w-60 h-60 rounded-2xl bg-gray-200 dark:bg-gray-700 animate-pulse" />
@@ -49,7 +49,7 @@ export default function AlbumDetailsPage() {
   if (!album) return <p className="text-center text-gray-600 mt-20">Album not found.</p>;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 text-black dark:text-white px-10 md:px-20 py-16 mt-20 transition-colors">
+    <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 text-black dark:text-white px-10 md:px-20 py-16 pb-40 md:pb-16 mt-20 transition-colors">
       {/* Breadcrumb */}
       <Breadcrumb
         items={[

@@ -57,7 +57,7 @@ export default function ArtistPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 transition-colors">
         <Navbar />
-        <div className="pt-24 px-6 pb-12 max-w-7xl mx-auto">
+        <div className="pt-24 px-6 pb-40 md:pb-12 max-w-7xl mx-auto">
           <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-64 mb-6 animate-pulse" />
           <ArtistHeaderSkeleton />
           <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-48 mb-6 animate-pulse" />
@@ -75,7 +75,7 @@ export default function ArtistPage() {
     <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 transition-colors">
       <Navbar />
       
-      <div className="pt-24 px-6 pb-12 max-w-7xl mx-auto">
+      <div className="pt-24 px-6 pb-40 md:pb-12 max-w-7xl mx-auto">
         {/* Breadcrumb */}
         <Breadcrumb
           items={[

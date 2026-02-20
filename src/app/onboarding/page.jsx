@@ -133,7 +133,7 @@ export default function OnboardingPage() {
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 text-black dark:text-white flex flex-col items-center justify-center p-6 transition-colors">
+    <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 text-black dark:text-white flex flex-col items-center justify-center p-6 pb-32 transition-colors">
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}

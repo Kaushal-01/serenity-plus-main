@@ -54,7 +54,7 @@ export default function FavoritesPage() {
 
   return (
     <>
-      <div className="mt-10 min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 text-black dark:text-white p-8 transition-colors">
+      <div className="mt-10 min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 text-black dark:text-white p-8 pb-40 md:pb-8 transition-colors">
         <div className="max-w-7xl mx-auto">
           {loading ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">

@@ -174,7 +174,7 @@ export default function PlaylistsPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 transition-colors">
         <Navbar />
-        <div className="pt-24 px-6 pb-12 max-w-7xl mx-auto">
+        <div className="pt-24 px-6 pb-40 md:pb-12 max-w-7xl mx-auto">
           <div className="flex justify-end items-center mb-8">
             <div className="h-12 w-40 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse" />
           </div>
@@ -200,7 +200,7 @@ export default function PlaylistsPage() {
     <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 transition-colors">
       <Navbar />
       
-      <div className="pt-24 px-6 pb-12 max-w-7xl mx-auto">
+      <div className="pt-24 px-6 pb-40 md:pb-12 max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex justify-end items-center mb-8">
           <button

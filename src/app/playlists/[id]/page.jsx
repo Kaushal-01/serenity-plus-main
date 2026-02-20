@@ -88,7 +88,7 @@ export default function PlaylistDetailsPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 transition-colors">
         <Navbar />
-        <div className="pt-20 md:pt-24 px-4 md:px-6 pb-20 md:pb-12 max-w-7xl mx-auto">
+        <div className="pt-20 md:pt-24 px-4 md:px-6 pb-40 md:pb-12 max-w-7xl mx-auto">
           <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-64 mb-6 animate-pulse" />
           <PlaylistHeaderSkeleton />
           <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-32 mb-6 animate-pulse" />
@@ -102,7 +102,7 @@ export default function PlaylistDetailsPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 transition-colors">
         <Navbar />
-        <div className="pt-20 md:pt-24 px-4 md:px-8 pb-20 md:pb-12 text-center">
+        <div className="pt-20 md:pt-24 px-4 md:px-8 pb-40 md:pb-12 text-center">
           <p className="text-gray-600 dark:text-gray-300 text-lg md:text-xl">Playlist not found</p>
           <button
             onClick={() => router.push("/playlists")}
@@ -119,7 +119,7 @@ export default function PlaylistDetailsPage() {
     <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 transition-colors">
       <Navbar />
       
-      <div className="pt-20 md:pt-24 px-4 md:px-6 pb-20 md:pb-12 max-w-7xl mx-auto">
+      <div className="pt-20 md:pt-24 px-4 md:px-6 pb-40 md:pb-12 max-w-7xl mx-auto">
         {/* Breadcrumb */}
         <Breadcrumb
           items={[
