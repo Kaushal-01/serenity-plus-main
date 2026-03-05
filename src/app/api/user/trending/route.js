@@ -4,10 +4,22 @@ import SongPlay from "@/models/songPlay";
 
 export async function GET(request) {
   try {
+    const startTime = Date.now();
+    const dbStart = Date.now();
     await connectDB();
+    console.log(`[TRENDING] DB connect took ${Date.now() - dbStart}ms`);
 
     // Aggregate song plays to get top 10 most played songs
+    // Optimized with time-based filtering to reduce dataset size
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    const aggStart = Date.now();
     const trendingSongs = await SongPlay.aggregate([
+      {
+        // Only consider plays from last 30 days for better performance
+        $match: { playedAt: { $gte: thirtyDaysAgo } }
+      },
       {
         // Group by songId and count plays
         $group: {
@@ -45,6 +57,8 @@ export async function GET(request) {
         }
       }
     ]);
+    console.log(`[TRENDING] Aggregation took ${Date.now() - aggStart}ms, found ${trendingSongs.length} songs`);
+    console.log(`[TRENDING] Total time: ${Date.now() - startTime}ms`);
 
     return NextResponse.json({
       success: true,

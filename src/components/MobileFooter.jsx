@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-import { LayoutDashboard, Music, Heart, User, Search } from "lucide-react";
+import { LayoutDashboard, Music, Heart, Users, Search } from "lucide-react";
 import { usePlayer } from "@/context/PlayerContext";
 
 export default function MobileFooter() {
@@ -56,6 +56,7 @@ export default function MobileFooter() {
     { href: "/search", icon: Search, label: "Search" },
     { href: "/playlists", icon: Music, label: "Playlists" },
     { href: "/favorites", icon: Heart, label: "Favorites" },
+    { href: "/social", icon: Users, label: "Community" },
   ];
 
   const isActive = (href) => {
@@ -70,7 +71,10 @@ export default function MobileFooter() {
       initial={{ y: 100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.3 }}
-      className="fixed md:hidden left-0 right-0 bottom-0 z-[40] bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 shadow-lg transition-all duration-300"
+      className="fixed md:hidden left-0 right-0 bottom-0 z-[40] bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-t border-gray-200 dark:border-gray-700 shadow-lg transition-all duration-300"
+      style={{
+        paddingBottom: 'env(safe-area-inset-bottom)',
+      }}
     >
       <div className="flex items-center justify-around px-2 py-2 safe-area-inset-bottom">
         {navItems.map((item) => {

@@ -46,20 +46,36 @@ export async function POST(req) {
       });
     }
 
-    // Add song to playlist
-    playlist.songs.push({
+    // Normalize artists - handle complex structures
+    let normalizedArtists = [];
+    if (song.artists?.primary && Array.isArray(song.artists.primary)) {
+      normalizedArtists = song.artists.primary.map(a => a.name || a).filter(Boolean);
+    } else if (Array.isArray(song.artists)) {
+      normalizedArtists = song.artists.map(a => a.name || a).filter(Boolean);
+    } else if (song.primaryArtists) {
+      normalizedArtists = [song.primaryArtists];
+    }
+
+    const songData = {
       id: song.id,
       name: song.name || song.title || "",
-      artists: song.artists || [],
-      primaryArtists: song.primaryArtists || "",
-      image: song.image || [],
-      downloadUrl: song.downloadUrl || [],
+      artists: normalizedArtists,
+      primaryArtists: song.primaryArtists || normalizedArtists.join(", ") || "",
+      image: Array.isArray(song.image) ? song.image : [],
+      downloadUrl: Array.isArray(song.downloadUrl) ? song.downloadUrl : [],
       url: song.url || "",
       addedAt: new Date()
-    });
-    playlist.updatedAt = new Date();
+    };
 
-    await user.save();
+    // Use atomic operation to avoid full document validation
+    await User.findOneAndUpdate(
+      { _id: payload.id, "playlists._id": playlistId },
+      { 
+        $push: { "playlists.$.songs": songData },
+        $set: { "playlists.$.updatedAt": new Date() }
+      },
+      { returnDocument: 'after' }
+    );
 
     return Response.json({
       success: true,

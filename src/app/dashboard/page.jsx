@@ -5,6 +5,7 @@ import axios from "axios";
 import { motion } from "framer-motion";
 import { usePlayer } from "@/context/PlayerContext";
 import SongCard from "@/components/SongCard";
+import ShareModal from "@/components/ShareModal";
 import { Sun, CloudRain, Waves, Flame, Sparkles, TrendingUp, Headphones, History } from "lucide-react";
 
 export default function Dashboard() {
@@ -19,6 +20,8 @@ export default function Dashboard() {
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [selectedMood, setSelectedMood] = useState(null);
   const [favorites, setFavorites] = useState([]);
+  const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [songToShare, setSongToShare] = useState(null);
 
   const moodList = [
     { id: 1, name: "Happy", Icon: Sun, gradient: "from-yellow-300 via-amber-400 to-orange-500" },
@@ -72,9 +75,7 @@ export default function Dashboard() {
       const res = await axios.get("/api/user/listening-history", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      console.log("Listening history API response:", res.data);
       if (res.data.success) {
-        console.log("Setting listening history:", res.data.songs);
         setListeningHistory(res.data.songs || []);
       }
     } catch (err) {
@@ -101,12 +102,19 @@ export default function Dashboard() {
         ...(preferences.genres || []),
         ...(preferences.artists || []),
       ];
-      if (queries.length === 0) return;
+      if (queries.length === 0) {
+        setLoadingRecs(false);
+        return;
+      }
 
       const songRequests = queries
         .slice(0, 4)
         .map((q) =>
           axios.get(`/api/serenity/search?query=${encodeURIComponent(q)}`)
+            .catch(err => {
+              console.error(`Failed to fetch songs for "${q}":`, err);
+              return { data: { data: { songs: { results: [] } } } };
+            })
         );
 
       const responses = await Promise.all(songRequests);
@@ -114,14 +122,29 @@ export default function Dashboard() {
         (res) => res.data.data?.songs?.results || []
       );
 
-      // Deduplicate songs by ID and ensure exactly 12 songs
-      const uniqueSongs = Array.from(
-        new Map(allSongs.map(song => [song.id, song])).values()
-      );
+      // Enhanced deduplication: by ID first, then by name+artist combination
+      const seenIds = new Set();
+      const seenSongs = new Set();
+      const uniqueSongs = allSongs.filter(song => {
+        if (!song || !song.id) return false;
+        
+        // Check if we've seen this ID
+        if (seenIds.has(song.id)) return false;
+        
+        // Create a unique key from song name and artist
+        const songKey = `${song.name?.toLowerCase()}-${song.primaryArtists?.toLowerCase()}`;
+        if (seenSongs.has(songKey)) return false;
+        
+        seenIds.add(song.id);
+        seenSongs.add(songKey);
+        return true;
+      });
       
       setRecommendedSongs(uniqueSongs.slice(0, 12));
     } catch (err) {
       console.error("Error fetching recommendations:", err);
+      // Set empty array on error so UI doesn't break
+      setRecommendedSongs([]);
     } finally {
       setLoadingRecs(false);
     }
@@ -163,8 +186,13 @@ export default function Dashboard() {
 
   const isFavorite = (songId) => favorites.some((f) => f.id === songId);
 
+  const handleShare = (song) => {
+    setSongToShare(song);
+    setShareModalOpen(true);
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 text-black dark:text-white overflow-x-hidden mt-20 pb-40 md:pb-0 transition-colors">
+    <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 text-black dark:text-white overflow-x-hidden mt-20 pb-24 md:pb-8 transition-colors">
       {/* 🎵 Header */}
       <header className="px-10 md:px-16 py-10 flex flex-col md:flex-row justify-between items-center gap-4 bg-gray-50 dark:bg-gray-800 rounded-b-3xl border-b border-gray-200 dark:border-gray-700">
         <motion.h1
@@ -263,6 +291,7 @@ export default function Dashboard() {
                         isFavorite={isFavorite(song.id)}
                         onToggleFavorite={() => toggleFavorite(song)}
                         showFavoriteButton={true}
+                        onShare={handleShare}
                       />
                     </div>
                   ))}
@@ -280,6 +309,7 @@ export default function Dashboard() {
                           isFavorite={isFavorite(song.id)}
                           onToggleFavorite={() => toggleFavorite(song)}
                           showFavoriteButton={true}
+                          onShare={handleShare}
                         />
                       </div>
                     ))}
@@ -297,6 +327,7 @@ export default function Dashboard() {
                   isFavorite={isFavorite(song.id)}
                   onToggleFavorite={() => toggleFavorite(song)}
                   showFavoriteButton={true}
+                  onShare={handleShare}
                 />
               ))}
             </div>
@@ -344,6 +375,7 @@ export default function Dashboard() {
                         isFavorite={isFavorite(song.id)}
                         onToggleFavorite={() => toggleFavorite(song)}
                         showFavoriteButton={true}
+                        onShare={handleShare}
                       />
                     </div>
                   ))}
@@ -361,6 +393,7 @@ export default function Dashboard() {
                           isFavorite={isFavorite(song.id)}
                           onToggleFavorite={() => toggleFavorite(song)}
                           showFavoriteButton={true}
+                          onShare={handleShare}
                         />
                       </div>
                     ))}
@@ -378,6 +411,7 @@ export default function Dashboard() {
                   isFavorite={isFavorite(song.id)}
                   onToggleFavorite={() => toggleFavorite(song)}
                   showFavoriteButton={true}
+                  onShare={handleShare}
                 />
               ))}
             </div>
@@ -428,6 +462,7 @@ export default function Dashboard() {
                         isFavorite={isFavorite(song.id)}
                         onToggleFavorite={() => toggleFavorite(song)}
                         showFavoriteButton={true}
+                        onShare={handleShare}
                       />
                     </div>
                   ))}
@@ -445,6 +480,7 @@ export default function Dashboard() {
                           isFavorite={isFavorite(song.id)}
                           onToggleFavorite={() => toggleFavorite(song)}
                           showFavoriteButton={true}
+                          onShare={handleShare}
                         />
                       </div>
                     ))}
@@ -462,6 +498,7 @@ export default function Dashboard() {
                   isFavorite={isFavorite(song.id)}
                   onToggleFavorite={() => toggleFavorite(song)}
                   showFavoriteButton={true}
+                  onShare={handleShare}
                 />
               ))}
             </div>
@@ -484,6 +521,13 @@ export default function Dashboard() {
           <p className="font-semibold text-[#0097b2] mb-2">Serenity</p>
         </motion.div>
       </footer>
+
+      {/* Share Modal */}
+      <ShareModal 
+        isOpen={shareModalOpen} 
+        onClose={() => setShareModalOpen(false)} 
+        song={songToShare} 
+      />
     </div>
   );
 }

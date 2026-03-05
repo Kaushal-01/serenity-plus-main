@@ -10,13 +10,16 @@ export default function Signup() {
   const [step, setStep] = useState(1);
   const [form, setForm] = useState({ 
     name: "", 
+    userId: "",
     email: "", 
     password: "",
+    dateOfBirth: "",
     gender: "",
     ageGroup: "",
     occupation: "",
     listeningHabits: ""
   });
+  const [ageDeclaration, setAgeDeclaration] = useState(false);
   const [captchaToken, setCaptchaToken] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -24,10 +27,39 @@ export default function Signup() {
 
 
 
+  const calculateAge = (dob) => {
+    const today = new Date();
+    const birthDate = new Date(dob);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
   const handleNext = () => {
     if (step === 1) {
-      if (!form.name || !form.email || !form.password) {
+      if (!form.name || !form.userId || !form.email || !form.password || !form.dateOfBirth) {
         setError("Please fill in all required fields");
+        return;
+      }
+      if (form.userId.length < 3) {
+        setError("User ID must be at least 3 characters");
+        return;
+      }
+      if (!/^[a-zA-Z0-9_]+$/.test(form.userId)) {
+        setError("User ID can only contain letters, numbers, and underscores");
+        return;
+      }
+      // Validate age
+      const age = calculateAge(form.dateOfBirth);
+      if (age < 16) {
+        setError("You must be at least 16 years old to sign up");
+        return;
+      }
+      if (!ageDeclaration) {
+        setError("Please confirm that you are at least 16 years old");
         return;
       }
     }
@@ -145,6 +177,17 @@ export default function Signup() {
             />
 
             <input
+              type="text"
+              placeholder="User ID (for connecting with friends)"
+              value={form.userId}
+              onChange={(e) => setForm({ ...form, userId: e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '') })}
+              required
+              minLength={3}
+              className="w-full px-3 md:px-4 py-2 text-sm md:text-base rounded-full bg-white border border-gray-300 placeholder-gray-500 text-black focus:ring-2 focus:ring-[#0097b2] focus:outline-none"
+            />
+            <p className="text-xs text-gray-600 -mt-2 px-2">Only letters, numbers, and underscores (min 3 characters)</p>
+
+            <input
               type="email"
               placeholder="Email Address"
               value={form.email}
@@ -162,6 +205,32 @@ export default function Signup() {
               minLength={6}
               className="w-full px-3 md:px-4 py-2 text-sm md:text-base rounded-full bg-white border border-gray-300 placeholder-gray-500 text-black focus:ring-2 focus:ring-[#0097b2] focus:outline-none"
             />
+
+            <div>
+              <label className="block text-xs md:text-sm font-medium text-gray-700 mb-2">Date of Birth</label>
+              <input
+                type="date"
+                value={form.dateOfBirth}
+                onChange={(e) => setForm({ ...form, dateOfBirth: e.target.value })}
+                required
+                max={new Date().toISOString().split('T')[0]}
+                className="w-full px-3 md:px-4 py-2 text-sm md:text-base rounded-full bg-white border border-gray-300 text-black focus:ring-2 focus:ring-[#0097b2] focus:outline-none"
+              />
+            </div>
+
+            <div className="flex items-start gap-2 mt-2">
+              <input
+                type="checkbox"
+                id="ageDeclaration"
+                checked={ageDeclaration}
+                onChange={(e) => setAgeDeclaration(e.target.checked)}
+                required
+                className="mt-1 w-4 h-4 text-[#0097b2] border-gray-300 rounded focus:ring-[#0097b2]"
+              />
+              <label htmlFor="ageDeclaration" className="text-xs md:text-sm text-gray-700">
+                I confirm that I am at least 16 years old and agree to use Serenity in accordance with the terms of service.
+              </label>
+            </div>
 
             <motion.button
               type="button"

@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 
-export async function GET(request, { params }) {
+export async function GET(request, context) {
   try {
-    const { id } = params;
+    const { id } = await context.params;
     
     const response = await fetch(
       `https://saavn.dev/api/artists/${id}`,

@@ -6,7 +6,10 @@ import mongoose from "mongoose";
 
 export async function GET(request) {
   try {
+    const startTime = Date.now();
+    const dbStart = Date.now();
     await connectDB();
+    console.log(`[LISTENING_HISTORY] DB connect took ${Date.now() - dbStart}ms`);
 
     // Get user from token
     const token = request.headers.get("Authorization")?.replace("Bearer ", "");
@@ -39,12 +42,18 @@ export async function GET(request) {
     }
 
     // Get last 12 unique songs listened by this user
-    console.log("Fetching listening history for userId:", userId, "Query:", userIdQuery);
+    // Optimized: Only look at recent plays (last 90 days) to reduce dataset
+    const ninetyDaysAgo = new Date();
+    ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
     
+    const aggStart = Date.now();
     const listeningHistory = await SongPlay.aggregate([
       {
-        // Filter by userId
-        $match: { userId: userIdQuery }
+        // Filter by userId and recent plays only
+        $match: { 
+          userId: userIdQuery,
+          playedAt: { $gte: ninetyDaysAgo }
+        }
       },
       {
         // Sort by most recent first
@@ -86,9 +95,8 @@ export async function GET(request) {
         }
       }
     ]);
-
-    console.log("Found listening history:", listeningHistory.length, "songs");
-    console.log("Sample song:", listeningHistory[0]);
+    console.log(`[LISTENING_HISTORY] Aggregation took ${Date.now() - aggStart}ms, found ${listeningHistory.length} songs`);
+    console.log(`[LISTENING_HISTORY] Total time: ${Date.now() - startTime}ms`);
 
     return NextResponse.json({
       success: true,

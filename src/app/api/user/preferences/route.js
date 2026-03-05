@@ -12,7 +12,8 @@ export async function GET(req) {
       return Response.json({ error: "Invalid token" }, { status: 401 });
 
     await connectDB();
-    const user = await User.findById(payload.id);
+    // Only select the preferences field, not the entire user document
+    const user = await User.findById(payload.id).select("preferences").lean();
     if (!user)
       return Response.json({ error: "User not found" }, { status: 404 });
 
@@ -39,21 +40,18 @@ export async function POST(req) {
     const { genres, artists } = body;
 
     await connectDB();
-    const user = await User.findById(payload.id);
-    if (!user)
-      return Response.json({ error: "User not found" }, { status: 404 });
-
-    user.preferences = {
+    // Use atomic update instead of loading full document
+    const preferences = {
       genres: genres || [],
       artists: artists || [],
       isSetupComplete: true,
     };
-
-    await user.save();
+    
+    await User.findByIdAndUpdate(payload.id, { preferences });
 
     return Response.json({
       success: true,
-      preferences: user.preferences,
+      preferences,
     });
   } catch (err) {
     console.error("POST /preferences error:", err);
@@ -74,21 +72,18 @@ export async function PUT(req) {
     const { genres, artists } = body;
 
     await connectDB();
-    const user = await User.findById(payload.id);
-    if (!user)
-      return Response.json({ error: "User not found" }, { status: 404 });
-
-    user.preferences = {
+    // Use atomic update instead of loading full document
+    const preferences = {
       genres: genres || [],
       artists: artists || [],
       isSetupComplete: true,
     };
-
-    await user.save();
+    
+    await User.findByIdAndUpdate(payload.id, { preferences });
 
     return Response.json({
       success: true,
-      preferences: user.preferences,
+      preferences,
     });
   } catch (err) {
     console.error("PUT /preferences error:", err);

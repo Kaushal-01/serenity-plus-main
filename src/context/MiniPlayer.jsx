@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { usePlayer } from "./PlayerContext";
 import axios from "axios";
+import DownloadButton from "@/components/DownloadButton";
 import {
   Play,
   Pause,
@@ -59,6 +60,28 @@ export default function MiniPlayer() {
   const [showQueue, setShowQueue] = useState(false);
   const [user, setUser] = useState(null);
   const [showOptionsMenu, setShowOptionsMenu] = useState(false);
+
+  // Helper function to get the correct image for both API and artist songs
+  const getSongImage = (song, quality = 'medium') => {
+    if (!song) return '/default-song.jpg';
+    
+    // For artist songs (uploaded music)
+    if (song.coverPhoto) return song.coverPhoto;
+    
+    // For API songs (JioSaavn)
+    if (Array.isArray(song.image)) {
+      // quality: 'high' = index 2, 'medium' = index 1, 'low' = index 0
+      const qualityIndex = quality === 'high' ? 2 : quality === 'medium' ? 1 : 0;
+      return song.image[qualityIndex]?.url || song.image[qualityIndex]?.link || song.image[0]?.url || song.image[0]?.link || '/default-song.jpg';
+    }
+    
+    // Handle string URLs (from audio rooms or direct URLs)
+    if (typeof song.image === 'string' && song.image) {
+      return song.image;
+    }
+    
+    return '/default-song.jpg';
+  };
 
   // Check if user is logged in
   useEffect(() => {
@@ -222,10 +245,13 @@ export default function MiniPlayer() {
                 closePlayer();
               }
             }}
-            className="fixed bottom-[64px] md:bottom-4 left-1/2 -translate-x-1/2 w-[95%] md:w-[80%] lg:w-[70%] xl:w-[60%]
+            className="fixed bottom-[68px] md:bottom-4 left-1/2 -translate-x-1/2 w-[95%] md:w-[80%] lg:w-[70%] xl:w-[60%]
             rounded-2xl bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 border border-gray-200 dark:border-gray-700
-            shadow-2xl text-black dark:text-white z-[999] hover:shadow-3xl
+            shadow-2xl text-black dark:text-white z-[35] hover:shadow-3xl
             transition-all duration-300 backdrop-blur-lg cursor-grab active:cursor-grabbing"
+            style={{
+              bottom: 'calc(68px + env(safe-area-inset-bottom))',
+            }}
           >
             {/* Progress Bar */}
             <div
@@ -255,8 +281,8 @@ export default function MiniPlayer() {
                   onClick={() => setIsExpanded(true)}
                 >
                   <img
-                    src={currentSong?.image?.[2]?.url || "/default-song.jpg"}
-                    alt={currentSong?.name}
+                    src={getSongImage(currentSong, 'high')}
+                    alt={currentSong?.name || currentSong?.songName || 'Song'}
                     className="w-12 h-12 md:w-16 md:h-16 rounded-lg md:rounded-xl object-cover border-2 border-gray-200 dark:border-gray-600 shadow-md"
                   />
                   {isPlaying && (
@@ -268,10 +294,10 @@ export default function MiniPlayer() {
 
                 <div className="flex flex-col min-w-0 flex-1">
                   <h4 className="font-semibold text-sm md:text-base truncate text-black dark:text-white">
-                    {currentSong?.name || "Unknown Track"}
+                    {currentSong?.name || currentSong?.songName || "Unknown Track"}
                   </h4>
                   <p className="text-gray-600 dark:text-gray-400 text-xs md:text-sm truncate">
-                    {currentSong?.artists?.primary?.map((a) => a.name).join(", ") || "Unknown Artist"}
+                    {currentSong?.artists?.primary?.map((a) => a.name).join(", ") || currentSong?.artistName || "Unknown Artist"}
                   </p>
                   <div className="hidden md:flex items-center gap-2 mt-1">
                     <span className="text-xs text-gray-500 dark:text-gray-400">{formatTime(currentTime)}</span>
@@ -368,6 +394,17 @@ export default function MiniPlayer() {
                   <Heart className={`w-4 h-4 ${isFavorite ? "fill-white" : ""}`} />
                 </motion.button>
 
+                {/* Download Button */}
+                {currentSong && (
+                  <div className="hidden md:block">
+                    <DownloadButton
+                      song={currentSong}
+                      audioUrl={currentSong?.selectedAudioUrl || currentSong?.downloadUrl?.[0]?.url}
+                      size="default"
+                    />
+                  </div>
+                )}
+
                 {/* Volume Control */}
                 <div
                   className="relative"
@@ -421,20 +458,20 @@ export default function MiniPlayer() {
                   <Plus className="w-4 h-4" />
                 </motion.button>
 
-                {/* Play/Pause - Mobile */}
+                {/* Play/Pause - Mobile Only */}
                 <motion.button
                   onClick={togglePlay}
                   whileTap={{ scale: 0.95 }}
                   whileHover={{ scale: 1.05 }}
-                  className="flex items-center justify-center w-11 h-11 md:w-9 md:h-9
+                  className="md:hidden flex items-center justify-center w-11 h-11
                   rounded-full shadow-lg bg-gradient-to-br from-[#0097b2] to-[#00b8d4] 
                   text-white hover:shadow-xl transition-all relative overflow-hidden"
                   title="Play/Pause"
                 >
                   {isPlaying ? (
-                    <Pause className="w-5 h-5 md:w-4 md:h-4" />
+                    <Pause className="w-5 h-5" />
                   ) : (
-                    <Play className="w-5 h-5 md:w-4 md:h-4 ml-0.5" />
+                    <Play className="w-5 h-5 ml-0.5" />
                   )}
                 </motion.button>
 
@@ -545,6 +582,14 @@ export default function MiniPlayer() {
                               <Plus className="w-4 h-4" />
                               <span>Add to Playlist</span>
                             </button>
+                            <div className="px-2 py-2">
+                              <DownloadButton
+                                song={currentSong}
+                                audioUrl={currentSong?.selectedAudioUrl || currentSong?.downloadUrl?.[0]?.url}
+                                size="default"
+                                className="w-full"
+                              />
+                            </div>
                             <button
                               onClick={() => {
                                 closePlayer();
@@ -569,8 +614,8 @@ export default function MiniPlayer() {
                     className="relative w-56 h-56 mx-auto mb-4"
                   >
                     <img
-                      src={currentSong?.image?.[2]?.url || "/default-song.jpg"}
-                      alt={currentSong?.name}
+                      src={getSongImage(currentSong, 'high')}
+                      alt={currentSong?.name || currentSong?.songName || 'Song'}
                       className="w-full h-full rounded-3xl object-cover shadow-2xl"
                     />
                     {isPlaying && (
@@ -590,10 +635,10 @@ export default function MiniPlayer() {
                     className="text-center mb-4 px-4"
                   >
                     <h2 className="text-xl md:text-2xl font-bold mb-1 text-white truncate">
-                      {currentSong?.name}
+                      {currentSong?.name || currentSong?.songName || "Unknown Track"}
                     </h2>
                     <p className="text-sm md:text-base text-gray-300 truncate">
-                      {currentSong?.artists?.primary?.map((a) => a.name).join(", ")}
+                      {currentSong?.artists?.primary?.map((a) => a.name).join(", ") || currentSong?.artistName || "Unknown Artist"}
                     </p>
                   </motion.div>
 
@@ -787,8 +832,8 @@ export default function MiniPlayer() {
                   className="relative w-64 h-64 sm:w-72 sm:h-72 mx-auto mb-6 mt-16"
                 >
                   <img
-                    src={currentSong?.image?.[2]?.url || "/default-song.jpg"}
-                    alt={currentSong?.name}
+                    src={getSongImage(currentSong, 'high')}
+                    alt={currentSong?.name || currentSong?.songName || 'Song'}
                     className="w-full h-full rounded-3xl object-cover shadow-2xl"
                   />
                   {isPlaying && (
@@ -808,10 +853,10 @@ export default function MiniPlayer() {
                   className="text-center mb-6 px-4"
                 >
                   <h2 className="text-2xl sm:text-3xl font-bold mb-2 text-white truncate">
-                    {currentSong?.name}
+                    {currentSong?.name || currentSong?.songName || "Unknown Track"}
                   </h2>
                   <p className="text-sm sm:text-base text-gray-300 truncate">
-                    {currentSong?.artists?.primary?.map((a) => a.name).join(", ")}
+                    {currentSong?.artists?.primary?.map((a) => a.name).join(", ") || currentSong?.artistName || "Unknown Artist"}
                   </p>
                 </motion.div>
 
@@ -956,16 +1001,16 @@ export default function MiniPlayer() {
               {/* Current Song Info */}
               <div className="flex items-center gap-3 mb-4 p-3 bg-gray-50 rounded-lg">
                 <img
-                  src={currentSong?.image?.[0]?.url}
-                  alt={currentSong?.name}
+                  src={getSongImage(currentSong, 'low')}
+                  alt={currentSong?.name || currentSong?.songName || 'Song'}
                   className="w-12 h-12 rounded-lg object-cover"
                 />
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-sm text-gray-800 truncate">
-                    {currentSong?.name}
+                    {currentSong?.name || currentSong?.songName || "Unknown Track"}
                   </p>
                   <p className="text-xs text-gray-600 truncate">
-                    {currentSong?.artists?.primary?.map((a) => a.name).join(", ")}
+                    {currentSong?.artists?.primary?.map((a) => a.name).join(", ") || currentSong?.artistName || "Unknown Artist"}
                   </p>
                 </div>
               </div>

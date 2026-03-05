@@ -4,15 +4,22 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import Navbar from "../../components/Navbar";
 import { motion, AnimatePresence } from "framer-motion";
-import { useTheme } from "../../context/ThemeContext";
 
 export default function ProfilePage() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [editing, setEditing] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [formData, setFormData] = useState({ name: "" });
+  const [showEditProfileModal, setShowEditProfileModal] = useState(false);
+  const [showBecomeArtistModal, setShowBecomeArtistModal] = useState(false);
+  const [artistName, setArtistName] = useState("");
+  const [formData, setFormData] = useState({
+    name: "",
+    userId: "",
+    profilePicture: "",
+    accountType: "public",
+    bio: ""
+  });
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
     newPassword: "",
@@ -22,7 +29,6 @@ export default function ProfilePage() {
   const [message, setMessage] = useState({ type: "", text: "" });
   const [saving, setSaving] = useState(false);
   const router = useRouter();
-  const { isDarkMode, toggleTheme } = useTheme();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -39,13 +45,19 @@ export default function ProfilePage() {
     
     setLoading(true);
     try {
-      const res = await axios.get("/api/user/profile", {
+      const res = await axios.get("/api/user/update-profile", {
         headers: { Authorization: `Bearer ${token}` },
       });
       
       if (res.data.success) {
         setUser(res.data.user);
-        setFormData({ name: res.data.user.name });
+        setFormData({
+          name: res.data.user.name,
+          userId: res.data.user.userId || "",
+          profilePicture: res.data.user.profilePicture || "",
+          accountType: res.data.user.accountType || "public",
+          bio: res.data.user.bio || ""
+        });
       }
     } catch (err) {
       console.error("Fetch profile error:", err);
@@ -71,15 +83,22 @@ export default function ProfilePage() {
 
     setSaving(true);
     try {
+      const updateData = {
+        name: formData.name,
+        userId: formData.userId,
+        profilePicture: formData.profilePicture,
+        accountType: formData.accountType,
+        bio: formData.bio
+      };
+
       const res = await axios.put(
-        "/api/user/profile",
-        { name: formData.name },
+        "/api/user/update-profile",
+        updateData,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
       if (res.data.success) {
         setMessage({ type: "success", text: "Profile updated successfully!" });
-        setEditing(false);
         
         // Update localStorage
         localStorage.setItem("user", JSON.stringify(res.data.user));
@@ -87,6 +106,8 @@ export default function ProfilePage() {
         // Broadcast update event to navbar
         window.dispatchEvent(new Event("serenity-auth-update"));
         
+        // Close modal and refresh
+        setShowEditProfileModal(false);
         fetchProfile();
       }
     } catch (err) {
@@ -94,6 +115,33 @@ export default function ProfilePage() {
       setMessage({ type: "error", text: err.response?.data?.error || "Failed to update profile" });
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file format (only JPEG, JPG, PNG)
+      const allowedFormats = ['image/jpeg', 'image/jpg', 'image/png'];
+      if (!allowedFormats.includes(file.type.toLowerCase())) {
+        setMessage({ type: "error", text: "Only JPEG, JPG, and PNG image formats are allowed" });
+        e.target.value = ''; // Reset file input
+        return;
+      }
+      
+      // Validate file size
+      if (file.size > 5 * 1024 * 1024) {
+        setMessage({ type: "error", text: "Image must be less than 5MB" });
+        e.target.value = ''; // Reset file input
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData({ ...formData, profilePicture: reader.result });
+        setMessage({ type: "success", text: "Image uploaded successfully. Click 'Save Changes' to update." });
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -202,13 +250,7 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 transition-colors">
       <Navbar />
       
-      <div className="pt-24 px-6 pb-40 md:pb-12 max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-2xl md:text-4xl font-bold text-[#0097b2] mb-2">My Profile</h1>
-          <p className="text-sm md:text-base text-gray-600 dark:text-gray-300">Manage your account settings and preferences</p>
-        </div>
-
+      <div className="pt-24 px-4 sm:px-6 pb-24 md:pb-12 max-w-4xl mx-auto">
         {/* Message Alert */}
         <AnimatePresence>
           {message.text && (
@@ -231,62 +273,34 @@ export default function ProfilePage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-6 transition-colors"
+          className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 sm:p-6 md:p-8 mb-6 transition-colors"
         >
           {/* Profile Header */}
-          <div className="flex items-center gap-6 mb-8 pb-6 border-b border-gray-200 dark:border-gray-700">
-            <div className="w-24 h-24 bg-gradient-to-br from-[#0097b2] to-[#007a93] rounded-full flex items-center justify-center text-white text-4xl font-bold shadow-lg">
-              {user.name.charAt(0).toUpperCase()}
+          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 mb-6 sm:mb-8 pb-6 border-b border-gray-200 dark:border-gray-700">
+            <div className="relative">
+              <div className="w-20 sm:w-24 h-20 sm:h-24 bg-gradient-to-br from-[#0097b2] to-[#007a93] rounded-full flex items-center justify-center text-white text-3xl sm:text-4xl font-bold shadow-lg overflow-hidden">
+                {user.profilePicture ? (
+                  <img src={user.profilePicture} alt={user.name} className="w-full h-full object-cover" />
+                ) : (
+                  user.name.charAt(0).toUpperCase()
+                )}
+              </div>
+              <button
+                onClick={() => setShowEditProfileModal(true)}
+                className="absolute -bottom-1 -right-1 w-8 h-8 bg-[#0097b2] hover:bg-[#007a93] text-white rounded-full flex items-center justify-center shadow-lg transition-all"
+                title="Edit Profile"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+              </button>
             </div>
-            <div className="flex-1">
-              {!editing ? (
-                <>
-                  <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">{user.name}</h2>
-                  <p className="text-gray-600 dark:text-gray-300">{user.email}</p>
-                  <button
-                    onClick={() => setEditing(true)}
-                    className="mt-3 text-[#0097b2] hover:text-[#007a93] text-sm font-medium flex items-center gap-1 transition-all"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                    </svg>
-                    Edit Name
-                  </button>
-                </>
-              ) : (
-                <form onSubmit={handleUpdateProfile} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label>
-                    <input
-                      type="text"
-                      value={formData.name}
-                      onChange={(e) => setFormData({ name: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#0097b2] focus:border-transparent"
-                      placeholder="Enter your name"
-                    />
-                  </div>
-                  <div className="flex gap-3">
-                    <button
-                      type="submit"
-                      disabled={saving}
-                      className="px-4 py-2 bg-[#0097b2] hover:bg-[#007a93] text-white rounded-lg font-medium transition-all disabled:opacity-50"
-                    >
-                      {saving ? "Saving..." : "Save"}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setEditing(false);
-                        setFormData({ name: user.name });
-                        setMessage({ type: "", text: "" });
-                      }}
-                      className="px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium transition-all"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </form>
+            <div className="flex-1 w-full sm:w-auto text-center sm:text-left">
+              <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">{user.name}</h2>
+              {user.userId && (
+                <p className="text-sm text-gray-500 dark:text-gray-400">@{user.userId}</p>
               )}
+              <p className="text-gray-600 dark:text-gray-300 mt-1">{user.email}</p>
             </div>
           </div>
 
@@ -299,7 +313,7 @@ export default function ProfilePage() {
                 </svg>
                 <div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Favorites</p>
-                  <p className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">{user.favoritesCount}</p>
+                  <p className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">{user.favorites?.length || 0}</p>
                 </div>
               </div>
             </div>
@@ -323,16 +337,50 @@ export default function ProfilePage() {
                 </svg>
                 <div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Member Since</p>
-                  <p className="text-lg font-bold text-gray-900 dark:text-white">{formatDate(user.joinedAt)}</p>
+                  <p className="text-lg font-bold text-gray-900 dark:text-white">{formatDate(user.createdAt)}</p>
                 </div>
               </div>
+            </div>
+          </div>
+
+          {/* Profile Information Section */}
+          <div className="mb-8 space-y-6">
+            {/* Username */}
+            <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                <svg className="w-5 h-5 text-[#0097b2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                Username
+              </h3>
+              {user?.userId ? (
+                <p className="text-gray-900 dark:text-white px-4 py-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl">@{user.userId}</p>
+              ) : (
+                <div className="px-4 py-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
+                  <p className="text-sm text-blue-600 dark:text-blue-400">
+                    ℹ️ Set your username to connect with friends. Click Edit Profile above.
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Bio */}
+            <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">Bio</h3>
+              {user?.bio ? (
+                <p className="text-gray-900 dark:text-white px-4 py-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl whitespace-pre-wrap">{user.bio}</p>
+              ) : (
+                <p className="text-gray-500 dark:text-gray-400 px-4 py-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl italic">
+                  No bio added yet. Click Edit Profile to add one.
+                </p>
+              )}
             </div>
           </div>
 
           {/* Preferences */}
           {user.preferences?.isSetupComplete && (
             <div className="mb-8">
-              <h3 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-4">Music Preferences</h3>
+              <h3 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-4">Onboarding Preferences</h3>
               
               {user.preferences.genres && user.preferences.genres.length > 0 && (
                 <div className="mb-4">
@@ -431,28 +479,38 @@ export default function ProfilePage() {
               </svg>
             </button>
 
-            <button
-              onClick={toggleTheme}
-              className="w-full flex items-center justify-between px-6 py-4 bg-gray-50 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-xl transition-all group"
-            >
-              <div className="flex items-center gap-3">
-                {isDarkMode ? (
-                  <svg className="w-5 h-5 text-gray-600 group-hover:text-[#0097b2] dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+            {/* Become an Artist Button */}
+            {user.accountType !== "artist" ? (
+              <button
+                onClick={() => setShowBecomeArtistModal(true)}
+                className="w-full flex items-center justify-between px-6 py-4 bg-gradient-to-r from-[#0097b2]/10 to-[#00b8d4]/10 hover:from-[#0097b2]/20 hover:to-[#00b8d4]/20 dark:from-[#0097b2]/20 dark:to-[#00b8d4]/20 dark:hover:from-[#0097b2]/30 dark:hover:to-[#00b8d4]/30 rounded-xl transition-all group border-2 border-[#0097b2]/30"
+              >
+                <div className="flex items-center gap-3">
+                  <svg className="w-5 h-5 text-[#0097b2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
                   </svg>
-                ) : (
-                  <svg className="w-5 h-5 text-gray-600 group-hover:text-[#0097b2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                  <span className="font-medium text-[#0097b2]">Become an Artist</span>
+                </div>
+                <svg className="w-5 h-5 text-[#0097b2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            ) : (
+              <button
+                onClick={() => router.push("/artist/dashboard")}
+                className="w-full flex items-center justify-between px-6 py-4 bg-gradient-to-r from-[#0097b2]/10 to-[#00b8d4]/10 hover:from-[#0097b2]/20 hover:to-[#00b8d4]/20 dark:from-[#0097b2]/20 dark:to-[#00b8d4]/20 dark:hover:from-[#0097b2]/30 dark:hover:to-[#00b8d4]/30 rounded-xl transition-all group border-2 border-[#0097b2]/30"
+              >
+                <div className="flex items-center gap-3">
+                  <svg className="w-5 h-5 text-[#0097b2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
                   </svg>
-                )}
-                <span className="font-medium text-gray-700 group-hover:text-[#0097b2] dark:text-gray-300">
-                  {isDarkMode ? "Light Mode" : "Dark Mode"}
-                </span>
-              </div>
-              <div className="relative w-12 h-6 bg-gray-300 dark:bg-[#0097b2] rounded-full transition-colors">
-                <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${isDarkMode ? "translate-x-6" : ""}`}></div>
-              </div>
-            </button>
+                  <span className="font-medium text-[#0097b2]">Artist Dashboard</span>
+                </div>
+                <svg className="w-5 h-5 text-[#0097b2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            )}
 
             <button
               onClick={() => {
@@ -481,7 +539,7 @@ export default function ProfilePage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 border-2 border-red-200 dark:border-red-800 transition-colors"
+          className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 sm:p-6 md:p-8 border-2 border-red-200 dark:border-red-800 transition-colors"
         >
           <h3 className="text-lg md:text-xl font-bold text-red-600 dark:text-red-400 mb-4 flex items-center gap-2">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -624,6 +682,301 @@ export default function ProfilePage() {
                       setShowDeleteModal(false);
                       setDeletePassword("");
                       setMessage({ type: "", text: "" });
+                    }}
+                    className="px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium transition-all"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Edit Profile Modal */}
+      <AnimatePresence>
+        {showEditProfileModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 overflow-y-auto"
+            onClick={() => setShowEditProfileModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-lg p-6 my-8"
+            >
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Edit Profile</h2>
+                <button
+                  onClick={() => setShowEditProfileModal(false)}
+                  className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-all"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                {/* Profile Picture */}
+                <div>
+                  <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 block">
+                    Profile Picture
+                  </label>
+                  <div className="flex items-center gap-4">
+                    <div className="w-20 h-20 bg-gradient-to-br from-[#0097b2] to-[#00b8d4] rounded-full flex items-center justify-center text-white text-2xl font-bold overflow-hidden">
+                      {formData.profilePicture ? (
+                        <img src={formData.profilePicture} alt="Profile" className="w-full h-full object-cover" />
+                      ) : (
+                        user?.name?.[0]?.toUpperCase()
+                      )}
+                    </div>
+                    <div>
+                      <label className="px-4 py-2 bg-[#0097b2] hover:bg-[#007a93] text-white rounded-lg cursor-pointer transition-all inline-block text-sm">
+                        Upload Photo
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/jpg,image/png"
+                          onChange={handleImageUpload}
+                          className="hidden"
+                        />
+                      </label>
+                      <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">Max 5MB (JPEG, JPG, PNG)</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Name */}
+                <div>
+                  <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 block">
+                    Name
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    placeholder="Your name"
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0097b2]"
+                  />
+                </div>
+
+                {/* Username */}
+                <div>
+                  <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 block">
+                    Username
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.userId}
+                    onChange={(e) => setFormData({ ...formData, userId: e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '') })}
+                    placeholder="username"
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0097b2]"
+                  />
+                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">
+                    Letters, numbers, and underscores only
+                  </p>
+                </div>
+
+                {/* Account Type */}
+                <div>
+                  <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 block">
+                    Account Type
+                  </label>
+                  <div className="space-y-3">
+                    <label className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ${
+                      formData.accountType === "public"
+                        ? "border-[#0097b2] bg-[#0097b2]/10"
+                        : "border-gray-200 dark:border-gray-700 hover:border-[#0097b2]/50"
+                    }`}>
+                      <input
+                        type="radio"
+                        name="accountTypeModal"
+                        value="public"
+                        checked={formData.accountType === "public"}
+                        onChange={(e) => setFormData({ ...formData, accountType: e.target.value })}
+                        className="w-4 h-4 text-[#0097b2]"
+                      />
+                      <div>
+                        <p className="font-semibold text-gray-900 dark:text-white text-sm">Public</p>
+                        <p className="text-xs text-gray-600 dark:text-gray-400">Anyone can see your playlists</p>
+                      </div>
+                    </label>
+
+                    <label className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ${
+                      formData.accountType === "private"
+                        ? "border-[#0097b2] bg-[#0097b2]/10"
+                        : "border-gray-200 dark:border-gray-700 hover:border-[#0097b2]/50"
+                    }`}>
+                      <input
+                        type="radio"
+                        name="accountTypeModal"
+                        value="private"
+                        checked={formData.accountType === "private"}
+                        onChange={(e) => setFormData({ ...formData, accountType: e.target.value })}
+                        className="w-4 h-4 text-[#0097b2]"
+                      />
+                      <div>
+                        <p className="font-semibold text-gray-900 dark:text-white text-sm">Private</p>
+                        <p className="text-xs text-gray-600 dark:text-gray-400">Only you can see your playlists</p>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+
+                {/* Bio */}
+                <div>
+                  <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 block">
+                    Bio
+                  </label>
+                  <textarea
+                    value={formData.bio}
+                    onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
+                    placeholder="Tell us about yourself..."
+                    rows={4}
+                    maxLength={500}
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0097b2] resize-none"
+                  />
+                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-2 text-right">
+                    {formData.bio.length}/500 characters
+                  </p>
+                </div>
+
+                {/* Save Button */}
+                <div className="flex gap-3 pt-4">
+                  <button
+                    onClick={handleUpdateProfile}
+                    disabled={saving}
+                    className="flex-1 px-6 py-3 bg-[#0097b2] hover:bg-[#007a93] text-white rounded-xl font-medium transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    {saving ? "Saving..." : "Save Changes"}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowEditProfileModal(false);
+                      setFormData({
+                        name: user.name,
+                        userId: user.userId || "",
+                        profilePicture: user.profilePicture || "",
+                        accountType: user.accountType || "public",
+                        bio: user.bio || ""
+                      });
+                    }}
+                    className="px-6 py-3 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-medium transition-all"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Become an Artist Modal */}
+      <AnimatePresence>
+        {showBecomeArtistModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+            onClick={() => setShowBecomeArtistModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-md w-full shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="text-center mb-6">
+                <div className="w-16 h-16 bg-gradient-to-br from-[#0097b2] to-[#00b8d4] rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                  </svg>
+                </div>
+                <h3 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-2">Become an Artist</h3>
+                <p className="text-gray-600 dark:text-gray-300">Share your music with the Serenity community!</p>
+              </div>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Artist Name</label>
+                  <input
+                    type="text"
+                    value={artistName}
+                    onChange={(e) => setArtistName(e.target.value)}
+                    placeholder="Enter your artist/band name"
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#0097b2] focus:border-transparent"
+                  />
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">This will be displayed on all your uploaded songs</p>
+                </div>
+                <div className="bg-[#0097b2]/10 dark:bg-[#0097b2]/20 rounded-lg p-4">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">As an artist, you can:</h4>
+                  <ul className="space-y-1 text-sm text-gray-700 dark:text-gray-300">
+                    <li className="flex items-center gap-2">
+                      <svg className="w-4 h-4 text-[#0097b2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      Upload your original music
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <svg className="w-4 h-4 text-[#0097b2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      Track your song plays and listeners
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <svg className="w-4 h-4 text-[#0097b2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      Build your fanbase
+                    </li>
+                  </ul>
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    onClick={async () => {
+                      if (!artistName.trim()) {
+                        setMessage({ type: "error", text: "Please enter an artist name" });
+                        return;
+                      }
+                      setSaving(true);
+                      try {
+                        const token = localStorage.getItem("token");
+                        const res = await axios.put(
+                          "/api/user/become-artist",
+                          { artistName: artistName.trim() },
+                          { headers: { Authorization: `Bearer ${token}` } }
+                        );
+                        if (res.data.success) {
+                          setMessage({ type: "success", text: "Welcome to Serenity Artists!" });
+                          setShowBecomeArtistModal(false);
+                          fetchProfile();
+                          setTimeout(() => {
+                            router.push("/artist/upload");
+                          }, 1500);
+                        }
+                      } catch (err) {
+                        setMessage({ type: "error", text: err.response?.data?.error || "Failed to upgrade account" });
+                      } finally {
+                        setSaving(false);
+                      }
+                    }}
+                    disabled={saving || !artistName.trim()}
+                    className="flex-1 px-4 py-2 bg-[#0097b2] hover:bg-[#007a93] text-white rounded-lg font-medium transition-all disabled:opacity-50"
+                  >
+                    {saving ? "Processing..." : "Become an Artist"}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowBecomeArtistModal(false);
+                      setArtistName("");
                     }}
                     className="px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium transition-all"
                   >

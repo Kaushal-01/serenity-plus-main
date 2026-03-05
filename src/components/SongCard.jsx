@@ -1,7 +1,8 @@
 "use client";
 import { motion } from "framer-motion";
-import { Play } from "lucide-react";
+import { Play, Heart, Share2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import DownloadButton from "./DownloadButton";
 
 export default function SongCard({ 
   song, 
@@ -9,8 +10,11 @@ export default function SongCard({
   isFavorite = false, 
   onToggleFavorite, 
   onAddToPlaylist,
+  onShare,
   showFavoriteButton = false, 
-  showAddToPlaylistButton = false 
+  showAddToPlaylistButton = false,
+  showDownloadButton = false,
+  audioUrl = null
 }) {
   const router = useRouter();
 
@@ -42,36 +46,62 @@ export default function SongCard({
     >
       {/* Image with Play Overlay */}
       <div className="relative aspect-square overflow-hidden bg-gray-100 dark:bg-gray-700">
-        {/* Favorite Button (top-right) */}
-        {showFavoriteButton && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onToggleFavorite && onToggleFavorite();
-            }}
-            className={`absolute z-10 top-2 right-2 w-8 h-8 rounded-full flex items-center justify-center transition-all ${
-              isFavorite
-                ? "bg-red-500 text-white"
-                : "bg-white/80 dark:bg-gray-800/80 text-gray-600 dark:text-gray-300 hover:bg-red-500 hover:text-white"
-            }`}
-            title={isFavorite ? "Remove from favorites" : "Add to favorites"}
-          >
-            {isFavorite ? "❤️" : "🤍"}
-          </button>
-        )}
-        
         <img
           src={song.image?.[2]?.url || song.image?.[1]?.url || song.image?.[0]?.url}
           alt={song.name}
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
         />
         
-        {/* Duration Badge */}
+        {/* Duration Badge (bottom-left) */}
         {song.duration && formatDuration(song.duration) && (
-          <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded-md font-medium">
+          <div className="absolute bottom-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded-md font-medium">
             {formatDuration(song.duration)}
           </div>
         )}
+
+        {/* Share and Like Icons (bottom-right) */}
+        <div className="absolute bottom-2 right-2 flex items-center gap-1.5 z-10">
+          {/* Download Button */}
+          {showDownloadButton && audioUrl && (
+            <DownloadButton 
+              song={song} 
+              audioUrl={audioUrl}
+              size="small"
+            />
+          )}
+          
+          {/* Share Button */}
+          {onShare && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onShare(song);
+              }}
+              className="w-7 h-7 rounded-full flex items-center justify-center bg-white/90 dark:bg-gray-800/90 text-gray-600 dark:text-gray-300 hover:bg-blue-500 hover:text-white transition-all shadow-md"
+              title="Share song"
+            >
+              <Share2 className="w-3.5 h-3.5" />
+            </button>
+          )}
+
+          {/* Favorite Button */}
+          {showFavoriteButton && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleFavorite && onToggleFavorite();
+              }}
+              className={`w-7 h-7 rounded-full flex items-center justify-center transition-all shadow-md ${
+                isFavorite
+                  ? "bg-red-500 text-white"
+                  : "bg-white/90 dark:bg-gray-800/90 text-gray-600 dark:text-gray-300 hover:bg-red-500 hover:text-white"
+              }`}
+              title={isFavorite ? "Remove from favorites" : "Add to favorites"}
+            >
+              <Heart className={`w-3.5 h-3.5 ${isFavorite ? "fill-white" : ""}`} />
+            </button>
+          )}
+        </div>
 
         {/* Circular Play Button Overlay */}
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center">
@@ -87,8 +117,8 @@ export default function SongCard({
       </div>
 
       {/* Song Info */}
-      <div className="p-4">
-        <h3 className="font-semibold text-gray-900 dark:text-white text-sm truncate mb-1" title={song.name}>
+      <div className="p-2.5 sm:p-4">
+        <h3 className="font-semibold text-gray-900 dark:text-white text-sm truncate mb-0.5" title={song.name}>
           {song.name}
         </h3>
         <button

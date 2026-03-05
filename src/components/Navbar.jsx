@@ -5,11 +5,13 @@ import Link from "next/link";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePlayer } from "@/context/PlayerContext";
+import { useTheme } from "@/context/ThemeContext";
 import InstallPWA from "./InstallPWA";
 import { LayoutDashboard, Music, Heart, User, MessageCircle, LogOut, Menu, X } from "lucide-react";
 
 export default function Navbar() {
   const { currentSong } = usePlayer();
+  const { isDarkMode, toggleTheme } = useTheme();
   const [user, setUser] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -139,11 +141,11 @@ export default function Navbar() {
 
   return (
     <nav className="fixed top-0 left-0 z-50 w-full bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-sm transition-all duration-300">
-      <div className="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center">
-        {/* 🌌 Logo */}
+      <div className="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center gap-4">
+        {/* 🌌 Logo - Left */}
         <Link
           href="/dashboard"
-          className="flex items-center gap-3 hover:opacity-80 transition-all"
+          className="flex items-center gap-3 hover:opacity-80 transition-all flex-shrink-0"
         >
           <img 
             src="/new-logo.png" 
@@ -153,55 +155,23 @@ export default function Navbar() {
           <span className="text-2xl font-extrabold text-[#0097b2]">Serenity</span>
         </Link>
 
-        {/* 🧭 Links */}
-        <div className="hidden md:flex items-center gap-6">
-          {user && (
-            <>
-              <Link
-                href="/dashboard"
-                className="text-black dark:text-white hover:text-[#0097b2] text-lg transition font-medium"
-              >
-                Dashboard
-              </Link>
-              <Link
-                href="/playlists"
-                className="text-black dark:text-white hover:text-[#0097b2] text-lg transition font-medium"
-              >
-                Playlists
-              </Link>
-              <Link
-                href="/favorites"
-                className="text-black dark:text-white hover:text-[#0097b2] text-lg transition font-medium"
-              >
-                Favorites
-              </Link>
-            </>
-          )}
-        </div>
-
-        {/* 🧍 User Menu */}
-        <div className="flex items-center gap-3">          {/* Mobile Profile Icon */}
-          {user && (
-            <Link
-              href="/profile"
-              className="md:hidden flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all"
-              title="Profile"
-            >
-              <User className="w-5 h-5 text-[#0097b2]" />
-            </Link>
-          )}
-                    {/* � Install PWA Button */}
-          <InstallPWA />
-
-          {/* �🔍 Search Button */}
-          {user && (
-            <button
-              onClick={() => setSearchOpen(true)}
-              className="hidden md:flex items-center gap-2 text-black dark:text-white hover:text-[#0097b2] transition-all hover:scale-110"
-              title="Search Music"
-            >
+        {/* 🔍 Search Box - Middle */}
+        {user && (
+          <div className="flex-1 max-w-2xl hidden md:block">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search Serenity"
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setSearchOpen(true);
+                }}
+                onFocus={() => setSearchOpen(true)}
+                className="w-full px-4 py-2 pl-10 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0097b2] transition-all"
+              />
               <svg 
-                className="w-6 h-6" 
+                className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" 
                 fill="none" 
                 stroke="currentColor" 
                 viewBox="0 0 24 24"
@@ -213,8 +183,78 @@ export default function Navbar() {
                   d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" 
                 />
               </svg>
-            </button>
+            </div>
+          </div>
+        )}
+
+        {/* 📱 Desktop Navigation Menu */}
+        {user && (
+          <div className="hidden lg:flex items-center gap-1">
+            <Link
+              href="/dashboard"
+              className="px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 hover:text-[#0097b2] transition-all font-medium"
+            >
+              Dashboard
+            </Link>
+            <Link
+              href="/playlists"
+              className="px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 hover:text-[#0097b2] transition-all font-medium"
+            >
+              Playlists
+            </Link>
+            <Link
+              href="/favorites"
+              className="px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 hover:text-[#0097b2] transition-all font-medium"
+            >
+              Favorites
+            </Link>
+            <Link
+              href="/social"
+              className="px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 hover:text-[#0097b2] transition-all font-medium"
+            >
+              Community
+            </Link>
+          </div>
+        )}
+
+        {/* 🧍 Right Side - User Menu & Actions */}
+        <div className="flex items-center gap-3 flex-shrink-0">          {/* Mobile Profile Icon */}
+          {user && (
+            <Link
+              href="/profile"
+              className="md:hidden flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all overflow-hidden"
+              title="Profile"
+            >
+              {user.profilePicture ? (
+                <img 
+                  src={user.profilePicture} 
+                  alt={user.name} 
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <User className="w-5 h-5 text-[#0097b2]" />
+              )}
+            </Link>
           )}
+                    {/* Install PWA Button */}
+          <InstallPWA />
+
+          {/* Dark Mode Toggle */}
+          <button
+            onClick={toggleTheme}
+            className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-all"
+            title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+          >
+            {isDarkMode ? (
+              <svg className="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+            ) : (
+              <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+              </svg>
+            )}
+          </button>
 
           {!user ? (
             <>
@@ -259,6 +299,17 @@ export default function Navbar() {
                 onClick={() => setMenuOpen(!menuOpen)}
                 className="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 px-4 py-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-all"
               >
+                {user.profilePicture ? (
+                  <img 
+                    src={user.profilePicture} 
+                    alt={user.name} 
+                    className="w-8 h-8 rounded-full object-cover border-2 border-[#0097b2]"
+                  />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#0097b2] to-[#00b8d4] flex items-center justify-center text-white text-sm font-bold">
+                    {user.name?.[0]?.toUpperCase()}
+                  </div>
+                )}
                 <motion.span layout className="text-sm font-medium text-black dark:text-white">
                   {user.name?.split(" ")[0] || "User"}
                 </motion.span>
