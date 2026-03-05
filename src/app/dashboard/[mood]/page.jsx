@@ -100,7 +100,21 @@ export default function MoodPage() {
         body: JSON.stringify({ mood: selectedMood?.id }),
       });
       const data = await res.json();
-      setSongs((prev) => [...prev, ...(data.songs || data)]);
+      const newSongs = data.songs || data;
+      
+      // Deduplicate new songs against existing songs
+      setSongs((prev) => {
+        const existingIds = new Set(prev.map(s => s.id || s.uri));
+        const existingKeys = new Set(prev.map(s => `${s.name?.toLowerCase()}-${s.artists?.toLowerCase()}`));
+        
+        const uniqueNewSongs = newSongs.filter(song => {
+          const songId = song.id || song.uri;
+          const songKey = `${song.name?.toLowerCase()}-${song.artists?.toLowerCase()}`;
+          return !existingIds.has(songId) && !existingKeys.has(songKey);
+        });
+        
+        return [...prev, ...uniqueNewSongs];
+      });
     } catch (error) {
       console.error("Error fetching more songs:", error);
     } finally {
@@ -118,7 +132,7 @@ export default function MoodPage() {
     <div id="smooth-wrapper">
       <div
         id="smooth-content"
-        className="relative min-h-screen flex flex-col items-center justify-center bg-gray-950 text-white overflow-hidden px-6 sm:px-10 md:px-16 py-20"
+        className="relative min-h-screen flex flex-col items-center justify-center bg-gray-950 text-white overflow-hidden px-6 sm:px-10 md:px-16 py-20 pb-28 md:pb-20"
       >
         {/* 🌅 Gradient background */}
         <motion.div

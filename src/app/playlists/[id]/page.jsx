@@ -6,7 +6,9 @@ import Navbar from "../../../components/Navbar";
 import { usePlayer } from "@/context/PlayerContext";
 import { motion, AnimatePresence } from "framer-motion";
 import Breadcrumb from "@/components/Breadcrumb";
+import ShareModal from "@/components/ShareModal";
 import { PlaylistHeaderSkeleton, SongListSkeleton } from "@/components/LoadingSkeleton";
+import { Share2 } from "lucide-react";
 
 export default function PlaylistDetailsPage() {
   const { id } = useParams();
@@ -15,6 +17,7 @@ export default function PlaylistDetailsPage() {
   const [playlist, setPlaylist] = useState(null);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState({ type: "", text: "" });
+  const [shareModalOpen, setShareModalOpen] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -119,7 +122,7 @@ export default function PlaylistDetailsPage() {
     <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 transition-colors">
       <Navbar />
       
-      <div className="pt-20 md:pt-24 px-4 md:px-6 pb-40 md:pb-12 max-w-7xl mx-auto">
+      <div className="pt-20 md:pt-24 px-4 md:px-6 pb-24 md:pb-12 max-w-7xl mx-auto">
         {/* Breadcrumb */}
         <Breadcrumb
           items={[
@@ -176,15 +179,24 @@ export default function PlaylistDetailsPage() {
                 )}
               </div>
               {playlist.songs && playlist.songs.length > 0 && (
-                <button
-                  onClick={playAllSongs}
-                  className="flex items-center justify-center gap-2 bg-[#0097b2] hover:bg-[#007a93] text-white px-6 py-2.5 md:py-3 rounded-full font-medium transition-all shadow-lg hover:shadow-xl text-sm md:text-base w-full md:w-auto"
-                >
-                  <svg className="w-4 h-4 md:w-5 md:h-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
-                  </svg>
-                  Play All
-                </button>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <button
+                    onClick={playAllSongs}
+                    className="flex items-center justify-center gap-2 bg-[#0097b2] hover:bg-[#007a93] text-white px-6 py-2.5 md:py-3 rounded-full font-medium transition-all shadow-lg hover:shadow-xl text-sm md:text-base"
+                  >
+                    <svg className="w-4 h-4 md:w-5 md:h-5" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
+                    </svg>
+                    Play All
+                  </button>
+                  <button
+                    onClick={() => setShareModalOpen(true)}
+                    className="flex items-center justify-center gap-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-white px-6 py-2.5 md:py-3 rounded-full font-medium transition-all shadow-lg hover:shadow-xl text-sm md:text-base"
+                  >
+                    <Share2 className="w-4 h-4 md:w-5 md:h-5" />
+                    Share Playlist
+                  </button>
+                </div>
               )}
             </div>
           </div>
@@ -286,6 +298,13 @@ export default function PlaylistDetailsPage() {
           </motion.div>
         )}
       </div>
+
+      {/* Share Modal */}
+      <ShareModal 
+        isOpen={shareModalOpen} 
+        onClose={() => setShareModalOpen(false)} 
+        playlist={playlist} 
+      />
     </div>
   );
 }

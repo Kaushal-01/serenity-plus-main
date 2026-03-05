@@ -42,4 +42,7 @@ chatContextSchema.pre('save', function(next) {
   next();
 });
 
+// Index for efficient user lookups
+chatContextSchema.index({ userId: 1 }, { unique: true });
+
 export default mongoose.models.ChatContext || mongoose.model("ChatContext", chatContextSchema);

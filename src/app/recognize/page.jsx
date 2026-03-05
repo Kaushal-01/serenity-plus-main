@@ -145,7 +145,6 @@ export default function RecognizePage() {
 
       mediaRecorderRef.current.ondataavailable = (event) => {
         if (event.data && event.data.size > 0) {
-          console.log(`Audio chunk received: ${event.data.size} bytes`);
           audioChunksRef.current.push(event.data);
         }
       };
@@ -153,12 +152,9 @@ export default function RecognizePage() {
       mediaRecorderRef.current.onstop = async () => {
         // Prevent re-entry
         if (isProcessingRef.current) {
-          console.log("Already processing, skipping duplicate onstop call");
           return;
         }
         isProcessingRef.current = true;
-        
-        console.log(`Recording stopped. Chunks collected: ${audioChunksRef.current.length}`);
         
         // Check if we have any recorded data
         if (audioChunksRef.current.length === 0) {
@@ -169,7 +165,6 @@ export default function RecognizePage() {
 
         // Process recorded audio
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-        console.log(`Audio blob created: ${audioBlob.size} bytes`);
         
         // Check if the blob has data
         if (audioBlob.size === 0) {
@@ -196,8 +191,6 @@ export default function RecognizePage() {
             return;
           }
           
-          console.log(`Audio decoded: duration=${audioBuffer.duration.toFixed(2)}s, sampleRate=${audioBuffer.sampleRate}Hz`);
-          
           // Resample to 22050 Hz mono to match backend exactly
           const offlineContext = new OfflineAudioContext({
             numberOfChannels: 1,
@@ -211,12 +204,10 @@ export default function RecognizePage() {
           source.start();
           
           const renderedBuffer = await offlineContext.startRendering();
-          console.log(`Resampled buffer: length=${renderedBuffer.length}, duration=${renderedBuffer.duration.toFixed(2)}s`);
           
           // Convert to WAV format
           const wavBuffer = audioBufferToWav(renderedBuffer, 1, 22050);
           const wavBlob = new Blob([wavBuffer], { type: 'audio/wav' });
-          console.log(`Final WAV blob: ${wavBlob.size} bytes, duration: ${renderedBuffer.duration.toFixed(2)}s`);
           
           setAudioBlob(wavBlob);
           
@@ -405,7 +396,7 @@ export default function RecognizePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 text-black dark:text-white pt-20 pb-10 px-4 transition-colors">
+    <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 text-black dark:text-white pt-20 pb-24 md:pb-10 px-4 transition-colors">
       <div className="max-w-2xl mx-auto">
         {/* Back Button */}
         <button

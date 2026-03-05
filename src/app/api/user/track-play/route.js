@@ -22,7 +22,7 @@ export async function POST(request) {
           userId = new mongoose.Types.ObjectId(userId);
         }
       } catch (err) {
-        console.log("Invalid token, tracking anonymously");
+        // Track anonymously on invalid token
       }
     }
 
@@ -48,14 +48,6 @@ export async function POST(request) {
     });
 
     await songPlay.save();
-    
-    console.log("Song play tracked:", {
-      songId: song.id,
-      songName: song.name,
-      userId: userId,
-      hasDownloadUrl: !!(song.downloadUrl && song.downloadUrl.length > 0),
-      hasImage: !!(song.image && song.image.length > 0)
-    });
 
     return NextResponse.json({
       success: true,

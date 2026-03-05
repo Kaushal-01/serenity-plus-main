@@ -4,8 +4,10 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import Navbar from "../../components/Navbar";
 import { usePlayer } from "@/context/PlayerContext";
+import { useDownload } from "@/context/DownloadContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { SongCardSkeleton } from "@/components/LoadingSkeleton";
+import { Download } from "lucide-react";
 
 export default function PlaylistsPage() {
   const [playlists, setPlaylists] = useState([]);
@@ -19,6 +21,8 @@ export default function PlaylistsPage() {
   const [saving, setSaving] = useState(false);
   const router = useRouter();
   const { playSong } = usePlayer();
+  const { downloadCount, isInitialized, getDownloads } = useDownload();
+  const [latestDownload, setLatestDownload] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -27,7 +31,30 @@ export default function PlaylistsPage() {
       return;
     }
     fetchPlaylists();
+    loadLatestDownload();
   }, []);
+
+  useEffect(() => {
+    loadLatestDownload();
+  }, [downloadCount]);
+
+  const loadLatestDownload = async () => {
+    if (!isInitialized) return;
+    try {
+      const downloads = await getDownloads();
+      if (downloads.length > 0) {
+        // Get the most recent download
+        const latest = downloads.sort((a, b) => 
+          new Date(b.downloadedAt) - new Date(a.downloadedAt)
+        )[0];
+        setLatestDownload(latest);
+      } else {
+        setLatestDownload(null);
+      }
+    } catch (error) {
+      console.error('Failed to load latest download:', error);
+    }
+  };
 
   const fetchPlaylists = async () => {
     const token = localStorage.getItem("token");
@@ -41,6 +68,8 @@ export default function PlaylistsPage() {
       setPlaylists(res.data.playlists || []);
     } catch (err) {
       console.error("Fetch playlists error:", err);
+      // Don't set error state - allow Downloads to still show when offline
+      setPlaylists([]);
     } finally {
       setLoading(false);
     }
@@ -174,12 +203,59 @@ export default function PlaylistsPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 transition-colors">
         <Navbar />
-        <div className="pt-24 px-6 pb-40 md:pb-12 max-w-7xl mx-auto">
+        <div className="pt-24 px-6 pb-24 md:pb-12 max-w-7xl mx-auto">
           <div className="flex justify-end items-center mb-8">
             <div className="h-12 w-40 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse" />
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-            {Array.from({ length: 8 }).map((_, i) => (
+            {/* Downloads card shows even while loading */}
+            {isInitialized && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                onClick={() => router.push('/downloads')}
+                className="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all group cursor-pointer"
+              >
+                <div className="relative h-48 overflow-hidden">
+                  {/* Song artwork or gradient background */}
+                  {latestDownload ? (
+                    <>
+                      <img 
+                        src={latestDownload.artwork} 
+                        alt="Latest download"
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-br from-[#0097b2]/70 to-[#007a93]/70 group-hover:from-[#0097b2]/80 group-hover:to-[#007a93]/80 transition-all" />
+                    </>
+                  ) : (
+                    <div className="absolute inset-0 bg-gradient-to-br from-[#0097b2] to-[#007a93] group-hover:from-[#0097b2]/90 group-hover:to-[#007a93]/90 transition-all" />
+                  )}
+                  
+                  {/* Download icon overlay */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Download className="w-20 h-20 text-white opacity-90" />
+                  </div>
+                  
+                  <div className="absolute top-3 right-3 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1 text-white text-xs font-medium">
+                    {downloadCount} songs
+                  </div>
+                  <div className="absolute top-3 left-3 bg-green-500/80 backdrop-blur-sm rounded-full px-2 py-1 text-white text-xs font-medium flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                    Offline
+                  </div>
+                </div>
+                <div className="p-4 bg-white dark:bg-gray-800">
+                  <h3 className="font-bold text-gray-900 dark:text-white text-lg mb-1 truncate">
+                    Downloads
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
+                    Available offline • System playlist
+                  </p>
+                </div>
+              </motion.div>
+            )}
+            {/* Loading skeletons for user playlists */}
+            {Array.from({ length: 7 }).map((_, i) => (
               <div key={i} className="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-lg animate-pulse">
                 <div className="h-48 bg-gray-200 dark:bg-gray-700" />
                 <div className="p-4 space-y-3">
@@ -200,7 +276,7 @@ export default function PlaylistsPage() {
     <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 transition-colors">
       <Navbar />
       
-      <div className="pt-24 px-6 pb-40 md:pb-12 max-w-7xl mx-auto">
+      <div className="pt-24 px-6 pb-24 md:pb-12 max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex justify-end items-center mb-8">
           <button
@@ -237,7 +313,7 @@ export default function PlaylistsPage() {
         </AnimatePresence>
 
         {/* Playlists Grid */}
-        {playlists.length === 0 ? (
+        {playlists.length === 0 && downloadCount === 0 ? (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -263,6 +339,53 @@ export default function PlaylistsPage() {
           </motion.div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            {/* System Playlist: Downloads - Always shows first, works offline */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              onClick={() => router.push('/downloads')}
+              className="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all group cursor-pointer relative"
+            >
+              <div className="relative h-48 overflow-hidden">
+                {/* Song artwork or gradient background */}
+                {latestDownload ? (
+                  <>
+                    <img 
+                      src={latestDownload.artwork} 
+                      alt="Latest download"
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-br from-[#0097b2]/70 to-[#007a93]/70 group-hover:from-[#0097b2]/80 group-hover:to-[#007a93]/80 transition-all" />
+                  </>
+                ) : (
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#0097b2] to-[#007a93] group-hover:from-[#0097b2]/90 group-hover:to-[#007a93]/90 transition-all" />
+                )}
+                
+                {/* Download icon overlay */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Download className="w-20 h-20 text-white opacity-90" />
+                </div>
+                
+                <div className="absolute top-3 right-3 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1 text-white text-xs font-medium">
+                  {downloadCount} songs
+                </div>
+                {/* Offline indicator */}
+                <div className="absolute top-3 left-3 bg-green-500/80 backdrop-blur-sm rounded-full px-2 py-1 text-white text-xs font-medium flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                  Offline
+                </div>
+              </div>
+              <div className="p-4 bg-white dark:bg-gray-800">
+                <h3 className="font-bold text-gray-900 dark:text-white text-lg mb-1 truncate">
+                  Downloads
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
+                  Available offline • System playlist
+                </p>
+              </div>
+            </motion.div>
+
+            {/* User Playlists */}
             {playlists.map((playlist, idx) => {
               // Get the last added song's image (most recent song)
               const lastSong = playlist.songs && playlist.songs.length > 0 

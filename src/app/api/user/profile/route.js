@@ -31,6 +31,10 @@ export async function GET(req) {
         id: user._id,
         name: user.name,
         email: user.email,
+        profilePicture: user.profilePicture || "",
+        userId: user.userId || "",
+        accountType: user.accountType || "public",
+        bio: user.bio || "",
         preferences: user.preferences || { genres: [], artists: [], isSetupComplete: false },
         favoritesCount: user.favorites?.length || 0,
         joinedAt: user._id.getTimestamp()
@@ -94,7 +98,10 @@ export async function PUT(req) {
     const updatedUser = {
       id: user._id,
       name: user.name,
-      email: user.email
+      email: user.email,
+      profilePicture: user.profilePicture || "",
+      userId: user.userId || "",
+      accountType: user.accountType || "public"
     };
 
     return Response.json({

@@ -33,6 +33,7 @@ const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
+  dateOfBirth: { type: Date },
   gender: { type: String },
   ageGroup: { type: String },
   occupation: { type: String },
@@ -44,7 +45,53 @@ const userSchema = new mongoose.Schema({
     artists: [String],
     isSetupComplete: { type: Boolean, default: false }
   },
+  // Social Features
+  userId: { 
+    type: String, 
+    unique: true, 
+    sparse: true // Allow null initially
+  },
+  userIdLastChanged: { type: Date },
+  profilePicture: { type: String, default: "" },
+  accountType: { 
+    type: String, 
+    enum: ["public", "private", "artist"], 
+    default: "public" 
+  },
+  bio: { type: String, default: "" },
+  favoriteArtists: { type: [String], default: [] },
+  favoriteGenres: { type: [String], default: [] },
+  // Friends system
+  friends: [{ 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: "User" 
+  }],
+  friendRequests: [{
+    from: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    createdAt: { type: Date, default: Date.now }
+  }],
+  sentFriendRequests: [{
+    to: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    createdAt: { type: Date, default: Date.now }
+  }],
+  // Blocked users
+  blockedUsers: [{ 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: "User" 
+  }],
+  // Artist specific fields
+  artistName: { type: String },
+  artistVerified: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now }
 });
+
+// Indexes for performance and uniqueness
+userSchema.index({ email: 1 }, { unique: true });
+userSchema.index({ userId: 1 }, { unique: true, sparse: true });
+userSchema.index({ name: 1 });
+userSchema.index({ userId: 1, name: 1 }); // Compound index for search
+userSchema.index({ friends: 1 }); // Index for friend queries
+userSchema.index({ "friendRequests.from": 1 }); // Index for incoming requests
+userSchema.index({ "sentFriendRequests.to": 1 }); // Index for outgoing requests
 
 export default mongoose.models.User || mongoose.model("User", userSchema);

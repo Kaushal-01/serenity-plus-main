@@ -2,6 +2,7 @@
 import { createContext, useContext, useState, useRef, useEffect } from "react";
 import axios from "axios";
 import MiniPlayer from "./MiniPlayer";
+import { getDownloadedSong } from "@/lib/db/downloadedSongs";
 const PlayerContext = createContext();
 
 export function PlayerProvider({ children }) {
@@ -15,12 +16,45 @@ export function PlayerProvider({ children }) {
   const [shuffle, setShuffle] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [isRoomListeningMode, setIsRoomListeningMode] = useState(false);
   const audioRef = useRef(null);
   const previousVolumeRef = useRef(0.7);
   const hasTrackedPlayRef = useRef(false);
   const isRestoringRef = useRef(false);
   const hasMountedRef = useRef(false);
   const lastSaveTimeRef = useRef(0);
+  const currentBlobUrlRef = useRef(null); // Track blob URLs for cleanup
+
+  // Sanitize song data to reduce localStorage size
+  const sanitizeSongForStorage = (song) => {
+    if (!song) return null;
+    
+    // Check if selectedAudioUrl is base64 (don't store large base64 strings)
+    const isBase64Audio = song.selectedAudioUrl?.startsWith('data:audio/');
+    
+    return {
+      id: song.id,
+      name: song.name,
+      album: song.album ? { id: song.album.id, name: song.album.name } : null,
+      year: song.year,
+      duration: song.duration,
+      image: Array.isArray(song.image) 
+        ? [song.image[song.image.length - 1]] // Keep only highest quality image
+        : song.image,
+      artists: song.artists ? {
+        primary: song.artists.primary?.map(a => ({ id: a.id, name: a.name })),
+        featured: song.artists.featured?.map(a => ({ id: a.id, name: a.name }))
+      } : null,
+      selectedAudioUrl: isBase64Audio ? null : song.selectedAudioUrl, // Don't store base64 audio
+      // For artist songs, keep essential fields only (no audioFile base64)
+      songName: song.songName,
+      artistName: song.artistName,
+      coverPhoto: song.coverPhoto,
+      _id: song._id,
+      // Artist songs need to be re-fetched if restored
+      isArtistSong: !!song.audioFile || !!song._id
+    };
+  };
 
   useEffect(() => {
     if (audioRef.current) {
@@ -36,6 +70,13 @@ export function PlayerProvider({ children }) {
     try {
       const savedState = localStorage.getItem("serenity-player-state");
       if (savedState) {
+        // Check if saved state is too large (> 500KB indicates issue)
+        if (savedState.length > 500000) {
+          console.warn("Player state too large, clearing...");
+          localStorage.removeItem("serenity-player-state");
+          return;
+        }
+
         const { 
           song, 
           queueData, 
@@ -67,6 +108,8 @@ export function PlayerProvider({ children }) {
       }
     } catch (err) {
       console.error("Error restoring player state:", err);
+      // Clear corrupted state
+      localStorage.removeItem("serenity-player-state");
     }
   }, []);
 
@@ -76,8 +119,8 @@ export function PlayerProvider({ children }) {
 
     try {
       const playerState = {
-        song: currentSong,
-        queueData: queue,
+        song: sanitizeSongForStorage(currentSong),
+        queueData: queue.map(s => sanitizeSongForStorage(s)),
         index: currentIndex,
         time: currentTime,
         volumeData: volume,
@@ -87,6 +130,24 @@ export function PlayerProvider({ children }) {
       localStorage.setItem("serenity-player-state", JSON.stringify(playerState));
     } catch (err) {
       console.error("Error saving player state:", err);
+      // If still exceeds quota, clear old state and try with minimal data
+      if (err.name === 'QuotaExceededError') {
+        try {
+          localStorage.removeItem("serenity-player-state");
+          const minimalState = {
+            song: sanitizeSongForStorage(currentSong),
+            queueData: [sanitizeSongForStorage(currentSong)], // Only save current song
+            index: 0,
+            time: currentTime,
+            volumeData: volume,
+            repeat: repeatMode,
+            shuffleMode: shuffle
+          };
+          localStorage.setItem("serenity-player-state", JSON.stringify(minimalState));
+        } catch (e) {
+          console.error("Failed to save even minimal state:", e);
+        }
+      }
     }
   }, [currentSong, queue, currentIndex, volume, repeatMode, shuffle]);
 
@@ -107,7 +168,12 @@ export function PlayerProvider({ children }) {
         localStorage.setItem("serenity-player-state", JSON.stringify(playerState));
       }
     } catch (err) {
-      console.error("Error saving playback time:", err);
+      if (err.name === 'QuotaExceededError') {
+        console.warn("Storage quota exceeded when saving time, clearing old state");
+        localStorage.removeItem("serenity-player-state");
+      } else {
+        console.error("Error saving playback time:", err);
+      }
     }
   }, [currentTime]);
 
@@ -123,6 +189,9 @@ export function PlayerProvider({ children }) {
             localStorage.setItem("serenity-player-state", JSON.stringify(playerState));
           }
         } catch (err) {
+          if (err.name === 'QuotaExceededError') {
+            localStorage.removeItem("serenity-player-state");
+          }
           console.error("Error saving state on unload:", err);
         }
       }
@@ -155,33 +224,64 @@ export function PlayerProvider({ children }) {
     }
   };
 
-  const playSong = (song, playlistSongs = []) => {
-    if (!song?.downloadUrl?.[0]?.url) {
-      alert("No audio available for this song.");
-      return;
+  const playSong = async (song, playlistSongs = []) => {
+    // Check if we have offline version first
+    let audioUrl = null;
+    let isOffline = false;
+    
+    // Try to load from IndexedDB if song has ID
+    if (song?.id) {
+      try {
+        const offlineSong = await getDownloadedSong(song.id);
+        if (offlineSong && offlineSong.audioBlob) {
+          // Clean up previous blob URL
+          if (currentBlobUrlRef.current) {
+            URL.revokeObjectURL(currentBlobUrlRef.current);
+          }
+          
+          // Create blob URL for offline playback
+          const blobUrl = URL.createObjectURL(offlineSong.audioBlob);
+          currentBlobUrlRef.current = blobUrl;
+          audioUrl = blobUrl;
+          isOffline = true;
+          console.log("🎵 Playing from offline storage:", song.name || song.title);
+        }
+      } catch (error) {
+        console.error("Failed to load offline audio:", error);
+      }
+    }
+    
+    // Fallback to online streaming if no offline version
+    if (!audioUrl) {
+      if (!song?.downloadUrl?.[0]?.url) {
+        alert("No audio available for this song.");
+        return;
+      }
+      
+      // Select highest quality audio (320kbps preferred)
+      let bestQualityUrl = song.downloadUrl[0].url;
+      
+      // Priority order: 320kbps > 160kbps > 96kbps > 48kbps > 12kbps
+      const qualityPriority = ["320kbps", "160kbps", "96kbps", "48kbps", "12kbps"];
+      
+      for (const quality of qualityPriority) {
+        const match = song.downloadUrl.find(dl => dl.quality === quality);
+        if (match) {
+          bestQualityUrl = match.url;
+          break;
+        }
+      }
+      
+      // Fallback to last element if no quality match found
+      if (bestQualityUrl === song.downloadUrl[0].url && song.downloadUrl.length > 1) {
+        bestQualityUrl = song.downloadUrl[song.downloadUrl.length - 1].url;
+      }
+      
+      audioUrl = bestQualityUrl;
     }
     
     // Reset tracking for new song
     hasTrackedPlayRef.current = false;
-    
-    // Select highest quality audio (320kbps preferred)
-    let bestQualityUrl = song.downloadUrl[0].url;
-    
-    // Priority order: 320kbps > 160kbps > 96kbps > 48kbps > 12kbps
-    const qualityPriority = ["320kbps", "160kbps", "96kbps", "48kbps", "12kbps"];
-    
-    for (const quality of qualityPriority) {
-      const match = song.downloadUrl.find(dl => dl.quality === quality);
-      if (match) {
-        bestQualityUrl = match.url;
-        break;
-      }
-    }
-    
-    // Fallback to last element if no quality match found
-    if (bestQualityUrl === song.downloadUrl[0].url && song.downloadUrl.length > 1) {
-      bestQualityUrl = song.downloadUrl[song.downloadUrl.length - 1].url;
-    }
     
     if (playlistSongs.length > 0) {
       setQueue(playlistSongs);
@@ -192,15 +292,21 @@ export function PlayerProvider({ children }) {
       setCurrentIndex(0);
     }
     
-    setCurrentSong({ ...song, selectedAudioUrl: bestQualityUrl });
-    setIsPlaying(true);
+    setCurrentSong({ ...song, selectedAudioUrl: audioUrl, _isOffline: isOffline });
     setCurrentTime(0);
     
-    setTimeout(() => {
-      if (audioRef.current) {
-        audioRef.current.play().catch(err => console.error("Playback error:", err));
-      }
-    }, 200);
+    // Don't auto-play in room listening mode (non-creators need to click Listen Song)
+    if (!isRoomListeningMode) {
+      setIsPlaying(true);
+      setTimeout(() => {
+        if (audioRef.current) {
+          audioRef.current.play().catch(err => console.error("Playback error:", err));
+        }
+      }, 200);
+    } else {
+      // In room mode for non-creators, just load without playing
+      setIsPlaying(false);
+    }
   };
 
   const togglePlay = () => {
@@ -223,6 +329,12 @@ export function PlayerProvider({ children }) {
   };
 
   const closePlayer = () => {
+    // Clean up blob URLs
+    if (currentBlobUrlRef.current) {
+      URL.revokeObjectURL(currentBlobUrlRef.current);
+      currentBlobUrlRef.current = null;
+    }
+    
     setCurrentSong(null);
     setQueue([]);
     setCurrentIndex(0);
@@ -333,11 +445,28 @@ export function PlayerProvider({ children }) {
     }
   };
 
+  const playQueue = (songs, startIndex = 0) => {
+    if (!songs || songs.length === 0) return;
+    setQueue(songs);
+    setCurrentIndex(startIndex);
+    playSong(songs[startIndex], songs);
+  };
+
+  // Cleanup blob URLs on unmount
+  useEffect(() => {
+    return () => {
+      if (currentBlobUrlRef.current) {
+        URL.revokeObjectURL(currentBlobUrlRef.current);
+      }
+    };
+  }, []);
+
   return (
     <PlayerContext.Provider
       value={{
         currentSong,
         isPlaying,
+        setIsPlaying,
         playSong,
         togglePlay,
         stopSong,
@@ -358,19 +487,26 @@ export function PlayerProvider({ children }) {
         queue,
         currentIndex,
         audioRef,
+        isRoomListeningMode,
+        setIsRoomListeningMode,
       }}
     >
       {children}
       {/* Global Player visible on all pages */}
       <audio
         ref={audioRef}
-        src={currentSong?.selectedAudioUrl || currentSong?.downloadUrl?.[0]?.url}
+        src={
+          currentSong?.selectedAudioUrl || 
+          currentSong?.audioFile || 
+          currentSong?.downloadUrl?.[0]?.url
+        }
         preload="auto"
         onEnded={handleEnded}
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleLoadedMetadata}
       />
-      {currentSong && <MiniPlayer />}
+      {/* Hide MiniPlayer for non-creators in room listening mode */}
+      {currentSong && !isRoomListeningMode && <MiniPlayer />}
     </PlayerContext.Provider>
   );
 }

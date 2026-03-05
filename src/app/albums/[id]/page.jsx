@@ -48,7 +48,7 @@ export default function AlbumsByQuery() {
     );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 text-black dark:text-white px-10 md:px-20 py-16 pb-40 md:pb-16 mt-20 transition-colors">
+    <div className="min-h-screen bg-gradient-to-br from-[#0097b2]/5 to-white dark:from-gray-900 dark:to-gray-800 text-black dark:text-white px-10 md:px-20 py-16 pb-24 md:pb-16 mt-20 transition-colors">
       {/* Breadcrumb */}
       <Breadcrumb
         items={[
