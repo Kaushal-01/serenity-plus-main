@@ -4,7 +4,6 @@ import Navbar from "@/components/Navbar";
 import { PlayerProvider } from "./../context/PlayerContext";
 import { DownloadProvider } from "./../context/DownloadContext";
 import { ThemeProvider } from "./../context/ThemeContext";
-import MiniPlayer from "../context/MiniPlayer";
 import DashboardFloatingButtons from "@/components/DashboardFloatingButtons";
 import MobileFooter from "@/components/MobileFooter";
 
@@ -115,7 +114,6 @@ export default function RootLayout({ children }) {
             <PlayerProvider>
               <Navbar />
               {children}
-              <MiniPlayer />
               <MobileFooter />
               <DashboardFloatingButtons />
             </PlayerProvider>

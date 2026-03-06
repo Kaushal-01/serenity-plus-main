@@ -133,23 +133,13 @@ export default function StorageManager({ isOpen, onClose }) {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <p className={`${isNearLimit ? 'text-orange-700 dark:text-orange-300' : 'text-blue-700 dark:text-blue-300'}`}>
-                      Downloaded Audio
-                    </p>
-                    <p className={`font-semibold ${isNearLimit ? 'text-orange-900 dark:text-orange-100' : 'text-blue-900 dark:text-blue-100'}`}>
-                      {storageInfo.downloadedAudioFormatted}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className={`${isNearLimit ? 'text-orange-700 dark:text-orange-300' : 'text-blue-700 dark:text-blue-300'}`}>
-                      Total Available
-                    </p>
-                    <p className={`font-semibold ${isNearLimit ? 'text-orange-900 dark:text-orange-100' : 'text-blue-900 dark:text-blue-100'}`}>
-                      {storageInfo.quotaFormatted}
-                    </p>
-                  </div>
+                <div className="text-sm">
+                  <p className={`${isNearLimit ? 'text-orange-700 dark:text-orange-300' : 'text-blue-700 dark:text-blue-300'}`}>
+                    Downloaded Audio
+                  </p>
+                  <p className={`font-semibold ${isNearLimit ? 'text-orange-900 dark:text-orange-100' : 'text-blue-900 dark:text-blue-100'}`}>
+                    {storageInfo.downloadedAudioFormatted}
+                  </p>
                 </div>
 
                 {isNearLimit && (

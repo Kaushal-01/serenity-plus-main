@@ -192,15 +192,10 @@ export default function DownloadsPage() {
                 <HardDrive className="w-5 h-5 text-[#0097b2] dark:text-[#00bcd4]" />
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-gray-900 dark:text-white text-sm sm:text-base">
-                    Storage Used
+                    Downloaded Audio
                   </p>
                   <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 truncate">
-                    {storageInfo.downloadedAudioFormatted} / {storageInfo.quotaFormatted}
-                  </p>
-                </div>
-                <div className="text-right flex-shrink-0">
-                  <p className="text-xs sm:text-sm font-medium text-[#0097b2] dark:text-[#00bcd4]">
-                    {storageInfo.usagePercent.toFixed(1)}%
+                    {storageInfo.downloadedAudioFormatted}
                   </p>
                 </div>
               </div>

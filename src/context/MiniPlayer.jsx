@@ -809,6 +809,14 @@ export default function MiniPlayer() {
                           <Plus className="w-4 h-4" />
                           <span>Add to Playlist</span>
                         </button>
+                        <div className="px-2 py-2">
+                          <DownloadButton
+                            song={currentSong}
+                            audioUrl={currentSong?.selectedAudioUrl || currentSong?.downloadUrl?.[0]?.url}
+                            size="default"
+                            className="w-full"
+                          />
+                        </div>
                         <button
                           onClick={() => {
                             closePlayer();
