@@ -54,9 +54,9 @@ export default function Home() {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
         
-        <main className="min-h-screen flex flex-col bg-white text-black overflow-y-auto">
+        <main className="min-h-screen flex flex-col bg-white dark:bg-gray-900 text-black dark:text-white overflow-y-auto">
           {/* ================= NAVBAR ================= */}
-          <nav className="w-full flex justify-between items-center px-6 sm:px-10 py-3 bg-white border-b border-gray-200 shadow-sm" role="navigation" aria-label="Main navigation">
+          <nav className="w-full flex justify-between items-center px-6 sm:px-10 py-3 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-sm" role="navigation" aria-label="Main navigation">
             <h1 className="text-2xl sm:text-3xl font-bold text-[#0097b2] tracking-tight">
               Serenity
             </h1>
@@ -68,10 +68,10 @@ export default function Home() {
           </nav>
           {/* Loading skeleton */}
           <section className="flex flex-col items-center justify-center text-center px-6 py-8" aria-labelledby="hero-heading">
-            <h2 id="hero-heading" className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 text-[#0097b2] leading-tight">
+            <h2 id="hero-heading" className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 text-[#0097b2] dark:text-[#00c9e6] leading-tight">
               Feel the Music with Serenity
             </h2>
-            <p className="text-gray-600 text-sm sm:text-base max-w-xl mb-6">
+            <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base max-w-xl mb-6">
               Discover songs, albums, and artists like never before — all in one elegant,
               immersive experience.
             </p>
@@ -89,9 +89,9 @@ export default function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
       
-      <main className="min-h-screen flex flex-col bg-white text-black overflow-y-auto">
+      <main className="min-h-screen flex flex-col bg-white dark:bg-gray-900 text-black dark:text-white overflow-y-auto">
         {/* ================= NAVBAR ================= */}
-        <nav className="w-full flex justify-between items-center px-6 sm:px-10 py-3 bg-white border-b border-gray-200 shadow-sm" role="navigation" aria-label="Main navigation">
+        <nav className="w-full flex justify-between items-center px-6 sm:px-10 py-3 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-sm" role="navigation" aria-label="Main navigation">
         <h1 className="text-2xl sm:text-3xl font-bold text-[#0097b2] tracking-tight">
           Serenity
         </h1>
@@ -107,7 +107,7 @@ export default function Home() {
             </Link>
             <Link
               href="/signup"
-              className="text-sm sm:text-base px-4 py-2 rounded-full bg-gray-100 text-black hover:bg-gray-200 transition font-medium border border-gray-300"
+              className="text-sm sm:text-base px-4 py-2 rounded-full bg-gray-100 dark:bg-gray-700 text-black dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600 transition font-medium border border-gray-300 dark:border-gray-600"
               aria-label="Create a new account"
             >
               Sign Up
@@ -115,7 +115,7 @@ export default function Home() {
           </div>
         ) : (
           <div className="flex items-center gap-4 sm:gap-5">
-            <p className="text-gray-600 text-sm sm:text-base">
+            <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">
               Hi, {user.name || "Listener"} 👋
             </p>
             <Link
@@ -127,7 +127,7 @@ export default function Home() {
             </Link>
             <button
               onClick={handleLogout}
-              className="text-sm sm:text-base px-4 py-2 rounded-full bg-gray-200 hover:bg-gray-300 transition text-black"
+              className="text-sm sm:text-base px-4 py-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition text-black dark:text-white"
               aria-label="Log out of your account"
             >
               Logout
@@ -138,10 +138,10 @@ export default function Home() {
 
         {/* ================= HERO SECTION ================= */}
         <section className="flex flex-col items-center justify-center text-center px-6 py-8" aria-labelledby="hero-heading">
-          <h2 id="hero-heading" className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 text-[#0097b2] leading-tight">
+          <h2 id="hero-heading" className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 text-[#0097b2] dark:text-[#00c9e6] leading-tight">
             Feel the Music with Serenity
           </h2>
-          <p className="text-gray-600 text-sm sm:text-base max-w-xl mb-6">
+          <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base max-w-xl mb-6">
             Discover songs, albums, and artists like never before — all in one elegant,
             immersive experience.
           </p>
@@ -157,7 +157,7 @@ export default function Home() {
               </Link>
               <Link
                 href="/login"
-                className="px-6 py-2.5 rounded-full border-2 border-[#0097b2] hover:bg-[#0097b2] hover:text-white transition text-base font-semibold text-[#0097b2]"
+              className="px-6 py-2.5 rounded-full border-2 border-[#0097b2] dark:border-[#00c9e6] hover:bg-[#0097b2] dark:hover:bg-[#00c9e6] hover:text-white transition text-base font-semibold text-[#0097b2] dark:text-[#00c9e6]"
                 aria-label="Log in to Serenity"
               >
                 Log In
@@ -210,31 +210,31 @@ export default function Home() {
           ].map((feature, i) => (
             <article
               key={i}
-              className="group relative bg-white hover:bg-gray-50 
-              transition-all duration-300 p-4 rounded-2xl border border-gray-200 
-              hover:border-[#0097b2] hover:shadow-lg hover:shadow-[#0097b2]/10 
+              className="group relative bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 
+              transition-all duration-300 p-4 rounded-2xl border border-gray-200 dark:border-gray-700 
+              hover:border-[#0097b2] dark:hover:border-[#00c9e6] hover:shadow-lg hover:shadow-[#0097b2]/10 dark:hover:shadow-[#00c9e6]/10 
               hover:-translate-y-1 cursor-pointer
               flex flex-col items-center sm:items-start text-center sm:text-left"
             >
               {/* Icon */}
-              <div className="text-[#0097b2] mb-2 group-hover:scale-110 transition-transform duration-300" aria-hidden="true">
+              <div className="text-[#0097b2] dark:text-[#00c9e6] mb-2 group-hover:scale-110 transition-transform duration-300" aria-hidden="true">
                 <feature.Icon size={32} strokeWidth={1.5} />
               </div>
               
               {/* Content */}
-              <h3 className="text-lg font-semibold mb-1.5 text-black group-hover:text-[#0097b2] 
+              <h3 className="text-lg font-semibold mb-1.5 text-black dark:text-white group-hover:text-[#0097b2] dark:group-hover:text-[#00c9e6] 
                 transition-colors duration-300">
                 {feature.title}
               </h3>
-              <p className="text-gray-600 text-xs leading-relaxed">{feature.desc}</p>
+              <p className="text-gray-600 dark:text-gray-400 text-xs leading-relaxed">{feature.desc}</p>
             </article>
           ))}
         </section>
 
         {/* ================= FOOTER ================= */}
-        <footer className="mt-auto py-6 text-center text-gray-500 text-xs border-t border-gray-200" role="contentinfo">
+        <footer className="mt-auto py-6 text-center text-gray-500 dark:text-gray-400 text-xs border-t border-gray-200 dark:border-gray-700" role="contentinfo">
           <div className="max-w-7xl mx-auto px-6">
-            <p className="text-gray-400">
+            <p className="text-gray-400 dark:text-gray-500">
               © {new Date().getFullYear()} Serenity. All rights reserved.
             </p>
           </div>

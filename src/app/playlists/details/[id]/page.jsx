@@ -112,7 +112,7 @@ export default function PlaylistDetailsPage() {
                 onClick={() => playSong(song, playlist.songs)}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
-                className="bg-[#0097b2] hover:bg-[#007a93] text-white rounded-full w-10 h-10 flex items-center justify-center transition-all shadow-md opacity-0 group-hover:opacity-100"
+                className="bg-[#0097b2] hover:bg-[#007a93] text-white rounded-full w-10 h-10 flex items-center justify-center transition-all shadow-md"
                 title="Play song"
               >
                 <svg className="w-5 h-5 ml-0.5" fill="currentColor" viewBox="0 0 20 20">
