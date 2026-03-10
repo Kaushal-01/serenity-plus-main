@@ -4,6 +4,7 @@ import User from "../../../../models/user";
 import bcrypt from "bcryptjs";
 import { createToken } from "@/lib/jwt";
 import axios from "axios";
+import { validateSignupData } from "@/utils/validation";
 
 // Verify reCAPTCHA token
 async function verifyCaptcha(token) {
@@ -37,6 +38,27 @@ export async function POST(req) {
       }, { status: 500 });
     }
     
+    const requestData = await req.json();
+    
+    // Verify CAPTCHA first
+    if (!requestData.captchaToken) {
+      return NextResponse.json({ error: "CAPTCHA verification required" }, { status: 400 });
+    }
+    
+    const isCaptchaValid = await verifyCaptcha(requestData.captchaToken);
+    if (!isCaptchaValid) {
+      return NextResponse.json({ error: "CAPTCHA verification failed" }, { status: 400 });
+    }
+    
+    // Comprehensive validation and sanitization
+    const validation = validateSignupData(requestData);
+    
+    if (!validation.valid) {
+      return NextResponse.json({ 
+        error: validation.errors[0] // Return first error
+      }, { status: 400 });
+    }
+    
     const { 
       name,
       userId, 
@@ -46,71 +68,32 @@ export async function POST(req) {
       gender, 
       ageGroup, 
       occupation,
-      listeningHabits,
-      captchaToken
-    } = await req.json();
-    
-    // Verify CAPTCHA
-    if (!captchaToken) {
-      return NextResponse.json({ error: "CAPTCHA verification required" }, { status: 400 });
-    }
-    
-    const isCaptchaValid = await verifyCaptcha(captchaToken);
-    if (!isCaptchaValid) {
-      return NextResponse.json({ error: "CAPTCHA verification failed" }, { status: 400 });
-    }
-    
-    // Validate required fields
-    if (!name || !email || !password) {
-      return NextResponse.json({ error: "Name, email, and password are required" }, { status: 400 });
-    }
-    
-    // Validate dateOfBirth
-    if (!dateOfBirth) {
-      return NextResponse.json({ error: "Date of birth is required" }, { status: 400 });
-    }
-    
-    // Calculate age
-    const today = new Date();
-    const birthDate = new Date(dateOfBirth);
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-    }
-    
-    // Validate minimum age
-    if (age < 16) {
-      return NextResponse.json({ error: "You must be at least 16 years old to sign up" }, { status: 400 });
-    }
-    
-    // Validate userId
-    if (!userId || userId.length < 3) {
-      return NextResponse.json({ error: "User ID must be at least 3 characters" }, { status: 400 });
-    }
-    
-    if (!/^[a-zA-Z0-9_]+$/.test(userId)) {
-      return NextResponse.json({ error: "User ID can only contain letters, numbers, and underscores" }, { status: 400 });
-    }
+      listeningHabits
+    } = validation.data;
     
     await connectDB();
 
+    // Check if email already exists
     const existing = await User.findOne({ email });
-    if (existing)
-      return NextResponse.json({ error: "User already exists" }, { status: 400 });
+    if (existing) {
+      return NextResponse.json({ error: "Email already registered" }, { status: 400 });
+    }
 
     // Check if userId is already taken
-    const userIdExists = await User.findOne({ userId: userId.toLowerCase() });
-    if (userIdExists)
+    const userIdExists = await User.findOne({ userId });
+    if (userIdExists) {
       return NextResponse.json({ error: "User ID is already taken" }, { status: 400 });
+    }
 
-    const hashed = await bcrypt.hash(password, 10);
+    // Hash password with strong salt rounds
+    const hashed = await bcrypt.hash(password, 12);
+    
     const newUser = await User.create({ 
       name,
-      userId: userId.toLowerCase(), 
+      userId, 
       email, 
       password: hashed,
-      dateOfBirth: new Date(dateOfBirth),
+      dateOfBirth,
       gender,
       ageGroup,
       occupation,

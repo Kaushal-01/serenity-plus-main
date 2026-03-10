@@ -4,6 +4,7 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { LogIn } from "lucide-react";
 import ReCaptcha from "@/components/ReCaptcha";
+import { validateEmail, MAX_LENGTHS } from "@/utils/validation";
 
 export default function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -15,6 +16,24 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    
+    // Validate email
+    const emailValidation = validateEmail(form.email);
+    if (!emailValidation.valid) {
+      setError(emailValidation.error);
+      return;
+    }
+    
+    // Validate password exists
+    if (!form.password || form.password.trim().length === 0) {
+      setError("Password is required");
+      return;
+    }
+    
+    if (form.password.length > MAX_LENGTHS.PASSWORD) {
+      setError("Invalid password");
+      return;
+    }
     
     if (!captchaToken) {
       setError("Please complete the CAPTCHA verification");
@@ -80,6 +99,7 @@ export default function Login() {
           value={form.email}
           onChange={(e) => setForm({ ...form, email: e.target.value })}
           required
+          maxLength={MAX_LENGTHS.EMAIL}
           className="border border-gray-300 bg-white text-black text-sm md:text-base p-2.5 md:p-3 w-full mb-3 md:mb-4 rounded-full focus:outline-none focus:ring-2 focus:ring-[#0097b2]"
         />
         <input
@@ -88,6 +108,7 @@ export default function Login() {
           value={form.password}
           onChange={(e) => setForm({ ...form, password: e.target.value })}
           required
+          maxLength={MAX_LENGTHS.PASSWORD}
           className="border border-gray-300 bg-white text-black text-sm md:text-base p-2.5 md:p-3 w-full mb-3 md:mb-4 rounded-full focus:outline-none focus:ring-2 focus:ring-[#0097b2]"
         />
 

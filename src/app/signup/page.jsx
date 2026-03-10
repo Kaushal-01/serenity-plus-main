@@ -5,6 +5,15 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Sparkles, User, PartyPopper } from "lucide-react";
 import ReCaptcha from "@/components/ReCaptcha";
+import { 
+  validateName, 
+  validateEmail, 
+  validatePassword, 
+  validateUserId,
+  validateDateOfBirth,
+  MAX_LENGTHS,
+  MIN_LENGTHS 
+} from "@/utils/validation";
 
 export default function Signup() {
   const [step, setStep] = useState(1);
@@ -40,24 +49,42 @@ export default function Signup() {
 
   const handleNext = () => {
     if (step === 1) {
-      if (!form.name || !form.userId || !form.email || !form.password || !form.dateOfBirth) {
-        setError("Please fill in all required fields");
+      // Validate name
+      const nameValidation = validateName(form.name);
+      if (!nameValidation.valid) {
+        setError(nameValidation.error);
         return;
       }
-      if (form.userId.length < 3) {
-        setError("User ID must be at least 3 characters");
+      
+      // Validate user ID
+      const userIdValidation = validateUserId(form.userId);
+      if (!userIdValidation.valid) {
+        setError(userIdValidation.error);
         return;
       }
-      if (!/^[a-zA-Z0-9_]+$/.test(form.userId)) {
-        setError("User ID can only contain letters, numbers, and underscores");
+      
+      // Validate email
+      const emailValidation = validateEmail(form.email);
+      if (!emailValidation.valid) {
+        setError(emailValidation.error);
         return;
       }
-      // Validate age
-      const age = calculateAge(form.dateOfBirth);
-      if (age < 16) {
-        setError("You must be at least 16 years old to sign up");
+      
+      // Validate password
+      const passwordValidation = validatePassword(form.password);
+      if (!passwordValidation.valid) {
+        setError(passwordValidation.error);
         return;
       }
+      
+      // Validate date of birth
+      const dobValidation = validateDateOfBirth(form.dateOfBirth);
+      if (!dobValidation.valid) {
+        setError(dobValidation.error);
+        return;
+      }
+      
+      // Check age declaration
       if (!ageDeclaration) {
         setError("Please confirm that you are at least 16 years old");
         return;
@@ -173,6 +200,7 @@ export default function Signup() {
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
               required
+              maxLength={MAX_LENGTHS.NAME}
               className="w-full px-3 md:px-4 py-2 text-sm md:text-base rounded-full bg-white border border-gray-300 placeholder-gray-500 text-black focus:ring-2 focus:ring-[#0097b2] focus:outline-none"
             />
 
@@ -182,10 +210,11 @@ export default function Signup() {
               value={form.userId}
               onChange={(e) => setForm({ ...form, userId: e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '') })}
               required
-              minLength={3}
+              minLength={MIN_LENGTHS.USER_ID}
+              maxLength={MAX_LENGTHS.USER_ID}
               className="w-full px-3 md:px-4 py-2 text-sm md:text-base rounded-full bg-white border border-gray-300 placeholder-gray-500 text-black focus:ring-2 focus:ring-[#0097b2] focus:outline-none"
             />
-            <p className="text-xs text-gray-600 -mt-2 px-2">Only letters, numbers, and underscores (min 3 characters)</p>
+            <p className="text-xs text-gray-600 -mt-2 px-2">Only letters, numbers, and underscores (min {MIN_LENGTHS.USER_ID}, max {MAX_LENGTHS.USER_ID} characters)</p>
 
             <input
               type="email"
@@ -193,18 +222,25 @@ export default function Signup() {
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
               required
+              maxLength={MAX_LENGTHS.EMAIL}
               className="w-full px-3 md:px-4 py-2 text-sm md:text-base rounded-full bg-white border border-gray-300 placeholder-gray-500 text-black focus:ring-2 focus:ring-[#0097b2] focus:outline-none"
             />
 
-            <input
-              type="password"
-              placeholder="Password (min 6 characters)"
-              value={form.password}
-              onChange={(e) => setForm({ ...form, password: e.target.value })}
-              required
-              minLength={6}
-              className="w-full px-3 md:px-4 py-2 text-sm md:text-base rounded-full bg-white border border-gray-300 placeholder-gray-500 text-black focus:ring-2 focus:ring-[#0097b2] focus:outline-none"
-            />
+            <div>
+              <input
+                type="password"
+                placeholder="Password"
+                value={form.password}
+                onChange={(e) => setForm({ ...form, password: e.target.value })}
+                required
+                minLength={MIN_LENGTHS.PASSWORD}
+                maxLength={MAX_LENGTHS.PASSWORD}
+                className="w-full px-3 md:px-4 py-2 text-sm md:text-base rounded-full bg-white border border-gray-300 placeholder-gray-500 text-black focus:ring-2 focus:ring-[#0097b2] focus:outline-none"
+              />
+              <p className="text-xs text-gray-600 mt-1 px-2">
+                Min {MIN_LENGTHS.PASSWORD} characters, with uppercase, lowercase, number, and special character
+              </p>
+            </div>
 
             <div>
               <label className="block text-xs md:text-sm font-medium text-gray-700 mb-2">Date of Birth</label>

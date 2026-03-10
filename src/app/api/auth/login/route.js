@@ -4,6 +4,7 @@ import User from "../../../../models/user";
 import bcrypt from "bcryptjs";
 import { createToken } from "@/lib/jwt";
 import axios from "axios";
+import { validateLoginData } from "@/utils/validation";
 
 // Verify reCAPTCHA token
 async function verifyCaptcha(token) {
@@ -21,30 +22,53 @@ async function verifyCaptcha(token) {
 }
 
 export async function POST(req) {
-  const { email, password, captchaToken } = await req.json();
-  
-  // Verify CAPTCHA
-  if (!captchaToken) {
-    return NextResponse.json({ error: "CAPTCHA verification required" }, { status: 400 });
-  }
-  
-  const isCaptchaValid = await verifyCaptcha(captchaToken);
-  if (!isCaptchaValid) {
-    return NextResponse.json({ error: "CAPTCHA verification failed" }, { status: 400 });
-  }
-  
-  await connectDB();
+  try {
+    const requestData = await req.json();
+    
+    // Verify CAPTCHA first
+    if (!requestData.captchaToken) {
+      return NextResponse.json({ error: "CAPTCHA verification required" }, { status: 400 });
+    }
+    
+    const isCaptchaValid = await verifyCaptcha(requestData.captchaToken);
+    if (!isCaptchaValid) {
+      return NextResponse.json({ error: "CAPTCHA verification failed" }, { status: 400 });
+    }
+    
+    // Comprehensive validation and sanitization
+    const validation = validateLoginData(requestData);
+    
+    if (!validation.valid) {
+      return NextResponse.json({ 
+        error: validation.errors[0] // Return first error
+      }, { status: 400 });
+    }
+    
+    const { email, password } = validation.data;
+    
+    await connectDB();
 
-  const user = await User.findOne({ email });
-  if (!user) {
-    return NextResponse.json({ error: "User not found" }, { status: 404 });
-  }
+    // Find user by email
+    const user = await User.findOne({ email });
+    if (!user) {
+      // Use generic error message to prevent email enumeration
+      return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
+    }
 
-  const match = await bcrypt.compare(password, user.password);
-  if (!match) {
-    return NextResponse.json({ error: "Invalid password" }, { status: 401 });
-  }
+    // Verify password
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) {
+      return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
+    }
 
-  const token = createToken(user);
-  return NextResponse.json({ success: true, token });
+    // Create JWT token
+    const token = createToken(user);
+    
+    return NextResponse.json({ success: true, token });
+  } catch (error) {
+    console.error("Login error:", error);
+    return NextResponse.json({ 
+      error: "An error occurred during login. Please try again." 
+    }, { status: 500 });
+  }
 }
